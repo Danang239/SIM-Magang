@@ -29,11 +29,11 @@
 
             <!-- Alpine.js Calendar -->
             <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6"
-                x-data="kalenderMagang({
+                x-data='kalenderMagang({
                     kalender: @json($kalender),
                     durasiBulan: {{ $durasiBulan }},
-                    apiUrl: '{{ route('pengguna.career.api.kuota', $bidang->id) }}'
-                })"
+                    apiUrl: "{{ route('pengguna.career.api.kuota', $bidang->id) }}"
+                })'
                 x-init="init()">
 
                 <div class="flex items-center justify-between mb-6">

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'public_id',
@@ -69,5 +70,27 @@ class Pengajuan extends Model
     public function skmJawabans(): HasMany
     {
         return $this->hasMany(SkmJawaban::class);
+    }
+
+    /**
+     * Relasi ke PengajuanBiodata.
+     */
+    public function biodata(): HasOne
+    {
+        return $this->hasOne(PengajuanBiodata::class);
+    }
+
+    /**
+     * Cek apakah formulir biodata dan SKM sudah selesai diisi.
+     */
+    public function isGateCompleted(): bool
+    {
+        $skmQuestionsCount = \App\Models\SkmPertanyaan::where('is_active', true)->count();
+        $skmAnsweredCount = $this->skmJawabans()->count();
+
+        $skmCompleted = ($skmAnsweredCount >= $skmQuestionsCount && $skmQuestionsCount > 0);
+        $biodataCompleted = $this->biodata()->exists();
+
+        return $skmCompleted && $biodataCompleted;
     }
 }

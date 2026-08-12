@@ -51,56 +51,6 @@
             <form method="POST" action="{{ route('pengguna.career.store') }}" enctype="multipart/form-data">
                 @csrf
 
-                <!-- Survei Kepuasan Masyarakat (SKM) -->
-                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-                    <div class="mb-6">
-                        <h2 class="text-lg font-bold text-gray-800 font-sans">Survei Kepuasan Masyarakat (SKM)</h2>
-                        <p class="text-xs text-gray-500 mt-1">Berikan penilaian Anda untuk setiap pernyataan berikut. Skala: 1 (Sangat Tidak Setuju) – 5 (Sangat Setuju).</p>
-                    </div>
-
-                    <div class="space-y-6">
-                        @foreach($pertanyaans as $index => $pertanyaan)
-                            <div class="pb-5 {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
-                                <p class="text-sm font-semibold text-gray-700 mb-3">
-                                    <span class="text-biogen-medium font-bold mr-1">{{ $index + 1 }}.</span>
-                                    {{ $pertanyaan->teks_pertanyaan }}
-                                </p>
-                                <div class="flex items-center space-x-2">
-                                    @foreach([1,2,3,4,5] as $rating)
-                                        <label for="skm_{{ $pertanyaan->id }}_{{ $rating }}" class="flex-1 cursor-pointer">
-                                            <input type="radio"
-                                                id="skm_{{ $pertanyaan->id }}_{{ $rating }}"
-                                                name="skm[{{ $pertanyaan->id }}]"
-                                                value="{{ $rating }}"
-                                                class="sr-only peer"
-                                                {{ old("skm.{$pertanyaan->id}") == $rating ? 'checked' : '' }}>
-                                            <div class="text-center py-2 rounded-lg border-2 border-gray-200 hover:border-biogen-medium peer-checked:border-biogen-medium peer-checked:bg-biogen-medium peer-checked:text-white text-gray-500 font-bold text-sm transition-all duration-150 cursor-pointer">
-                                                {{ $rating }}
-                                            </div>
-                                        </label>
-                                    @endforeach
-                                </div>
-                                <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-1">
-                                    <span>Sangat Tidak Setuju</span>
-                                    <span>Sangat Setuju</span>
-                                </div>
-                                <x-input-error :messages="$errors->get('skm.'.$pertanyaan->id)" class="mt-1" />
-                            </div>
-                        @endforeach
-
-                        <!-- Saran Tambahan -->
-                        <div class="pt-2">
-                            <label for="skm_saran" class="block text-sm font-semibold text-gray-700 mb-2">
-                                Saran / Masukan (Opsional)
-                            </label>
-                            <textarea id="skm_saran" name="skm_saran" rows="3"
-                                class="w-full rounded-xl border border-gray-200 text-sm text-gray-800 px-4 py-3 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none resize-none transition"
-                                placeholder="Tuliskan saran atau masukan Anda untuk perbaikan layanan magang BRMP Biogen..."
-                                maxlength="2000">{{ old('skm_saran') }}</textarea>
-                            <x-input-error :messages="$errors->get('skm_saran')" class="mt-1" />
-                        </div>
-                    </div>
-                </div>
 
                 <!-- Upload Surat Pengantar -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-8">

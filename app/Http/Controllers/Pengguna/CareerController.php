@@ -22,7 +22,6 @@ class CareerController extends Controller
 {
     public function __construct(
         protected KuotaService $kuotaService,
-        protected SkmService $skmService,
         protected PengajuanService $pengajuanService,
     ) {}
 
@@ -143,7 +142,7 @@ class CareerController extends Controller
         return redirect()->route('pengguna.career.step5');
     }
 
-    // ─── STEP 5: SKM + Upload Surat Pengantar (OLD STEP 4) ────────────────────
+    // ─── STEP 5: Upload Surat Pengantar (OLD STEP 4) ────────────────────
     public function step5()
     {
         $step3 = session('career_step3');
@@ -154,9 +153,8 @@ class CareerController extends Controller
         }
 
         $bidang = Bidang::with('pembimbing')->findOrFail($step3['bidang_id']);
-        $pertanyaans = $this->skmService->getPertanyaanAktif();
 
-        return view('pengguna.career.step5', compact('bidang', 'pertanyaans', 'step3', 'step4'));
+        return view('pengguna.career.step5', compact('bidang', 'step3', 'step4'));
     }
 
     public function storeFinal(CareerStepFinalRequest $request)
@@ -215,18 +213,8 @@ class CareerController extends Controller
                     'status' => 'Menunggu Verifikasi',
                     'file_surat_pengantar' => $filePath,
                     'laporan_status' => 'Belum Ada',
-                    'skm_saran' => $request->skm_saran,
+                    'skm_saran' => null,
                 ]);
-
-                // Simpan jawaban SKM
-                $pertanyaans = $this->skmService->getPertanyaanAktif();
-                foreach ($pertanyaans as $pertanyaan) {
-                    SkmJawaban::create([
-                        'pengajuan_id' => $pengajuan->id,
-                        'skm_pertanyaan_id' => $pertanyaan->id,
-                        'rating' => (int) $request->input("skm.{$pertanyaan->id}"),
-                    ]);
-                }
 
                 // Catat log status awal
                 \App\Models\PengajuanStatusLog::create([

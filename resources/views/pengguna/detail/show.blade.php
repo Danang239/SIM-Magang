@@ -409,6 +409,46 @@
                                 </button>
                             </form>
                         </div>
+                    @endif                    <!-- Post-Approval SKM & Biodata Gate -->
+                    @if($pengajuan->status === 'Disetujui')
+                        @if(!$pengajuan->skmJawabans()->exists() || !$pengajuan->biodata()->exists())
+                            <div class="bg-white rounded-2xl border border-amber-250 shadow-sm p-6 text-center mt-6">
+                                <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-3 text-amber-500">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                                </div>
+                                <h4 class="font-bold text-sm text-gray-805 mb-2">Lengkapi Persyaratan Magang</h4>
+                                <p class="text-xs text-gray-400 leading-relaxed mb-4">Pengajuan Anda telah disetujui. Lengkapi kuesioner dan biodata di bawah ini agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>.</p>
+                                
+                                <div class="space-y-3">
+                                    @if(!$pengajuan->skmJawabans()->exists())
+                                        <a href="{{ route('pengguna.gate.skm', $pengajuan->id) }}" class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
+                                            Isi Kuesioner SKM
+                                        </a>
+                                    @else
+                                        <div class="block w-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold py-2.5 rounded-xl">
+                                            Kuesioner SKM (Selesai ✓)
+                                        </div>
+                                    @endif
+
+                                    @if(!$pengajuan->biodata()->exists())
+                                        @if($pengajuan->skmJawabans()->exists())
+                                            <a href="{{ route('pengguna.gate.biodata', $pengajuan->id) }}" class="block w-full bg-biogen-medium hover:bg-biogen-light text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
+                                                Isi Formulir Biodata
+                                            </a>
+                                        @else
+                                            <button type="button" class="w-full bg-gray-100 text-gray-400 border border-gray-200 text-xs font-bold py-2.5 rounded-xl cursor-not-allowed flex items-center justify-center space-x-1.5" title="Selesaikan Kuesioner SKM terlebih dahulu" disabled>
+                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                                <span>Isi Formulir Biodata (Terkunci)</span>
+                                            </button>
+                                        @endif
+                                    @else
+                                        <div class="block w-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold py-2.5 rounded-xl">
+                                            Formulir Biodata (Selesai ✓)
+                                        </div>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                     @endif
                 </div>
             </div>

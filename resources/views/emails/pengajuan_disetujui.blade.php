@@ -126,9 +126,13 @@
                 @endif
             </div>
 
-            <p><strong>Langkah Selanjutnya:</strong> Silakan bersiap untuk memulai kegiatan magang Anda sesuai tanggal mulai yang tertera di atas. Jika Anda memerlukan informasi lebih lanjut, silakan hubungi unit pelayanan kami melalui WhatsApp di +628111756776 atau sapa kami via surel di magangbiogen@gmail.com.</p>
+            <p style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; font-size: 13px; color: #78350f; border-radius: 4px;">
+                <strong>PENTING:</strong> Agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>, Anda wajib masuk ke portal website dan melengkapi <strong>Kuesioner SKM</strong> serta <strong>Formulir Biodata Peserta</strong>.
+            </p>
 
-            <a href="{{ route('login') }}" class="btn">Masuk ke Dashboard Peserta</a>
+            <p>Jika Anda memerlukan informasi lebih lanjut, silakan hubungi unit pelayanan kami melalui WhatsApp di +628111756776 atau surel di magangbiogen@gmail.com.</p>
+
+            <a href="{{ route('login') }}" class="btn">Lengkapi SKM & Biodata Sekarang</a>
         </div>
         <div class="footer">
             SIM-MAGANG &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>

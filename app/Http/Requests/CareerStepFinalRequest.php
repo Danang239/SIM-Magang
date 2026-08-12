@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Services\SkmService;
+
 use Illuminate\Foundation\Http\FormRequest;
 
 class CareerStepFinalRequest extends FormRequest
@@ -14,12 +14,7 @@ class CareerStepFinalRequest extends FormRequest
 
     public function rules(): array
     {
-        // Build SKM rules dynamically based on active questions
-        $skmService = app(SkmService::class);
-        $pertanyaans = $skmService->getPertanyaanAktif();
-
-        $rules = [
-            'skm_saran' => ['nullable', 'string', 'max:2000'],
+        return [
             'file_surat_pengantar' => [
                 'required',
                 'file',
@@ -27,13 +22,6 @@ class CareerStepFinalRequest extends FormRequest
                 'max:2048',
             ],
         ];
-
-        // Dynamically add rules for each active SKM question
-        foreach ($pertanyaans as $pertanyaan) {
-            $rules["skm.{$pertanyaan->id}"] = ['required', 'integer', 'between:1,5'];
-        }
-
-        return $rules;
     }
 
     public function messages(): array
@@ -43,9 +31,6 @@ class CareerStepFinalRequest extends FormRequest
             'file_surat_pengantar.file' => 'File surat pengantar tidak valid.',
             'file_surat_pengantar.mimes' => 'Format file hanya boleh PDF, JPG, atau PNG.',
             'file_surat_pengantar.max' => 'Ukuran file maksimal 2MB.',
-            'skm.*.required' => 'Semua pertanyaan kepuasan harus dijawab.',
-            'skm.*.integer' => 'Jawaban kepuasan harus berupa angka.',
-            'skm.*.between' => 'Nilai kepuasan antara 1 sampai 5.',
         ];
     }
 

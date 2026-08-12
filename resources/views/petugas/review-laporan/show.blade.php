@@ -60,6 +60,69 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Formulir Biodata Gate -->
+            @if($pengajuan->biodata)
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
+                    <h3 class="font-bold text-gray-800 text-sm mb-4 font-sans border-b border-gray-100 pb-3 flex items-center">
+                        <svg class="w-5 h-5 text-gray-400 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Formulir Biodata Peserta
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+                        <div>
+                            <p class="text-gray-400 font-medium">NIM / NISN</p>
+                            <p class="font-bold text-gray-800 mt-1 text-sm">{{ $pengajuan->biodata->nim_nisn }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 font-medium">Tempat, Tanggal Lahir</p>
+                            <p class="font-bold text-gray-800 mt-1 text-sm">
+                                {{ $pengajuan->biodata->tempat_lahir }}, {{ $pengajuan->biodata->tanggal_lahir->translatedFormat('d M Y') }}
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 font-medium">Jenis Kelamin</p>
+                            <p class="font-bold text-gray-800 mt-1 text-sm">{{ $pengajuan->biodata->jenis_kelamin }}</p>
+                        </div>
+                        <div>
+                            <p class="text-gray-400 font-medium">Kontak Darurat</p>
+                            <p class="font-bold text-gray-800 mt-1 text-sm">
+                                {{ $pengajuan->biodata->kontak_darurat_nama }} ({{ $pengajuan->biodata->hubungan_kontak_darurat }}) - {{ $pengajuan->biodata->kontak_darurat_no }}
+                            </p>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-gray-400 font-medium">Alamat Domisili</p>
+                            <p class="font-bold text-gray-800 mt-1 text-sm leading-relaxed">{{ $pengajuan->biodata->alamat }}</p>
+                        </div>
+                    </div>
+                </div>
+            <!-- Hasil Kuesioner SKM -->
+            @if($pengajuan->skmJawabans()->exists())
+                <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 mt-6">
+                    <h3 class="font-bold text-gray-800 text-sm mb-4 font-sans border-b border-gray-100 pb-3 flex items-center">
+                        <svg class="w-5 h-5 text-gray-400 me-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.907c.961 0 1.371 1.24.588 1.81l-3.97 2.883a1 1 0 00-.364 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.971-2.883a1 1 0 00-1.17 0l-3.97 2.883c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.364-1.118l-3.97-2.883c-.783-.57-.37-1.81.588-1.81h4.906a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                        Hasil Kuesioner SKM (Kepuasan Masyarakat)
+                    </h3>
+                    <div class="space-y-4">
+                        @foreach($pengajuan->skmJawabans()->with('pertanyaan')->get() as $jawaban)
+                            <div class="flex items-start justify-between text-xs pb-3 border-b border-gray-50 last:border-b-0">
+                                <div class="max-w-md">
+                                    <p class="font-semibold text-gray-700">{{ $jawaban->pertanyaan->teks_pertanyaan }}</p>
+                                </div>
+                                <div class="flex items-center space-x-1 shrink-0 bg-emerald-50 text-biogen-medium font-bold px-2.5 py-1 rounded-lg border border-emerald-150">
+                                    <span>Skor: {{ $jawaban->rating }}</span>
+                                </div>
+                            </div>
+                        @endforeach
+                        
+                        @if($pengajuan->skm_saran)
+                            <div class="mt-4 p-4 rounded-xl bg-gray-50 border border-gray-100 text-xs">
+                                <p class="font-bold text-gray-700">Saran / Masukan Tambahan:</p>
+                                <p class="text-gray-600 mt-1 italic">"{{ $pengajuan->skm_saran }}"</p>
+                            </div>
+                        @endif
+                    </div>
+                </div>
+            @endif
         </div>
 
         <!-- Action Box (Right 1 Column) -->

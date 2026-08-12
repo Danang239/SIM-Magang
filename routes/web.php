@@ -48,6 +48,14 @@ Route::middleware(['auth', 'role:Pengguna'])->prefix('pengguna')->name('pengguna
         Route::get('/api/kuota/{bidang}', [\App\Http\Controllers\Pengguna\CareerController::class, 'kuotaKalender'])->name('api.kuota');
     });
 
+    // Post-Approval Gate (SKM & Biodata)
+    Route::prefix('gate/{pengajuan}')->name('gate.')->group(function () {
+        Route::get('/skm', [\App\Http\Controllers\Pengguna\GateController::class, 'showSkm'])->name('skm');
+        Route::post('/skm', [\App\Http\Controllers\Pengguna\GateController::class, 'storeSkm'])->name('skm.store');
+        Route::get('/biodata', [\App\Http\Controllers\Pengguna\GateController::class, 'showBiodata'])->name('biodata');
+        Route::post('/biodata', [\App\Http\Controllers\Pengguna\GateController::class, 'storeBiodata'])->name('biodata.store');
+    });
+
     // Riwayat Pengajuan
     Route::get('/riwayat', [\App\Http\Controllers\Pengguna\RiwayatController::class, 'index'])->name('riwayat');
 

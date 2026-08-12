@@ -72,20 +72,11 @@ class CareerFormTest extends TestCase
         $response->assertRedirect(route('pengguna.career.step5'));
         $this->assertEquals($tanggalMulai, session('career_step4.tanggal_mulai'));
 
-        // Get questions for step 5
-        $skmQuestions = SkmPertanyaan::where('is_active', true)->get();
-        $skmAnswers = [];
-        foreach ($skmQuestions as $q) {
-            $skmAnswers[$q->id] = 5; // Very Satisfied
-        }
-
-        // 6. Step 5: Finalize with SKM & file upload
+        // 6. Step 5: Finalize with file upload
         $file = UploadedFile::fake()->create('surat_pengantar.pdf', 500, 'application/pdf');
 
         $response = $this->actingAs($user)
             ->post(route('pengguna.career.store'), [
-                'skm' => $skmAnswers,
-                'skm_saran' => 'Layanan yang sangat cepat dan profesional.',
                 'file_surat_pengantar' => $file,
             ]);
 
@@ -99,7 +90,7 @@ class CareerFormTest extends TestCase
             'bidang_id' => $bidang->id,
             'durasi_bulan' => 3,
             'status' => 'Menunggu Verifikasi',
-            'skm_saran' => 'Layanan yang sangat cepat dan profesional.',
+            'skm_saran' => null,
         ]);
 
         $pengajuan = \App\Models\Pengajuan::where('user_id', $user->id)->first();
