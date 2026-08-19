@@ -7,6 +7,11 @@ use Illuminate\Support\Facades\Route;
 
 // 1. Route Publik (Landing Page & Kontak)
 Route::get('/', [BerandaController::class, 'index'])->name('home');
+Route::get('/bidang/{bidang}', [\App\Http\Controllers\Guest\BidangDetailController::class, 'show'])->name('bidang.show');
+Route::get('/bidang/{bidang}/daftar', function(\App\Models\Bidang $bidang) {
+    session(['bidang_id' => $bidang->id]);
+    return redirect()->route('login');
+})->name('bidang.daftar');
 Route::get('/kontak', function () {
     return view('guest.kontak');
 })->name('kontak');
@@ -24,6 +29,9 @@ Route::get('/dashboard', function () {
     } elseif ($user->hasRole('Petugas')) {
         return redirect()->route('petugas.dashboard');
     }
+    if (session()->has('bidang_id')) {
+        return redirect()->route('pengguna.career.step1', ['bidang_id' => session('bidang_id')]);
+    }
     return redirect()->route('home');
 })->middleware(['auth'])->name('dashboard');
 
@@ -31,29 +39,21 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'role:Pengguna'])->prefix('pengguna')->name('pengguna.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Pengguna\DashboardController::class, 'index'])->name('dashboard');
 
-    // Career Form 5-step wizard
+    // Career Form 2-step wizard
     Route::prefix('career')->name('career.')->group(function () {
         Route::get('/step1',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step1'])->name('step1');
         Route::post('/step1',  [\App\Http\Controllers\Pengguna\CareerController::class, 'step1Store'])->name('step1.store');
         Route::get('/step2',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step2'])->name('step2');
-        Route::post('/step2',  [\App\Http\Controllers\Pengguna\CareerController::class, 'step2Store'])->name('step2.store');
-        Route::get('/step3',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step3'])->name('step3');
-        Route::post('/step3',  [\App\Http\Controllers\Pengguna\CareerController::class, 'step3Store'])->name('step3.store');
-        Route::get('/step4',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step4'])->name('step4');
-        Route::post('/step4',  [\App\Http\Controllers\Pengguna\CareerController::class, 'step4Store'])->name('step4.store');
-        Route::get('/step5',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step5'])->name('step5');
-        Route::post('/step5',  [\App\Http\Controllers\Pengguna\CareerController::class, 'storeFinal'])->name('store');
+        Route::post('/step2',  [\App\Http\Controllers\Pengguna\CareerController::class, 'storeFinal'])->name('store');
         Route::get('/konfirmasi/{public_id}', [\App\Http\Controllers\Pengguna\CareerController::class, 'konfirmasi'])->name('konfirmasi');
         // API endpoint for Alpine.js calendar
         Route::get('/api/kuota/{bidang}', [\App\Http\Controllers\Pengguna\CareerController::class, 'kuotaKalender'])->name('api.kuota');
     });
 
-    // Post-Approval Gate (SKM & Biodata)
+    // Post-Approval Gate (SKM)
     Route::prefix('gate/{pengajuan}')->name('gate.')->group(function () {
         Route::get('/skm', [\App\Http\Controllers\Pengguna\GateController::class, 'showSkm'])->name('skm');
         Route::post('/skm', [\App\Http\Controllers\Pengguna\GateController::class, 'storeSkm'])->name('skm.store');
-        Route::get('/biodata', [\App\Http\Controllers\Pengguna\GateController::class, 'showBiodata'])->name('biodata');
-        Route::post('/biodata', [\App\Http\Controllers\Pengguna\GateController::class, 'storeBiodata'])->name('biodata.store');
     });
 
     // Riwayat Pengajuan
@@ -91,7 +91,7 @@ Route::middleware(['auth', 'role:Petugas|Administrator'])->prefix('petugas')->na
 // 4. Route Administrator (System controller)
 Route::middleware(['auth', 'role:Administrator'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/laporan-tahunan/export', [\App\Http\Controllers\Admin\LaporanTahunanController::class, 'export'])->name('laporan-tahunan.export');
+    
     
     // User Directory Management
     Route::resource('/user', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
@@ -102,6 +102,15 @@ Route::middleware(['auth', 'role:Administrator'])->prefix('admin')->name('admin.
     // Annual Excel & CSV Statistics Export
     Route::get('/laporan/export-excel', [\App\Http\Controllers\Admin\LaporanStatistikController::class, 'exportExcel'])->name('laporan.excel');
     Route::get('/laporan/export-csv', [\App\Http\Controllers\Admin\LaporanStatistikController::class, 'exportCsv'])->name('laporan.csv');
+
+    // Rekap SKM Kuartal
+    Route::get('/rekap-skm', [\App\Http\Controllers\Admin\RekapSkmController::class, 'index'])->name('rekap-skm.index');
+    Route::get('/rekap-skm/export-excel', [\App\Http\Controllers\Admin\RekapSkmController::class, 'exportExcel'])->name('rekap-skm.excel');
+    Route::get('/rekap-skm/export-csv', [\App\Http\Controllers\Admin\RekapSkmController::class, 'exportCsv'])->name('rekap-skm.csv');
+
+    // Riwayat Pengajuan Magang (Filter & Detail)
+    Route::get('/riwayat-pengajuan', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'index'])->name('riwayat-pengajuan.index');
+    Route::get('/riwayat-pengajuan/{public_id}', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'show'])->name('riwayat-pengajuan.show');
 });
 
 // 5. Shared Authenticated Profile & Private File Serving Routes

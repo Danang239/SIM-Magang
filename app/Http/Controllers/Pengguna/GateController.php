@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Pengguna;
 
 use App\Http\Controllers\Controller;
 use App\Models\Pengajuan;
-use App\Models\PengajuanBiodata;
 use App\Models\PengajuanStatusLog;
 use App\Models\SkmJawaban;
 use App\Services\SkmService;
@@ -25,12 +24,12 @@ class GateController extends Controller
         $this->authorizeOwner($pengajuan);
 
         if ($pengajuan->status !== 'Disetujui') {
-            return redirect()->route('pengguna.dashboard')->with('error', 'Form SKM hanya dapat diisi jika pengajuan Anda sudah disetujui.');
+            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Form SKM hanya dapat diisi jika pengajuan Anda sudah disetujui.');
         }
 
         // Cek jika sudah pernah mengisi SKM untuk pengajuan ini
         if ($pengajuan->skmJawabans()->exists()) {
-            return redirect()->route('pengguna.dashboard')->with('info', 'Anda sudah mengisi kuesioner SKM.');
+            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('info', 'Anda sudah mengisi kuesioner SKM.');
         }
 
         $pertanyaans = $this->skmService->getPertanyaanAktif();
@@ -45,12 +44,13 @@ class GateController extends Controller
         $this->authorizeOwner($pengajuan);
 
         if ($pengajuan->status !== 'Disetujui') {
-            return redirect()->route('pengguna.dashboard')->with('error', 'Aksi tidak diizinkan.');
+            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Aksi tidak diizinkan.');
         }
 
         $pertanyaans = $this->skmService->getPertanyaanAktif();
         
         $rules = [
+            'status_disabilitas' => ['required', 'string', 'max:255'],
             'skm_saran' => ['nullable', 'string', 'max:2000'],
         ];
         foreach ($pertanyaans as $p) {
@@ -58,6 +58,7 @@ class GateController extends Controller
         }
 
         $validated = $request->validate($rules, [
+            'status_disabilitas.required' => 'Status disabilitas wajib dipilih.',
             'skm.*.required' => 'Semua pertanyaan wajib dijawab.',
             'skm.*.between' => 'Penilaian harus berada di skala 1 sampai 5.',
         ]);
@@ -72,9 +73,10 @@ class GateController extends Controller
                 ]);
             }
 
-            // Simpan saran ke pengajuan
+            // Simpan saran & status disabilitas ke pengajuan
             $pengajuan->update([
-                'skm_saran' => $request->skm_saran
+                'skm_saran' => $request->skm_saran,
+                'status_disabilitas' => $request->status_disabilitas,
             ]);
 
             // Cek jika gate lengkap, promosikan ke Terjadwal
@@ -84,7 +86,7 @@ class GateController extends Controller
                 PengajuanStatusLog::create([
                     'pengajuan_id' => $pengajuan->id,
                     'status' => 'Terjadwal',
-                    'catatan' => 'Calon peserta telah melengkapi kuesioner SKM dan Biodata. Status otomatis menjadi Terjadwal.',
+                    'catatan' => 'Calon peserta telah melengkapi kuesioner SKM. Status otomatis menjadi Terjadwal.',
                     'created_by' => auth()->id(),
                 ]);
 
@@ -97,94 +99,6 @@ class GateController extends Controller
         });
 
         return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('success', 'Kuesioner SKM berhasil disimpan.');
-    }
-
-    /**
-     * Tampilkan form Biodata.
-     */
-    public function showBiodata(Pengajuan $pengajuan)
-    {
-        $this->authorizeOwner($pengajuan);
-
-        if ($pengajuan->status !== 'Disetujui') {
-            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Formulir biodata hanya dapat diisi jika pengajuan Anda sudah disetujui.');
-        }
-
-        // SKM must be completed first
-        if (!$pengajuan->skmJawabans()->exists()) {
-            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Anda wajib mengisi kuesioner SKM terlebih dahulu sebelum mengisi formulir biodata.');
-        }
-
-        // Cek jika sudah pernah mengisi biodata
-        if ($pengajuan->biodata()->exists()) {
-            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('info', 'Anda sudah melengkapi formulir biodata.');
-        }
-
-        return view('pengguna.gate.biodata', compact('pengajuan'));
-    }
-
-    /**
-     * Simpan formulir Biodata.
-     */
-    public function storeBiodata(Request $request, Pengajuan $pengajuan)
-    {
-        $this->authorizeOwner($pengajuan);
-
-        if ($pengajuan->status !== 'Disetujui') {
-            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Aksi tidak diizinkan.');
-        }
-
-        // SKM must be completed first
-        if (!$pengajuan->skmJawabans()->exists()) {
-            return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('error', 'Anda wajib mengisi kuesioner SKM terlebih dahulu sebelum mengisi formulir biodata.');
-        }
-
-        $validated = $request->validate([
-            'nim_nisn' => ['required', 'string', 'max:50'],
-            'tempat_lahir' => ['required', 'string', 'max:100'],
-            'tanggal_lahir' => ['required', 'date', 'before:today'],
-            'jenis_kelamin' => ['required', 'in:Laki-laki,Perempuan'],
-            'alamat' => ['required', 'string', 'max:1000'],
-            'kontak_darurat_nama' => ['required', 'string', 'max:255'],
-            'kontak_darurat_no' => ['required', 'string', 'max:20'],
-            'hubungan_kontak_darurat' => ['required', 'string', 'max:100'],
-        ], [
-            'nim_nisn.required' => 'NIM / NISN wajib diisi.',
-            'tempat_lahir.required' => 'Tempat lahir wajib diisi.',
-            'tanggal_lahir.required' => 'Tanggal lahir wajib diisi.',
-            'tanggal_lahir.before' => 'Tanggal lahir tidak valid.',
-            'jenis_kelamin.required' => 'Jenis kelamin wajib dipilih.',
-            'alamat.required' => 'Alamat domisili wajib diisi.',
-            'kontak_darurat_nama.required' => 'Nama kontak darurat wajib diisi.',
-            'kontak_darurat_no.required' => 'Nomor HP kontak darurat wajib diisi.',
-            'hubungan_kontak_darurat.required' => 'Hubungan kontak darurat wajib diisi.',
-        ]);
-
-        DB::transaction(function () use ($validated, $pengajuan) {
-            PengajuanBiodata::create(array_merge($validated, [
-                'pengajuan_id' => $pengajuan->id
-            ]));
-
-            // Cek jika gate lengkap, promosikan ke Terjadwal
-            if ($pengajuan->isGateCompleted()) {
-                $pengajuan->update(['status' => 'Terjadwal']);
-
-                PengajuanStatusLog::create([
-                    'pengajuan_id' => $pengajuan->id,
-                    'status' => 'Terjadwal',
-                    'catatan' => 'Calon peserta telah melengkapi kuesioner SKM dan Biodata. Status otomatis menjadi Terjadwal.',
-                    'created_by' => auth()->id(),
-                ]);
-
-                \App\Models\Notifikasi::create([
-                    'user_id' => $pengajuan->user_id,
-                    'judul' => 'Pengajuan Terjadwal',
-                    'pesan' => "Selamat! Pengajuan magang Anda ({$pengajuan->nomor_pengajuan}) kini berstatus Terjadwal. Silakan persiapkan diri Anda.",
-                ]);
-            }
-        });
-
-        return redirect()->route('pengguna.pengajuan.show', $pengajuan->public_id)->with('success', 'Formulir biodata berhasil disimpan.');
     }
 
     /**

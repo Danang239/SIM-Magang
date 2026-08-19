@@ -29,38 +29,110 @@
             <form method="POST" action="{{ route('pengguna.gate.skm.store', $pengajuan->id) }}">
                 @csrf
 
+                <!-- Data Profil Responden (Auto-filled) -->
+                <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-4 mb-4">
+                        <div>
+                            <h2 class="text-base font-bold text-gray-800 font-sans">Identitas Responden (Otomatis dari Formulir)</h2>
+                            <p class="text-xs text-gray-500 mt-0.5">Data identitas berikut ditarik secara otomatis dari berkas pendaftaran Anda.</p>
+                        </div>
+                        <span class="px-2.5 py-1 bg-emerald-100 text-emerald-800 font-bold text-[10px] rounded-lg tracking-wider uppercase">Auto-Filled</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+                        <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150">
+                            <p class="text-gray-400 font-medium">Nama Lengkap</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">{{ $pengajuan->user->name }}</p>
+                        </div>
+                        <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150">
+                            <p class="text-gray-400 font-medium">Jenis Kelamin</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">{{ $pengajuan->jenis_kelamin ?? '-' }}</p>
+                        </div>
+                        <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150">
+                            <p class="text-gray-400 font-medium">Pendidikan Terakhir</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">{{ $pengajuan->pendidikan_terakhir ?? $pengajuan->jenjang }}</p>
+                        </div>
+                        <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150">
+                            <p class="text-gray-400 font-medium">Usia</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">
+                                {{ $pengajuan->tanggal_lahir ? \Carbon\Carbon::parse($pengajuan->tanggal_lahir)->age . ' Tahun' : '-' }}
+                            </p>
+                        </div>
+                        <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150 sm:col-span-2">
+                            <p class="text-gray-400 font-medium">Pekerjaan</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">Siswa / Mahasiswa (Peserta Magang)</p>
+                        </div>
+                    </div>
+
+                    <!-- Pilihan Cepat Status Disabilitas -->
+                    <div class="mt-5 pt-4 border-t border-gray-100" x-data="{ disabilitas: '{{ old('status_disabilitas', '') }}' }">
+                        <label class="block text-xs font-bold text-gray-800 uppercase tracking-wider mb-2">
+                            Status Penyandang Disabilitas <span class="text-red-500">*</span>
+                        </label>
+                        <p class="text-xs text-gray-500 mb-3">Silakan pilih salah satu opsi status penyandang disabilitas berikut:</p>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <label class="flex items-center p-3 rounded-xl border cursor-pointer transition-all"
+                                :class="disabilitas === 'Bukan Penyandang Disabilitas' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-gray-50 border-gray-200 hover:border-emerald-300'">
+                                <input type="radio" name="status_disabilitas" value="Bukan Penyandang Disabilitas" x-model="disabilitas" class="text-emerald-600 focus:ring-emerald-500 me-2.5" required>
+                                <span class="text-xs font-bold text-gray-800">Bukan Penyandang Disabilitas</span>
+                            </label>
+
+                            <label class="flex items-center p-3 rounded-xl border cursor-pointer transition-all"
+                                :class="disabilitas === 'Penyandang Disabilitas' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-gray-50 border-gray-200 hover:border-emerald-300'">
+                                <input type="radio" name="status_disabilitas" value="Penyandang Disabilitas" x-model="disabilitas" class="text-emerald-600 focus:ring-emerald-500 me-2.5" required>
+                                <span class="text-xs font-bold text-gray-800">Penyandang Disabilitas</span>
+                            </label>
+
+                            <label class="flex items-center p-3 rounded-xl border cursor-pointer transition-all"
+                                :class="disabilitas === 'Pendamping Penyandang Disabilitas' ? 'bg-emerald-50 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-gray-50 border-gray-200 hover:border-emerald-300'">
+                                <input type="radio" name="status_disabilitas" value="Pendamping Penyandang Disabilitas" x-model="disabilitas" class="text-emerald-600 focus:ring-emerald-500 me-2.5" required>
+                                <span class="text-xs font-bold text-gray-800">Pendamping Penyandang</span>
+                            </label>
+                        </div>
+                        <x-input-error :messages="$errors->get('status_disabilitas')" class="mt-1" />
+                    </div>
+                </div>
+
                 <!-- Survei Kepuasan Masyarakat (SKM) -->
                 <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-                    <div class="mb-6">
-                        <h2 class="text-lg font-bold text-gray-800 font-sans">Survei Kepuasan Masyarakat (SKM)</h2>
-                        <p class="text-xs text-gray-500 mt-1">Berikan penilaian Anda untuk setiap pernyataan berikut. Skala: 1 (Sangat Tidak Setuju) – 5 (Sangat Setuju).</p>
+                    <div class="mb-6 border-b border-gray-100 pb-4">
+                        <span class="inline-block px-3 py-1 bg-emerald-100 text-emerald-800 font-bold text-xs rounded-lg uppercase tracking-wider mb-2">Pendapat Responden Tentang Pelayanan</span>
+                        <h2 class="text-lg font-bold text-gray-800 font-sans">Instrumen Kuesioner SKM</h2>
+                        <p class="text-xs text-gray-500 mt-1">Pilihlah salah satu jawaban yang paling menggambarkan pengalaman pelayanan yang Anda terima.</p>
                     </div>
 
                     <div class="space-y-6">
                         @foreach($pertanyaans as $index => $pertanyaan)
-                            <div class="pb-5 {{ !$loop->last ? 'border-b border-gray-100' : '' }}">
-                                <p class="text-sm font-semibold text-gray-700 mb-3">
-                                    <span class="text-biogen-medium font-bold mr-1">{{ $index + 1 }}.</span>
-                                    {{ $pertanyaan->teks_pertanyaan }}
+                            @php
+                                $lower = strtolower($pertanyaan->teks_pertanyaan);
+                                $isSesuai = str_contains($lower, 'persyaratan') || str_contains($lower, 'jangka waktu') || str_contains($lower, 'biaya') || str_contains($lower, 'produk');
+                                $options = [
+                                    4 => $isSesuai ? 'Sangat sesuai' : 'Sangat setuju',
+                                    3 => $isSesuai ? 'Sesuai' : 'Setuju',
+                                    2 => $isSesuai ? 'Tidak sesuai' : 'Tidak setuju',
+                                    1 => $isSesuai ? 'Sangat tidak sesuai' : 'Sangat tidak setuju',
+                                ];
+                            @endphp
+                            <div class="pb-5 border-b border-gray-100 last:border-0">
+                                <p class="text-sm font-bold text-gray-800 mb-3 leading-relaxed">
+                                    <span class="text-emerald-700 font-extrabold mr-1">{{ $index + 1 }}.</span>
+                                    {{ $pertanyaan->teks_pertanyaan }} <span class="text-red-500">*</span>
                                 </p>
-                                <div class="flex items-center space-x-2">
-                                    @foreach([1,2,3,4,5] as $rating)
-                                        <label for="skm_{{ $pertanyaan->id }}_{{ $rating }}" class="flex-1 cursor-pointer">
+                                
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                                    @foreach($options as $val => $label)
+                                        <label class="flex items-center p-3 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/40 cursor-pointer transition-all">
                                             <input type="radio"
-                                                id="skm_{{ $pertanyaan->id }}_{{ $rating }}"
+                                                id="skm_{{ $pertanyaan->id }}_{{ $val }}"
                                                 name="skm[{{ $pertanyaan->id }}]"
-                                                value="{{ $rating }}"
-                                                class="sr-only peer"
-                                                {{ old("skm.{$pertanyaan->id}") == $rating ? 'checked' : '' }}>
-                                            <div class="text-center py-2 rounded-lg border-2 border-gray-200 hover:border-biogen-medium peer-checked:border-biogen-medium peer-checked:bg-biogen-medium peer-checked:text-white text-gray-500 font-bold text-sm transition-all duration-150 cursor-pointer">
-                                                {{ $rating }}
-                                            </div>
+                                                value="{{ $val }}"
+                                                class="text-emerald-600 focus:ring-emerald-500 me-3"
+                                                {{ old("skm.{$pertanyaan->id}") == $val ? 'checked' : '' }}
+                                                required>
+                                            <span class="text-xs font-semibold text-gray-800">{{ $val }}. {{ $label }}</span>
                                         </label>
                                     @endforeach
-                                </div>
-                                <div class="flex justify-between text-[10px] text-gray-400 mt-1 px-1">
-                                    <span>Sangat Tidak Setuju</span>
-                                    <span>Sangat Setuju</span>
                                 </div>
                                 <x-input-error :messages="$errors->get('skm.'.$pertanyaan->id)" class="mt-1" />
                             </div>

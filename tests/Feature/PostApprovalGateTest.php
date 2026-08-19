@@ -16,7 +16,7 @@ class PostApprovalGateTest extends TestCase
     protected $seed = true;
 
     /**
-     * Test filling out SKM and Biodata forms promotes status to Terjadwal.
+     * Test filling out SKM promotes status to Terjadwal.
      */
     public function test_post_approval_gate_promotes_to_terjadwal(): void
     {
@@ -25,7 +25,7 @@ class PostApprovalGateTest extends TestCase
 
         $bidang = Bidang::where('is_active', true)->first();
 
-        // Create an approved application
+        // Create an approved application with biodata already completed
         $pengajuan = Pengajuan::create([
             'public_id' => \Illuminate\Support\Str::uuid(),
             'nomor_pengajuan' => 'PKL-TEST-' . rand(1000, 9999),
@@ -38,47 +38,6 @@ class PostApprovalGateTest extends TestCase
             'tanggal_selesai_rencana' => now()->addDays(100)->toDateString(),
             'status' => 'Disetujui',
             'file_surat_pengantar' => 'surat.pdf',
-        ]);
-
-        // 1. Visit details page, should see the action gate card and locked Biodata button
-        $response = $this->actingAs($user)->get(route('pengguna.pengajuan.show', $pengajuan->public_id));
-        $response->assertStatus(200);
-        $response->assertSee('Lengkapi Persyaratan Magang');
-        $response->assertSee('Isi Formulir Biodata (Terkunci)');
-
-        // 1b. Try to access biodata page directly, should redirect back with error
-        $response = $this->actingAs($user)->get(route('pengguna.gate.biodata', $pengajuan->id));
-        $response->assertRedirect(route('pengguna.pengajuan.show', $pengajuan->public_id));
-        $response->assertSessionHas('error');
-
-        // 2. Submit SKM
-        $questions = SkmPertanyaan::where('is_active', true)->get();
-        $this->assertNotEmpty($questions);
-        $skmPayload = [];
-        foreach ($questions as $q) {
-            $skmPayload[$q->id] = 5;
-        }
-
-        $response = $this->actingAs($user)->post(route('pengguna.gate.skm.store', $pengajuan->id), [
-            'skm' => $skmPayload,
-            'skm_saran' => 'Komentar saya.',
-        ]);
-
-        $response->assertRedirect(route('pengguna.pengajuan.show', $pengajuan->public_id));
-        $this->assertDatabaseHas('skm_jawaban', [
-            'pengajuan_id' => $pengajuan->id,
-            'rating' => 5,
-        ]);
-        $this->assertEquals('Disetujui', $pengajuan->fresh()->status); // Still approved because biodata is missing
-
-        // 2b. Visit details page again, should now see active "Isi Formulir Biodata" link
-        $response = $this->actingAs($user)->get(route('pengguna.pengajuan.show', $pengajuan->public_id));
-        $response->assertStatus(200);
-        $response->assertSee('Isi Formulir Biodata');
-        $response->assertDontSee('Isi Formulir Biodata (Terkunci)');
-
-        // 3. Submit Biodata
-        $response = $this->actingAs($user)->post(route('pengguna.gate.biodata.store', $pengajuan->id), [
             'nim_nisn' => '1202203001',
             'tempat_lahir' => 'Bogor',
             'tanggal_lahir' => '2002-05-15',
@@ -89,15 +48,35 @@ class PostApprovalGateTest extends TestCase
             'hubungan_kontak_darurat' => 'Ayah',
         ]);
 
+        // 1. Visit details page, should see the action gate card
+        $response = $this->actingAs($user)->get(route('pengguna.pengajuan.show', $pengajuan->public_id));
+        $response->assertStatus(200);
+        $response->assertSee('Lengkapi Persyaratan Magang');
+        $response->assertSee('Isi Kuesioner SKM');
+
+        // 2. Submit SKM
+        $questions = SkmPertanyaan::where('is_active', true)->get();
+        $this->assertNotEmpty($questions);
+        $skmPayload = [];
+        foreach ($questions as $q) {
+            $skmPayload[$q->id] = 4;
+        }
+
+        $response = $this->actingAs($user)->post(route('pengguna.gate.skm.store', $pengajuan->id), [
+            'status_disabilitas' => 'Bukan Penyandang Disabilitas',
+            'skm' => $skmPayload,
+            'skm_saran' => 'Komentar saya.',
+        ]);
         $response->assertRedirect(route('pengguna.pengajuan.show', $pengajuan->public_id));
-        $this->assertDatabaseHas('pengajuan_biodatas', [
+        
+        $this->assertDatabaseHas('skm_jawaban', [
             'pengajuan_id' => $pengajuan->id,
-            'nim_nisn' => '1202203001',
+            'rating' => 4,
         ]);
 
-        // 4. Assert status promoted to Terjadwal
+        // 3. Assert status immediately promoted to Terjadwal
         $this->assertEquals('Terjadwal', $pengajuan->fresh()->status);
-
+ 
         // Assert log exists
         $this->assertDatabaseHas('pengajuan_status_logs', [
             'pengajuan_id' => $pengajuan->id,

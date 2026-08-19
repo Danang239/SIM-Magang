@@ -21,13 +21,9 @@ class VerifikasiRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'action' => ['required', 'string', 'in:setujui,tolak'],
-            'catatan' => [
-                'required_if:action,tolak',
-                'nullable',
-                'string',
-                'max:1000',
-            ],
+            'action' => 'required|string|in:setujui,tolak',
+            'catatan' => 'required_if:action,tolak|nullable|string|max:1000',
+            'file_surat_balasan' => 'required_if:action,setujui|nullable|file|mimes:pdf|max:2048',
         ];
     }
 
@@ -41,6 +37,10 @@ class VerifikasiRequest extends FormRequest
             'action.in' => 'Keputusan hanya boleh Setujui atau Tolak.',
             'catatan.required_if' => 'Alasan/catatan penolakan wajib diisi jika Anda menolak pengajuan.',
             'catatan.max' => 'Catatan penolakan maksimal 1000 karakter.',
+            'file_surat_balasan.required_if' => 'Surat balasan wajib diunggah dalam format PDF saat menyetujui pengajuan.',
+            'file_surat_balasan.file' => 'File surat balasan tidak valid.',
+            'file_surat_balasan.mimes' => 'Surat balasan harus berformat PDF.',
+            'file_surat_balasan.max' => 'Ukuran file surat balasan maksimal 2MB.',
         ];
     }
 }

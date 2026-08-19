@@ -13,23 +13,32 @@ class SkmPertanyaanSeeder extends Seeder
     public function run(): void
     {
         $pertanyaan = [
-            'Persyaratan pengajuan magang/PKL di sistem ini mudah dipahami dan tidak memberatkan.',
-            'Alur/prosedur pengajuan pada sistem ini jelas dan tidak berbelit-belit.',
-            'Waktu proses verifikasi pengajuan oleh petugas cukup cepat.',
-            'Pengajuan magang/PKL ini tidak dipungut biaya apa pun.',
-            'Informasi bidang penempatan yang tersedia jelas dan sesuai kebutuhan saya.',
-            'Petugas yang menangani pengajuan menunjukkan kompetensi/pemahaman yang baik.',
-            'Petugas bersikap sopan dan responsif dalam melayani.',
-            'Sistem/aplikasi ini mudah diakses dan digunakan.',
-            'Instansi menyediakan sarana pengaduan/kontak yang jelas jika saya mengalami kendala.',
+            'Informasi pelayanan tersedia melalui media elektronik maupun nonelektronik',
+            'Kesesuaian persyaratan dengan standar pelayanan/Informasi yang diberikan',
+            'Standar dan prosedur layanan diinformasikan dengan jelas',
+            'Prosedur/Alur layanan mudah dipahami dan dilakukan',
+            'Layanan diberikan sesuai prosedur tanpa kecurangan',
+            'Jangka waktu layanan sesuai dengan standar pelayanan/ yang diinformasikan',
+            'Biaya layanan sesuai dengan standar pelayanan/ yang diinformasikan',
+            'Tidak ada pungutan liar (pungli) dalam pelayanan',
+            'Tidak ada percaloan/perantara tidak resmi dalam pelayanan',
+            'Produk layanan yang diterima sesuai dengan standar pelayanan / yang dipublikasikan',
+            'Petugas merespon kebutuhan dengan cepat',
+            'Petugas melayani saya dengan ramah',
+            'Seluruh pengguna layanan dilayani secara adil tanpa diskriminasi',
+            'Pelayanan diberikan tanpa imbalan uang, barang, atau fasilitas di luar aturan',
+            'Layanan konsultasi dan pengaduan mudah diakses',
+            'Sarana prasarana nyaman dan mudah digunakan',
         ];
 
         foreach ($pertanyaan as $index => $teks) {
-            SkmPertanyaan::create([
-                'teks_pertanyaan' => $teks,
-                'urutan' => $index + 1,
-                'is_active' => true,
-            ]);
+            SkmPertanyaan::updateOrCreate(
+                ['urutan' => $index + 1],
+                [
+                    'teks_pertanyaan' => $teks,
+                    'is_active' => true,
+                ]
+            );
         }
     }
 }

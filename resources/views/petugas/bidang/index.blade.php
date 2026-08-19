@@ -86,14 +86,24 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 font-bold text-gray-800 text-sm">
-                                    {{ $bidang->kapasitas }} Slot
+                                    {{ $bidang->kapasitas_total }} Slot
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if($bidang->pembimbing)
+                                    @if($bidang->petugasList->isNotEmpty())
+                                        <div class="space-y-1">
+                                            @foreach($bidang->petugasList as $p)
+                                                <div class="flex items-center space-x-1.5 text-xs">
+                                                    <span class="font-semibold text-gray-800">{{ $p->name }}</span>
+                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                        {{ $p->pivot->kuota }} Slot
+                                                    </span>
+                                                </div>
+                                            @endforeach
+                                        </div>
+                                    @elseif($bidang->pembimbing)
                                         <p class="font-semibold text-gray-800">{{ $bidang->pembimbing->name }}</p>
-                                        <p class="text-[10px] text-gray-400 mt-0.5">{{ $bidang->pembimbing->email }}</p>
                                     @else
-                                        <span class="text-gray-400 italic">Belum ditugaskan</span>
+                                        <span class="text-gray-400 italic text-[11px]">Belum ditugaskan</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4">

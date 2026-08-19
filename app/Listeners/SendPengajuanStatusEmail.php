@@ -23,11 +23,11 @@ class SendPengajuanStatusEmail
         }
 
         if ($pengajuan->status === 'Disetujui') {
-            Mail::to($user->email)->queue(new PengajuanDisetujuiMail($pengajuan));
+            Mail::to($user->email)->queue(new PengajuanDisetujuiMail($pengajuan->id));
         } elseif ($pengajuan->status === 'Ditolak') {
-            Mail::to($user->email)->queue(new PengajuanDitolakMail($pengajuan, $event->catatan));
+            Mail::to($user->email)->queue(new PengajuanDitolakMail($pengajuan->id, $event->catatan));
         } elseif ($pengajuan->status === 'Selesai') {
-            Mail::to($user->email)->queue(new LaporanDiterimaMail($pengajuan));
+            Mail::to($user->email)->queue(new LaporanDiterimaMail($pengajuan->id));
         }
     }
 }

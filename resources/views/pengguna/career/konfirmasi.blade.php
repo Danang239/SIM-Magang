@@ -10,7 +10,7 @@
                 </div>
                 <h1 class="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">Pengajuan Berhasil Dikirim!</h1>
                 <p class="text-gray-500 text-sm mt-2">
-                    Tim BRMP Biogen akan memverifikasi pengajuan Anda. Pantau status di dashboard Anda.
+                    Tim BRMP Biogen akan memverifikasi pengajuan Anda (maksimal 3 hari kerja). Pantau status di dashboard Anda.
                 </p>
             </div>
 
@@ -84,7 +84,7 @@
                 <div class="text-sm text-blue-700">
                     <p class="font-semibold mb-1">Langkah selanjutnya</p>
                     <ul class="list-disc pl-4 space-y-0.5 text-xs leading-relaxed">
-                        <li>Petugas akan memverifikasi kelengkapan dokumen Anda.</li>
+                        <li>Petugas akan memverifikasi kelengkapan dokumen Anda (maksimal 3 hari kerja).</li>
                         <li>Anda akan mendapat notifikasi jika ada perubahan status.</li>
                         <li>Simpan nomor pengajuan <strong>{{ $pengajuan->nomor_pengajuan }}</strong> sebagai referensi.</li>
                     </ul>

@@ -18,7 +18,7 @@ class PengajuanDisetujuiMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      */
     public function __construct(
-        public Pengajuan $pengajuan
+        public int $pengajuanId
     ) {}
 
     /**
@@ -38,6 +38,9 @@ class PengajuanDisetujuiMail extends Mailable implements ShouldQueue
     {
         return new Content(
             view: 'emails.pengajuan_disetujui',
+            with: [
+                'pengajuan' => Pengajuan::with(['user', 'bidang'])->findOrFail($this->pengajuanId),
+            ],
         );
     }
 }

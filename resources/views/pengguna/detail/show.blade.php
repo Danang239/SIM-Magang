@@ -142,6 +142,49 @@
                                 </a>
                             </div>
 
+                            @php
+                                $skmQuestionsCount = \App\Models\SkmPertanyaan::where('is_active', true)->count();
+                                $skmAnsweredCount = $pengajuan->skmJawabans()->count();
+                                $skmCompleted = ($skmAnsweredCount >= $skmQuestionsCount && $skmQuestionsCount > 0);
+                            @endphp
+
+                            <!-- Surat Balasan (Conditional) -->
+                            @if($pengajuan->file_surat_balasan)
+                                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 bg-gray-50 transition-colors">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-10 h-10 rounded-lg {{ $skmCompleted ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400' }} flex items-center justify-center">
+                                            @if($skmCompleted)
+                                                <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                                            @else
+                                                <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            @endif
+                                        </div>
+                                        <div>
+                                            <p class="text-xs font-bold text-gray-800">Surat Balasan Resmi</p>
+                                            <p class="text-[10px] text-gray-400">
+                                                @if($skmCompleted)
+                                                    Dokumen Resmi BRMP Biogen
+                                                @else
+                                                    Terkunci - Lengkapi Kuesioner SKM Terlebih Dahulu
+                                                @endif
+                                            </p>
+                                        </div>
+                                    </div>
+                                    @if($skmCompleted)
+                                        <a href="{{ route('pengajuan.file', [$pengajuan->public_id, 'surat_balasan']) }}" target="_blank"
+                                            class="text-xs font-bold text-emerald-600 hover:text-emerald-800 underline flex items-center space-x-1">
+                                            <span>Lihat File</span>
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                                        </a>
+                                    @else
+                                        <span class="text-xs font-bold text-gray-400 flex items-center space-x-1 cursor-not-allowed">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                                            <span>Terkunci</span>
+                                        </span>
+                                    @endif
+                                </div>
+                            @endif
+
                             <!-- Laporan Akhir (Conditional) -->
                             @if($pengajuan->file_laporan_akhir)
                                 <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 bg-gray-50 hover:bg-emerald-50 transition-colors">
@@ -392,8 +435,7 @@
                         </div>
                     </div>
 
-                    <!-- Cancel Application Button (Conditional) -->
-                    @php
+                    <!-- Cancel Application Button (Conditional) --                    @php
                         $cancellable = in_array($pengajuan->status, ['Menunggu Verifikasi', 'Disetujui', 'Terjadwal']);
                     @endphp
                     @if($cancellable)
@@ -404,48 +446,27 @@
                             <form method="POST" action="{{ route('pengguna.pengajuan.cancel', $pengajuan->public_id) }}" 
                                 onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan magang ini? Tindakan ini tidak dapat dibatalkan.');">
                                 @csrf
-                                <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold py-2.5 rounded-xl border border-red-200 transition-colors">
+                                <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-650 text-xs font-bold py-2.5 rounded-xl border border-red-200 transition-colors">
                                     Batalkan Pengajuan
                                 </button>
                             </form>
                         </div>
-                    @endif                    <!-- Post-Approval SKM & Biodata Gate -->
+                    @endif
+
+                    <!-- Post-Approval SKM Gate -->
                     @if($pengajuan->status === 'Disetujui')
-                        @if(!$pengajuan->skmJawabans()->exists() || !$pengajuan->biodata()->exists())
-                            <div class="bg-white rounded-2xl border border-amber-250 shadow-sm p-6 text-center mt-6">
+                        @if(!$pengajuan->skmJawabans()->exists())
+                            <div class="bg-white rounded-2xl border border-amber-200 shadow-sm p-6 text-center mt-6">
                                 <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-3 text-amber-500">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 </div>
                                 <h4 class="font-bold text-sm text-gray-805 mb-2">Lengkapi Persyaratan Magang</h4>
-                                <p class="text-xs text-gray-400 leading-relaxed mb-4">Pengajuan Anda telah disetujui. Lengkapi kuesioner dan biodata di bawah ini agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>.</p>
+                                <p class="text-xs text-gray-400 leading-relaxed mb-4">Pengajuan Anda telah disetujui. Lengkapi kuesioner di bawah ini agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>.</p>
                                 
                                 <div class="space-y-3">
-                                    @if(!$pengajuan->skmJawabans()->exists())
-                                        <a href="{{ route('pengguna.gate.skm', $pengajuan->id) }}" class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
-                                            Isi Kuesioner SKM
-                                        </a>
-                                    @else
-                                        <div class="block w-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold py-2.5 rounded-xl">
-                                            Kuesioner SKM (Selesai ✓)
-                                        </div>
-                                    @endif
-
-                                    @if(!$pengajuan->biodata()->exists())
-                                        @if($pengajuan->skmJawabans()->exists())
-                                            <a href="{{ route('pengguna.gate.biodata', $pengajuan->id) }}" class="block w-full bg-biogen-medium hover:bg-biogen-light text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
-                                                Isi Formulir Biodata
-                                            </a>
-                                        @else
-                                            <button type="button" class="w-full bg-gray-100 text-gray-400 border border-gray-200 text-xs font-bold py-2.5 rounded-xl cursor-not-allowed flex items-center justify-center space-x-1.5" title="Selesaikan Kuesioner SKM terlebih dahulu" disabled>
-                                                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                                                <span>Isi Formulir Biodata (Terkunci)</span>
-                                            </button>
-                                        @endif
-                                    @else
-                                        <div class="block w-full bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold py-2.5 rounded-xl">
-                                            Formulir Biodata (Selesai ✓)
-                                        </div>
-                                    @endif
+                                    <a href="{{ route('pengguna.gate.skm', $pengajuan->id) }}" class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">
+                                        Isi Kuesioner SKM
+                                    </a>
                                 </div>
                             </div>
                         @endif

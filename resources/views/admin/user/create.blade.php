@@ -21,6 +21,19 @@
         </div>
     @endif
 
+    <!-- Notice Email Wajib Asli -->
+    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-900 flex items-start space-x-3">
+        <svg class="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <div>
+            <p class="font-bold text-emerald-950">Wajib Menggunakan Email Asli &amp; Aktif</p>
+            <p class="mt-0.5 leading-relaxed text-emerald-800">
+                Email petugas ini akan otomatis menerima <strong>notifikasi email pendaftaran magang/PKL baru</strong> dari pemohon yang memilih bidang pembimbingan petugas yang bersangkutan.
+            </p>
+        </div>
+    </div>
+
     <div class="max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
         <form method="POST" action="{{ route('admin.user.store') }}" class="space-y-6">
             @csrf
@@ -34,8 +47,9 @@
 
             <!-- Email -->
             <div>
-                <x-input-label for="email" :value="__('Alamat Email Resmi')" />
-                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full text-xs rounded-xl border-gray-200 focus:ring-biogen-medium focus:border-biogen-medium" :value="old('email')" required placeholder="Contoh: eko.wahyudi@pertanian.go.id" />
+                <x-input-label for="email" :value="__('Alamat Email Aktif (Wajib Asli)')" />
+                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full text-xs rounded-xl border-gray-200 focus:ring-biogen-medium focus:border-biogen-medium" :value="old('email')" required placeholder="Contoh: eko.wahyudi@pertanian.go.id atau email@gmail.com" />
+                <p class="text-[10px] text-gray-400 mt-1">Pastikan email dapat menerima pesan (inbox) untuk pemberitahuan pendaftaran pemohon.</p>
                 <x-input-error class="mt-1" :messages="$errors->get('email')" />
             </div>
 

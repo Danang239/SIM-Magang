@@ -61,8 +61,9 @@ class UserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
-            'email.unique' => 'Email ini sudah terdaftar.',
+            'email.required' => 'Alamat email aktif wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid. Pastikan menggunakan email asli yang aktif.',
+            'email.unique' => 'Email ini sudah terdaftar di sistem.',
             'no_hp.required' => 'Nomor HP wajib diisi.',
             'no_hp.regex' => 'Nomor HP hanya boleh berisi angka.',
             'no_hp.min' => 'Nomor HP minimal 10 digit.',
@@ -119,7 +120,9 @@ class UserController extends Controller
             'role' => ['required', 'string', 'exists:roles,name'],
         ], [
             'name.required' => 'Nama lengkap wajib diisi.',
-            'email.required' => 'Email wajib diisi.',
+            'email.required' => 'Alamat email aktif wajib diisi.',
+            'email.email' => 'Format alamat email tidak valid. Pastikan menggunakan email asli yang aktif.',
+            'email.unique' => 'Email ini sudah digunakan oleh akun lain.',
             'no_hp.required' => 'Nomor HP wajib diisi.',
             'no_hp.regex' => 'Nomor HP hanya boleh berisi angka.',
             'role.required' => 'Role pengguna wajib dipilih.',

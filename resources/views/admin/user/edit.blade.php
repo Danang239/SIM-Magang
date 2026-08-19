@@ -35,8 +35,9 @@
 
             <!-- Email -->
             <div>
-                <x-input-label for="email" :value="__('Alamat Email')" />
+                <x-input-label for="email" :value="__('Alamat Email Aktif (Wajib Asli)')" />
                 <x-text-input id="email" name="email" type="email" class="mt-1 block w-full text-xs rounded-xl border-gray-200 focus:ring-biogen-medium focus:border-biogen-medium" :value="old('email', $user->email)" required />
+                <p class="text-[10px] text-gray-400 mt-1">Apabila akun bertindak sebagai Petugas Pembimbing, email ini akan menerima notifikasi pendaftaran dari pemohon.</p>
                 <x-input-error class="mt-1" :messages="$errors->get('email')" />
             </div>
 

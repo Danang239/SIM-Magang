@@ -98,7 +98,7 @@ class PetugasVerifikasiTest extends TestCase
 
         // Assert mail was queued
         Mail::assertQueued(PengajuanDisetujuiMail::class, function ($mail) use ($applicant) {
-            return $mail->hasTo($applicant->email);
+            return collect($mail->to)->contains('address', $applicant->email);
         });
     }
 

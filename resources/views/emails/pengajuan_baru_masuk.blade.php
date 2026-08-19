@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Pengajuan Magang Disetujui</title>
+    <title>Pengajuan Magang Baru Masuk</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -18,7 +18,7 @@
             border-radius: 12px;
             overflow: hidden;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px border #e5e7eb;
+            border: 1px solid #e5e7eb;
         }
         .header {
             background-color: #0b5e3c;
@@ -93,15 +93,19 @@
     <div class="container">
         <div class="header">
             <h1>BRMP BIOGEN</h1>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a7f3d0; font-weight: bold; text-transform: uppercase;">Penerimaan Magang & PKL</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a7f3d0; font-weight: bold; text-transform: uppercase;">Notifikasi Pengajuan Baru</p>
         </div>
         <div class="content">
-            <h2>Halo, {{ $pengajuan->user->name }}</h2>
-            <p>Selamat! Kami senang memberitahu Anda bahwa pengajuan magang/PKL Anda di BRMP Biogen telah <strong>DISETUJUI</strong> oleh petugas verifikasi kami.</p>
+            <h2>Halo, Pembimbing Bidang</h2>
+            <p>Terdapat pengajuan pendaftaran program magang baru yang masuk ke bidang Anda. Silakan melakukan peninjauan berkas calon peserta magang ini.</p>
             
-            <p>Berikut adalah ringkasan detail penempatan Anda:</p>
+            <p>Berikut adalah detail pengajuan:</p>
             
             <div class="details-box">
+                <div class="details-row">
+                    <span class="details-label">Nama Pemohon</span>
+                    <span class="details-val">{{ $pengajuan->user->name }}</span>
+                </div>
                 <div class="details-row">
                     <span class="details-label">Nomor Pengajuan</span>
                     <span class="details-val">{{ $pengajuan->nomor_pengajuan }}</span>
@@ -111,28 +115,16 @@
                     <span class="details-val">{{ $pengajuan->bidang->nama_bidang }}</span>
                 </div>
                 <div class="details-row">
-                    <span class="details-label">Tanggal Mulai</span>
-                    <span class="details-val">{{ \Carbon\Carbon::parse($pengajuan->tanggal_mulai)->translatedFormat('d F Y') }}</span>
+                    <span class="details-label">Tanggal Masuk</span>
+                    <span class="details-val">{{ $pengajuan->created_at->translatedFormat('d F Y') }}</span>
                 </div>
                 <div class="details-row">
-                    <span class="details-label">Rencana Selesai</span>
-                    <span class="details-val">{{ \Carbon\Carbon::parse($pengajuan->tanggal_selesai_rencana)->translatedFormat('d F Y') }}</span>
+                    <span class="details-label">Durasi Magang</span>
+                    <span class="details-val">{{ $pengajuan->durasi_bulan }} Bulan</span>
                 </div>
-                @if($pengajuan->bidang->pembimbing)
-                    <div class="details-row" style="margin-top: 10px; padding-top: 10px; border-top: 1px dashed #e5e7eb;">
-                        <span class="details-label">Pembimbing Lapangan</span>
-                        <span class="details-val">{{ $pengajuan->bidang->pembimbing->name }}</span>
-                    </div>
-                @endif
             </div>
 
-            <p style="background-color: #fef3c7; border-left: 4px solid #f59e0b; padding: 12px; font-size: 13px; color: #78350f; border-radius: 4px;">
-                <strong>PENTING:</strong> Agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>, Anda wajib masuk ke portal website dan melengkapi <strong>Kuesioner SKM</strong>.
-            </p>
-
-            <p>Jika Anda memerlukan informasi lebih lanjut, silakan hubungi unit pelayanan kami melalui WhatsApp di +628111756776 atau surel di magangbiogen@gmail.com.</p>
-
-            <a href="{{ route('pengguna.pengajuan.show', $pengajuan->public_id) }}" class="btn">Lengkapi SKM Sekarang</a>
+            <a href="{{ route('petugas.verifikasi.show', $pengajuan->public_id) }}" class="btn">Tinjau & Verifikasi Pengajuan</a>
         </div>
         <div class="footer">
             SIM-MAGANG &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>

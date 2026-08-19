@@ -57,6 +57,12 @@ class GoogleController extends Controller
 
         Auth::login($user, true);
 
+        // Jika data profil (no_hp, instansi, atau program_studi) belum lengkap, arahkan ke edit profil dengan notifikasi
+        if (empty($user->no_hp) || empty($user->instansi) || empty($user->program_studi)) {
+            return redirect()->route('profile.edit')
+                ->with('info', 'Selamat datang! Silakan lengkapi Nomor HP, Asal Sekolah/Kampus, dan Program Studi Anda agar data pemohon dapat diproses oleh petugas.');
+        }
+
         return redirect()->intended(route('home'));
     }
 }

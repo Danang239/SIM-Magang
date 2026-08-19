@@ -19,6 +19,10 @@ class PengajuanSeeder extends Seeder
      */
     public function run(): void
     {
+        if (Pengajuan::count() > 0) {
+            return;
+        }
+
         $danang = User::where('email', 'danang@example.com')->first();
         $roni = User::where('email', 'roni@example.com')->first();
         $budi = User::where('email', 'budi@biogen.go.id')->first();

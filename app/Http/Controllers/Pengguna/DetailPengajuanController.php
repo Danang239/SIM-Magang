@@ -48,11 +48,24 @@ class DetailPengajuanController extends Controller
             abort(403, 'Anda tidak diizinkan mengakses file ini.');
         }
 
+        // Pengguna pemilik hanya bisa unduh surat_balasan jika SKM sudah diisi
+        if ($type === 'surat_balasan' && $pengajuan->user_id === $user->id) {
+            $skmQuestionsCount = \App\Models\SkmPertanyaan::where('is_active', true)->count();
+            $skmAnsweredCount = $pengajuan->skmJawabans()->count();
+            $skmCompleted = ($skmAnsweredCount >= $skmQuestionsCount && $skmQuestionsCount > 0);
+
+            if (!$skmCompleted) {
+                abort(403, 'Anda wajib melengkapi kuesioner SKM terlebih dahulu sebelum dapat mengunduh surat balasan.');
+            }
+        }
+
         // Get the requested file path
         $path = match ($type) {
+            'foto_diri' => $pengajuan->foto_diri,
             'surat_pengantar' => $pengajuan->file_surat_pengantar,
             'laporan_akhir' => $pengajuan->file_laporan_akhir,
             'surat_keterangan' => $pengajuan->file_surat_keterangan,
+            'surat_balasan' => $pengajuan->file_surat_balasan,
             default => null,
         };
 

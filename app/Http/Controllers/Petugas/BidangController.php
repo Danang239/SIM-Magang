@@ -15,7 +15,7 @@ class BidangController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Bidang::with('pembimbing');
+        $query = Bidang::with(['pembimbing', 'petugasList']);
 
         // Search by nama_bidang
         if ($request->filled('search')) {
@@ -44,7 +44,28 @@ class BidangController extends Controller
      */
     public function store(BidangRequest $request)
     {
-        Bidang::create($request->validated());
+        $data = $request->validated();
+        
+        $petugasIds = $request->input('petugas_ids', []);
+        $kuotaPetugas = $request->input('kuota_petugas', []);
+
+        // Calculate total capacity from assigned petugas quotas if available
+        $totalKuota = 0;
+        $syncData = [];
+
+        foreach ($petugasIds as $pId) {
+            $k = isset($kuotaPetugas[$pId]) ? max(1, (int) $kuotaPetugas[$pId]) : 5;
+            $syncData[$pId] = ['kuota' => $k];
+            $totalKuota += $k;
+        }
+
+        $data['kapasitas'] = $totalKuota > 0 ? $totalKuota : ($data['kapasitas'] ?? 5);
+
+        $bidang = Bidang::create($data);
+
+        if (!empty($syncData)) {
+            $bidang->petugasList()->sync($syncData);
+        }
 
         return redirect()->route('petugas.bidang.index')
             ->with('success', 'Bidang penempatan berhasil ditambahkan.');
@@ -55,6 +76,7 @@ class BidangController extends Controller
      */
     public function edit(Bidang $bidang)
     {
+        $bidang->load('petugasList');
         $pembimbings = User::role(['Petugas', 'Administrator'])->orderBy('name', 'asc')->get();
 
         return view('petugas.bidang.edit', compact('bidang', 'pembimbings'));
@@ -65,7 +87,24 @@ class BidangController extends Controller
      */
     public function update(BidangRequest $request, Bidang $bidang)
     {
-        $bidang->update($request->validated());
+        $data = $request->validated();
+
+        $petugasIds = $request->input('petugas_ids', []);
+        $kuotaPetugas = $request->input('kuota_petugas', []);
+
+        $totalKuota = 0;
+        $syncData = [];
+
+        foreach ($petugasIds as $pId) {
+            $k = isset($kuotaPetugas[$pId]) ? max(1, (int) $kuotaPetugas[$pId]) : 5;
+            $syncData[$pId] = ['kuota' => $k];
+            $totalKuota += $k;
+        }
+
+        $data['kapasitas'] = $totalKuota > 0 ? $totalKuota : ($data['kapasitas'] ?? $bidang->kapasitas);
+
+        $bidang->update($data);
+        $bidang->petugasList()->sync($syncData);
 
         return redirect()->route('petugas.bidang.index')
             ->with('success', 'Bidang penempatan berhasil diperbarui.');

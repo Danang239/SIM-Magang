@@ -12,7 +12,8 @@ class BerandaController extends Controller
      */
     public function index()
     {
-        $bidangs = \App\Models\Bidang::where('is_active', true)->with('pembimbing')->get();
-        return view('guest.beranda', compact('bidangs'));
+        $bidangsPertanian = \App\Models\Bidang::where('is_active', true)->where('kategori', 'Pertanian')->with('pembimbing')->get();
+        $bidangsNonPertanian = \App\Models\Bidang::where('is_active', true)->where('kategori', 'Non Pertanian')->with('pembimbing')->get();
+        return view('guest.beranda', compact('bidangsPertanian', 'bidangsNonPertanian'));
     }
 }

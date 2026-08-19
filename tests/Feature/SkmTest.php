@@ -53,6 +53,7 @@ class SkmTest extends TestCase
         }
 
         $response = $this->actingAs($applicant)->post(route('pengguna.pengajuan.skm.store', $pengajuan->public_id), [
+            'status_disabilitas' => 'Bukan Penyandang Disabilitas',
             'ratings' => $ratings,
             'saran' => 'Pelayanan administrasi sangat memuaskan.',
         ]);

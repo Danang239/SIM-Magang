@@ -25,7 +25,31 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
     'file_laporan_akhir',
     'laporan_status',
     'file_surat_keterangan',
-    'skm_saran'
+    'skm_saran',
+    'nim_nisn',
+    'tempat_lahir',
+    'tanggal_lahir',
+    'jenis_kelamin',
+    'alamat',
+    'kontak_darurat_nama',
+    'kontak_darurat_no',
+    'hubungan_kontak_darurat',
+    'file_surat_balasan',
+    'foto_diri',
+    'nik_ktp',
+    'nama_pimpinan_instansi',
+    'alamat_instansi',
+    'kontak_instansi',
+    'fakultas',
+    'tahun_masuk',
+    'pendidikan_terakhir',
+    'semester_saat_ini',
+    'judul_magang',
+    'tujuan_magang',
+    'nama_dosen_pembimbing',
+    'tanda_tangan_digital',
+    'pembimbing_id',
+    'status_disabilitas'
 ])]
 class Pengajuan extends Model
 {
@@ -46,6 +70,14 @@ class Pengajuan extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relasi ke Pembimbing (Petugas yang dipilih untuk membimbing pengajuan ini).
+     */
+    public function pembimbing(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'pembimbing_id');
     }
 
     /**
@@ -73,14 +105,6 @@ class Pengajuan extends Model
     }
 
     /**
-     * Relasi ke PengajuanBiodata.
-     */
-    public function biodata(): HasOne
-    {
-        return $this->hasOne(PengajuanBiodata::class);
-    }
-
-    /**
      * Cek apakah formulir biodata dan SKM sudah selesai diisi.
      */
     public function isGateCompleted(): bool
@@ -89,8 +113,7 @@ class Pengajuan extends Model
         $skmAnsweredCount = $this->skmJawabans()->count();
 
         $skmCompleted = ($skmAnsweredCount >= $skmQuestionsCount && $skmQuestionsCount > 0);
-        $biodataCompleted = $this->biodata()->exists();
 
-        return $skmCompleted && $biodataCompleted;
+        return $skmCompleted;
     }
 }

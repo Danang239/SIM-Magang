@@ -94,9 +94,13 @@
                             <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                             Konfigurasi SKM
                         </a>
-                        <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <a href="{{ route('admin.rekap-skm.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.rekap-skm.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
                             <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Laporan Tahunan
+                            Rekap SKM
+                        </a>
+                        <a href="{{ route('admin.riwayat-pengajuan.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.riwayat-pengajuan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Riwayat Pengajuan
                         </a>
                     @endif
                 </nav>

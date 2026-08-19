@@ -19,7 +19,7 @@ class LaporanMagangExport implements FromCollection, WithHeadings, WithMapping
     public function collection()
     {
         return Pengajuan::whereYear('created_at', $this->year)
-            ->with(['user', 'bidang', 'biodata'])
+            ->with(['user', 'bidang'])
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -67,14 +67,14 @@ class LaporanMagangExport implements FromCollection, WithHeadings, WithMapping
             $row->user->no_hp ?? '-',
             $row->user->instansi ?? '-',
             $row->user->program_studi ?? '-',
-            $row->biodata ? $row->biodata->nim_nisn : '-',
-            $row->biodata ? $row->biodata->tempat_lahir : '-',
-            $row->biodata && $row->biodata->tanggal_lahir ? $row->biodata->tanggal_lahir->toDateString() : '-',
-            $row->biodata ? $row->biodata->jenis_kelamin : '-',
-            $row->biodata ? $row->biodata->alamat : '-',
-            $row->biodata ? $row->biodata->kontak_darurat_nama : '-',
-            $row->biodata ? $row->biodata->kontak_darurat_no : '-',
-            $row->biodata ? $row->biodata->hubungan_kontak_darurat : '-',
+            $row->nim_nisn ?? '-',
+            $row->tempat_lahir ?? '-',
+            $row->tanggal_lahir ? $row->tanggal_lahir->toDateString() : '-',
+            $row->jenis_kelamin ?? '-',
+            $row->alamat ?? '-',
+            $row->kontak_darurat_nama ?? '-',
+            $row->kontak_darurat_no ?? '-',
+            $row->hubungan_kontak_darurat ?? '-',
             $row->bidang->nama_bidang,
             $row->jenjang,
             $row->durasi_bulan,

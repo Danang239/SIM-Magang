@@ -23,20 +23,19 @@ class BidangRequest extends FormRequest
         return [
             'nama_bidang' => ['required', 'string', 'max:255'],
             'deskripsi' => ['required', 'string', 'max:2000'],
+            'jobdesc' => ['nullable', 'string', 'max:4000'],
             'jenjang' => ['required', 'string', 'in:Siswa,Mahasiswa'],
             'kategori' => ['required', 'string', 'in:Pertanian,Non Pertanian'],
             'pembimbing_id' => [
                 'nullable',
                 'integer',
                 'exists:users,id',
-                function ($attribute, $value, $fail) {
-                    $user = User::find($value);
-                    if ($user && !$user->hasAnyRole(['Petugas', 'Administrator'])) {
-                        $fail('User yang dipilih sebagai pembimbing harus memiliki role Petugas atau Administrator.');
-                    }
-                },
             ],
-            'kapasitas' => ['required', 'integer', 'min:1', 'max:100'],
+            'petugas_ids' => ['nullable', 'array'],
+            'petugas_ids.*' => ['integer', 'exists:users,id'],
+            'kuota_petugas' => ['nullable', 'array'],
+            'kuota_petugas.*' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'kapasitas' => ['nullable', 'integer', 'min:1', 'max:100'],
             'is_active' => ['required', 'boolean'],
         ];
     }

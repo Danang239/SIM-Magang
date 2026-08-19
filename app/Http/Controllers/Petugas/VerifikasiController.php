@@ -20,7 +20,7 @@ class VerifikasiController extends Controller
     public function index(Request $request)
     {
         $query = Pengajuan::where('status', 'Menunggu Verifikasi')
-            ->with(['user', 'bidang']);
+            ->with(['user', 'bidang', 'pembimbing', 'bidang.petugasList']);
 
         // Search by applicant name or nomor_pengajuan
         if ($request->filled('search')) {
@@ -45,7 +45,7 @@ class VerifikasiController extends Controller
     {
         $pengajuan = Pengajuan::where('public_id', $publicId)
             ->where('status', 'Menunggu Verifikasi')
-            ->with(['user', 'bidang', 'bidang.pembimbing'])
+            ->with(['user', 'bidang', 'pembimbing', 'bidang.pembimbing', 'bidang.petugasList'])
             ->firstOrFail();
 
         return view('petugas.verifikasi.show', compact('pengajuan'));
@@ -64,6 +64,20 @@ class VerifikasiController extends Controller
         $catatan = $request->input('catatan');
 
         if ($action === 'setujui') {
+            if ($request->hasFile('file_surat_balasan')) {
+                $file = $request->file('file_surat_balasan');
+                $allowedMimes = ['application/pdf'];
+                $allowedExtensions = ['pdf'];
+                $ext = strtolower($file->getClientOriginalExtension());
+                if (!in_array($ext, $allowedExtensions) || !in_array($file->getMimeType(), $allowedMimes)) {
+                    return back()->withErrors(['file_surat_balasan' => 'Tipe file tidak diizinkan berdasarkan konten file. Harus PDF.'])->withInput();
+                }
+                
+                $filePath = $file->store('surat-balasan', 'local');
+                $pengajuan->file_surat_balasan = $filePath;
+                $pengajuan->save();
+            }
+
             $this->pengajuanService->ubahStatus(
                 $pengajuan,
                 'Disetujui',

@@ -35,6 +35,10 @@ class AuthenticatedSessionController extends Controller
             return redirect()->intended(route('petugas.dashboard'));
         }
 
+        if ($user->hasRole('Pengguna') && session()->has('bidang_id')) {
+            return redirect()->route('pengguna.career.step1', ['bidang_id' => session('bidang_id')]);
+        }
+
         return redirect()->intended(route('home'));
     }
 

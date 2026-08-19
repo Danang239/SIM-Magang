@@ -47,7 +47,6 @@
                         <a href="/" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Beranda</a>
                         @auth
                             @if(auth()->user()->hasRole('Pengguna'))
-                                <a href="{{ route('pengguna.career.step1') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Daftar Magang</a>
                                 <a href="{{ route('pengguna.riwayat') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Riwayat</a>
                                 <a href="{{ route('profile.edit') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Profil</a>
                             @else

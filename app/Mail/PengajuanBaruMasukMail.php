@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class PengajuanDitolakMail extends Mailable implements ShouldQueue
+class PengajuanBaruMasukMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -18,8 +18,7 @@ class PengajuanDitolakMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      */
     public function __construct(
-        public int $pengajuanId,
-        public ?string $catatan = null
+        public int $pengajuanId
     ) {}
 
     /**
@@ -28,7 +27,7 @@ class PengajuanDitolakMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Pengajuan Magang / PKL DITOLAK - BRMP Biogen',
+            subject: 'Ada Pengajuan Magang Baru Masuk - SIM-MAGANG',
         );
     }
 
@@ -38,7 +37,7 @@ class PengajuanDitolakMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.pengajuan_ditolak',
+            view: 'emails.pengajuan_baru_masuk',
             with: [
                 'pengajuan' => Pengajuan::with(['user', 'bidang'])->findOrFail($this->pengajuanId),
             ],

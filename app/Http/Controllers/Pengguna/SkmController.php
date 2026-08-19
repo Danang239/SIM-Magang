@@ -34,6 +34,7 @@ class SkmController extends Controller
 
         // Construct validation rules dynamically
         $rules = [
+            'status_disabilitas' => ['required', 'string', 'max:255'],
             'saran' => ['nullable', 'string', 'max:1000'],
             'ratings' => ['required', 'array'],
         ];
@@ -43,6 +44,7 @@ class SkmController extends Controller
         }
 
         $validated = $request->validate($rules, [
+            'status_disabilitas.required' => 'Status disabilitas wajib dipilih.',
             'ratings.required' => 'Seluruh instrumen pertanyaan rating wajib diisi.',
             'ratings.*.required' => 'Setiap pertanyaan kuesioner wajib diberi nilai rating.',
             'ratings.*.min' => 'Rating minimal adalah 1 bintang.',
@@ -59,9 +61,10 @@ class SkmController extends Controller
             ]);
         }
 
-        // Save suggestions in pengajuans table
+        // Save suggestions and disability status in pengajuans table
         $pengajuan->update([
             'skm_saran' => $request->input('saran'),
+            'status_disabilitas' => $request->input('status_disabilitas'),
         ]);
 
         return back()->with('success', 'Terima kasih! Survei kepuasan masyarakat berhasil dikirim.');
