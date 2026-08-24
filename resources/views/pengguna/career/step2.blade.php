@@ -339,28 +339,53 @@
                     </h2>
                     <p class="text-xs text-gray-500 mb-4">Wajib mengunggah surat pengantar resmi dari sekolah atau universitas Anda. Format: PDF, JPG, PNG (Maks. 2MB).</p>
 
-                    <div class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center hover:border-emerald-500 transition-colors"
-                        x-data="{ fileName: '' }"
+                    <div class="border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 relative cursor-pointer"
+                        :class="isDragging ? 'border-emerald-500 bg-emerald-50/80 scale-[1.01] shadow-lg ring-4 ring-emerald-500/10' : (fileName ? 'border-emerald-400 bg-emerald-50/30' : 'border-gray-200 bg-gray-50/50 hover:border-emerald-400 hover:bg-gray-50')"
+                        x-data="{ fileName: '', isDragging: false }"
+                        @dragover.prevent="isDragging = true"
+                        @dragleave.prevent="isDragging = false"
                         @drop.prevent="
+                            isDragging = false;
                             const f = $event.dataTransfer.files[0];
                             if(f) { fileName = f.name; $refs.fileInput.files = $event.dataTransfer.files; }
-                        "
-                        @dragover.prevent>
-                        <svg class="w-8 h-8 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                        ">
+                        
+                        <div class="w-14 h-14 rounded-2xl bg-emerald-100/80 text-emerald-600 mx-auto mb-3 flex items-center justify-center transition-transform duration-300"
+                             :class="isDragging ? 'scale-110 rotate-6 bg-emerald-600 text-white' : ''">
+                            <svg class="w-7 h-7" :class="isDragging ? 'animate-bounce' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                            </svg>
+                        </div>
+
                         <template x-if="!fileName">
-                            <div>
-                                <p class="text-xs text-gray-500 mb-2">Seret & lepas file di sini, atau</p>
-                                <label for="file_surat_pengantar" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-4 py-2 rounded-lg font-bold shadow transition-all duration-200 inline-block">
-                                    Pilih File Surat Pengantar
-                                </label>
+                            <div class="space-y-1.5">
+                                <p class="text-xs font-bold text-gray-700" x-text="isDragging ? 'Lepaskan file di sini...' : 'Seret & lepas file Surat Pengantar di sini'"></p>
+                                <p class="text-[11px] text-gray-400">atau klik tombol di bawah untuk jelajahi berkas</p>
+                                <div class="pt-2">
+                                    <label for="file_surat_pengantar" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200 inline-block">
+                                        Pilih Berkas PDF / Gambar
+                                    </label>
+                                </div>
                             </div>
                         </template>
+
                         <template x-if="fileName">
-                            <div>
-                                <p class="text-xs font-semibold text-emerald-800" x-text="fileName"></p>
-                                <button type="button" class="text-[10px] text-gray-400 hover:text-red-500 mt-1 transition-colors" @click="fileName = ''; $refs.fileInput.value = ''">Hapus</button>
+                            <div class="p-3 bg-white rounded-xl border border-emerald-200 shadow-sm max-w-md mx-auto flex items-center justify-between space-x-3">
+                                <div class="flex items-center space-x-3 truncate">
+                                    <div class="p-2 bg-emerald-100 text-emerald-700 rounded-lg shrink-0">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    </div>
+                                    <div class="text-left truncate">
+                                        <p class="text-xs font-bold text-gray-900 truncate" x-text="fileName"></p>
+                                        <span class="text-[10px] text-emerald-600 font-semibold">File Siap Diunggah</span>
+                                    </div>
+                                </div>
+                                <button type="button" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors shrink-0" title="Ganti File" @click="fileName = ''; $refs.fileInput.value = ''">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                </button>
                             </div>
                         </template>
+
                         <input type="file"
                             id="file_surat_pengantar"
                             name="file_surat_pengantar"
@@ -368,7 +393,7 @@
                             required
                             class="hidden"
                             x-ref="fileInput"
-                            @change="fileName = $event.target.files[0]?.name ?? ''">
+                            @change="fileName = $event.target.files[0]?.name || ''">
                         <p class="text-[9px] text-gray-400 mt-3">Format: PDF, JPG, PNG • Ukuran file maksimal 2MB</p>
                     </div>
                 </div>

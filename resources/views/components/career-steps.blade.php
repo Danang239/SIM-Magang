@@ -12,22 +12,22 @@ $steps = [
         <div class="flex items-center {{ !$loop->last ? 'flex-1' : '' }}">
             <div class="flex flex-col items-center">
                 <div class="w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                    {{ $current == $num ? 'bg-emerald-600 border-emerald-600 text-white shadow-md' :
-                       ($current > $num ? 'bg-emerald-800 border-emerald-800 text-white' : 'bg-white border-gray-200 text-gray-400') }}">
+                    {{ $current == $num ? 'bg-emerald-600 border-emerald-600 text-white shadow-md ring-4 ring-emerald-500/25 scale-105' :
+                       ($current > $num ? 'bg-emerald-800 border-emerald-800 text-white shadow-sm' : 'bg-white border-gray-200 text-gray-400') }}">
                     @if($current > $num)
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
                         </svg>
                     @else
-                        <span class="text-sm font-bold">{{ $num }}</span>
+                        <span class="text-sm font-extrabold">{{ $num }}</span>
                     @endif
                 </div>
-                <span class="text-[11px] mt-1.5 font-bold whitespace-nowrap {{ $current == $num ? 'text-emerald-600' : ($current > $num ? 'text-emerald-800' : 'text-gray-400') }}">
+                <span class="text-[11px] mt-2 font-bold whitespace-nowrap transition-colors duration-200 {{ $current == $num ? 'text-emerald-700 font-extrabold' : ($current > $num ? 'text-emerald-800' : 'text-gray-400') }}">
                     {{ $step['label'] }}
                 </span>
             </div>
             @if(!$loop->last)
-                <div class="flex-1 h-0.5 mx-3 mt-[-18px] {{ $current > $num ? 'bg-emerald-800' : 'bg-gray-200' }}"></div>
+                <div class="flex-1 h-1 mx-3 mt-[-18px] rounded-full transition-all duration-500 {{ $current > $num ? 'bg-emerald-700' : 'bg-gray-200' }}"></div>
             @endif
         </div>
     @endforeach

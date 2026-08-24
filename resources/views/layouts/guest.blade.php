@@ -14,40 +14,117 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased min-h-screen flex flex-col justify-center items-center relative overflow-x-hidden py-12 px-4 sm:px-6 lg:px-8">
+    <body class="font-sans antialiased min-h-screen bg-white m-0 p-0 overflow-x-hidden page-fade-enter">
         
-        <!-- Bulletproof Inline Green Gradient Overlay (Guaranteed to work regardless of Tailwind compilation) -->
-        <div class="absolute inset-0 z-10" style="background: linear-gradient(135deg, rgba(6, 78, 59, 0.92) 0%, rgba(2, 44, 23, 0.97) 100%);"></div>
-        
-        <!-- Full Building Background Image -->
-        <div class="absolute inset-0 bg-cover bg-center z-0" style="background-image: url('{{ asset('background-dengan-logo.png') }}');"></div>
+        <!-- Top Loading Progress Bar -->
+        <div id="page-progress-bar" 
+             class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-emerald-500 via-emerald-400 to-amber-300 z-[9999] transition-all duration-300 ease-out w-0 shadow-[0_0_10px_rgba(16,185,129,0.9)] opacity-0 pointer-events-none"></div>
 
-        <!-- Content Container -->
-        <div class="relative z-20 w-full flex flex-col items-center">
-            
-            <!-- Semi-transparent Card Box with Glassmorphism effect wrapping all content -->
-            <div class="w-full sm:max-w-md bg-white/85 backdrop-blur-md p-8 rounded-2xl shadow-2xl border border-white/35">
+        <style>
+            .page-fade-enter {
+                opacity: 0;
+                transition: opacity 0.22s ease-out;
+            }
+            .page-fade-active {
+                opacity: 1;
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                requestAnimationFrame(() => {
+                    document.body.classList.add('page-fade-active');
+                });
+
+                const bar = document.getElementById('page-progress-bar');
                 
-                <!-- Branding Logo inside the card so it is covered and highly readable -->
-                <div class="flex items-center justify-center space-x-2.5 mb-8">
-                    <div class="w-9 h-9 rounded-xl bg-biogen-medium flex items-center justify-center shadow-md">
-                        <svg class="w-5.5 h-5.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v18M12 3a9 9 0 019 9m-9-9a9 9 0 00-9 9m9 9a9 9 0 019-9m-9 9a9 9 0 00-9-9M6 12h12M9 8h6M9 16h6" />
-                        </svg>
+                document.addEventListener('click', (e) => {
+                    const anchor = e.target.closest('a');
+                    if (!anchor) return;
+
+                    const href = anchor.getAttribute('href');
+                    const target = anchor.getAttribute('target');
+
+                    if (href && !href.startsWith('#') && !href.startsWith('javascript:') && target !== '_blank' && !e.ctrlKey && !e.metaKey) {
+                        if (anchor.hostname === window.location.hostname) {
+                            if (bar) {
+                                bar.style.opacity = '1';
+                                bar.style.width = '75%';
+                            }
+                        }
+                    }
+                });
+
+                window.addEventListener('beforeunload', () => {
+                    if (bar) {
+                        bar.style.opacity = '1';
+                        bar.style.width = '100%';
+                    }
+                });
+            });
+        </script>
+        
+        <!-- Full-Screen Split Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 min-h-screen w-full">
+            
+            <!-- LEFT SIDE: Full-Height Image & Green Gradient Overlay (60% Width) -->
+            <div class="lg:col-span-7 relative hidden lg:flex flex-col justify-between p-10 lg:p-14 text-white bg-cover bg-center overflow-hidden min-h-screen" style="background-image: url('{{ asset('background.png') }}');">
+                <!-- Dark Green Gradient Overlay for Text Readability -->
+                <div class="absolute inset-0 z-0" style="background: linear-gradient(135deg, rgba(4, 47, 29, 0.92) 0%, rgba(11, 94, 60, 0.85) 50%, rgba(9, 77, 49, 0.92) 100%);"></div>
+
+                <!-- Top Branding -->
+                <div class="relative z-10 flex items-center space-x-3">
+                    <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-11 h-11 object-contain drop-shadow-md shrink-0">
+                    <div>
+                        <span class="font-black text-2xl tracking-tight text-white block leading-none font-sans">BRMP Biogen</span>
+                        <span class="text-xs text-emerald-200 uppercase tracking-widest font-semibold mt-1 block">Balai Besar R&amp;D</span>
                     </div>
-                    <span class="font-bold text-xl text-gray-800 font-sans tracking-tight">
-                        BRMP <span class="text-biogen-medium">Biogen</span>
-                    </span>
                 </div>
 
-                <!-- Form Content slot -->
-                {{ $slot }}
+                <!-- Middle Content -->
+                <div class="relative z-10 space-y-5 my-auto py-12 max-w-lg">
+                    <div class="inline-flex items-center space-x-2 bg-emerald-900/70 border border-emerald-400/40 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-200">
+                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span class="uppercase tracking-wider">SIM-MAGANG &amp; PKL</span>
+                    </div>
+                    <h1 class="text-3xl lg:text-4xl font-extrabold leading-tight font-sans text-white">
+                        Modernisasi Bioteknologi Pertanian Indonesia
+                    </h1>
+                    <p class="text-sm text-emerald-100/90 leading-relaxed font-medium">
+                        Bergabunglah bersama peneliti &amp; praktisi ahli di Balai Besar Research &amp; Development Biogen. Akses portal pendaftaran dan kelola berkas Anda secara terintegrasi.
+                    </p>
+                </div>
 
-                <!-- Small inside footer -->
-                <p class="mt-8 text-[10px] text-gray-400 text-center font-medium uppercase tracking-wider">
+                <!-- Bottom Footer -->
+                <div class="relative z-10 pt-6 border-t border-white/15 text-xs text-emerald-200/70 font-medium">
                     © {{ date('Y') }} BRMP Biogen — Kementerian Pertanian RI
-                </p>
+                </div>
             </div>
+
+            <!-- RIGHT SIDE: Clean Form Slot Container (40% Width) -->
+            <div class="lg:col-span-5 flex flex-col justify-between items-center p-6 sm:p-10 lg:p-14 bg-white min-h-screen relative">
+                
+                <!-- Header Branding Logo for Mobile -->
+                <div class="w-full max-w-md flex lg:hidden items-center justify-between mb-8">
+                    <a href="/" class="flex items-center space-x-2.5">
+                        <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-9 h-9 object-contain shrink-0">
+                        <span class="font-bold text-lg text-gray-800 font-sans tracking-tight">
+                            BRMP <span class="text-biogen-medium">Biogen</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Form Content Slot (Centered Vertically) -->
+                <div class="w-full max-w-md my-auto space-y-6">
+                    {{ $slot }}
+                </div>
+
+                <!-- Footer Copyright for Mobile -->
+                <div class="w-full max-w-md lg:hidden mt-8 text-center text-xs text-gray-400 font-medium border-t border-gray-100 pt-4">
+                    © {{ date('Y') }} BRMP Biogen — Kementerian Pertanian RI
+                </div>
+            </div>
+
         </div>
 
     </body>

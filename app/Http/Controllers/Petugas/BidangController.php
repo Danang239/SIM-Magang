@@ -61,6 +61,10 @@ class BidangController extends Controller
 
         $data['kapasitas'] = $totalKuota > 0 ? $totalKuota : ($data['kapasitas'] ?? 5);
 
+        if ($request->hasFile('gambar')) {
+            $data['gambar'] = $request->file('gambar')->store('bidang', 'public');
+        }
+
         $bidang = Bidang::create($data);
 
         if (!empty($syncData)) {
@@ -102,6 +106,13 @@ class BidangController extends Controller
         }
 
         $data['kapasitas'] = $totalKuota > 0 ? $totalKuota : ($data['kapasitas'] ?? $bidang->kapasitas);
+
+        if ($request->hasFile('gambar')) {
+            if ($bidang->gambar && \Illuminate\Support\Facades\Storage::disk('public')->exists($bidang->gambar)) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($bidang->gambar);
+            }
+            $data['gambar'] = $request->file('gambar')->store('bidang', 'public');
+        }
 
         $bidang->update($data);
         $bidang->petugasList()->sync($syncData);

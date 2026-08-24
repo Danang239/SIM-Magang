@@ -3,3 +3,9 @@
 @tailwind utilities;
 
 [x-cloak] { display: none !important; }
+
+/* Hide native Microsoft Edge & Internet Explorer password reveal buttons */
+input::-ms-reveal,
+input::-ms-clear {
+    display: none !important;
+}

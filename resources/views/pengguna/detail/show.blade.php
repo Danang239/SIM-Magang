@@ -35,7 +35,8 @@
                                 <h2 class="text-xl font-extrabold tracking-wider mt-0.5">{{ $pengajuan->nomor_pengajuan }}</h2>
                             </div>
                             @php
-                                $badgeClasses = match($pengajuan->status) {
+                                $statusDisplay = $pengajuan->status_efektif;
+                                $badgeClasses = match($statusDisplay) {
                                     'Disetujui' => 'bg-green-700 text-green-100',
                                     'Menunggu Verifikasi' => 'bg-yellow-600 text-yellow-100',
                                     'Ditolak' => 'bg-red-700 text-red-100',
@@ -47,7 +48,7 @@
                                 };
                             @endphp
                             <div class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider {{ $badgeClasses }}">
-                                {{ $pengajuan->status }}
+                                {{ $statusDisplay }}
                             </div>
                         </div>
 
@@ -148,7 +149,7 @@
                                 $skmCompleted = ($skmAnsweredCount >= $skmQuestionsCount && $skmQuestionsCount > 0);
                             @endphp
 
-                            <!-- Surat Balasan (Conditional) -->
+                            <!-- Surat Balasan & Bukti Penerimaan (Conditional) -->
                             @if($pengajuan->file_surat_balasan)
                                 <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 bg-gray-50 transition-colors">
                                     <div class="flex items-center space-x-3">
@@ -160,10 +161,10 @@
                                             @endif
                                         </div>
                                         <div>
-                                            <p class="text-xs font-bold text-gray-800">Surat Balasan Resmi</p>
+                                            <p class="text-xs font-bold text-gray-800">Surat Balasan Resmi BRMP Biogen</p>
                                             <p class="text-[10px] text-gray-400">
                                                 @if($skmCompleted)
-                                                    Dokumen Resmi BRMP Biogen
+                                                    Dokumen Penerimaan Magang Resmi
                                                 @else
                                                     Terkunci - Lengkapi Kuesioner SKM Terlebih Dahulu
                                                 @endif
@@ -184,135 +185,8 @@
                                     @endif
                                 </div>
                             @endif
-
-                            <!-- Laporan Akhir (Conditional) -->
-                            @if($pengajuan->file_laporan_akhir)
-                                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 bg-gray-50 hover:bg-emerald-50 transition-colors">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-emerald-100 text-biogen-medium flex items-center justify-center">
-                                            <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-gray-800">Laporan Akhir Magang</p>
-                                            <p class="text-[10px] text-gray-400">Status Laporan: <span class="font-bold text-biogen-medium">{{ $pengajuan->laporan_status }}</span></p>
-                                        </div>
-                                    </div>
-                                    <a href="{{ route('pengajuan.file', [$pengajuan->public_id, 'laporan_akhir']) }}" target="_blank"
-                                        class="text-xs font-bold text-biogen-medium hover:text-biogen-dark underline flex items-center space-x-1">
-                                        <span>Lihat File</span>
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-                                    </a>
-                                </div>
-                            @endif
-
-                            <!-- Surat Keterangan Selesai (Conditional) -->
-                            @if($pengajuan->file_surat_keterangan)
-                                <div class="flex items-center justify-between p-3.5 rounded-xl border border-gray-100 bg-emerald-50 hover:bg-emerald-100 transition-colors">
-                                    <div class="flex items-center space-x-3">
-                                        <div class="w-10 h-10 rounded-lg bg-emerald-600 text-white flex items-center justify-center shadow">
-                                            <svg class="w-5.5 h-5.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        </div>
-                                        <div>
-                                            <p class="text-xs font-bold text-emerald-900">Surat Keterangan Selesai Magang</p>
-                                            <p class="text-[10px] text-emerald-600 font-medium">Dokumen Resmi BRMP Biogen</p>
-                                        </div>
-                                    </div>
-                                    <a href="{{ route('pengajuan.file', [$pengajuan->public_id, 'surat_keterangan']) }}" target="_blank"
-                                        class="text-xs font-bold text-emerald-700 hover:text-emerald-950 underline flex items-center space-x-1">
-                                        <span>Unduh Bukti</span>
-                                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-                                    </a>
-                                </div>
-                            @endif
                         </div>
                     </div>
-
-                    {{-- ===== UPLOAD LAPORAN AKHIR SECTION ===== --}}
-                    @if($pengajuan->status === 'Sedang Magang')
-                        <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                            {{-- Card Header --}}
-                            <div class="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                                <div class="flex items-center space-x-3">
-                                    <div class="w-9 h-9 rounded-xl bg-cyan-50 text-cyan-600 flex items-center justify-center shrink-0">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-                                    </div>
-                                    <div>
-                                        <h3 class="font-bold text-gray-800 text-sm font-sans">Unggah Laporan Akhir Magang</h3>
-                                        <p class="text-[10px] text-gray-400">Syarat wajib penyelesaian program magang</p>
-                                    </div>
-                                </div>
-                                {{-- Status Badge --}}
-                                @if($pengajuan->laporan_status === 'Menunggu Review')
-                                    <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-yellow-500 inline-block"></span>
-                                        <span>Menunggu Review</span>
-                                    </span>
-                                @elseif($pengajuan->laporan_status === 'Ditolak')
-                                    <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-red-50 text-red-700 border border-red-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-red-500 inline-block"></span>
-                                        <span>Ditolak – Upload Ulang</span>
-                                    </span>
-                                @else
-                                    <span class="inline-flex items-center space-x-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-gray-100 text-gray-500 border border-gray-200">
-                                        <span class="w-1.5 h-1.5 rounded-full bg-gray-400 inline-block"></span>
-                                        <span>Belum Diunggah</span>
-                                    </span>
-                                @endif
-                            </div>
-
-                            <div class="p-6">
-                                {{-- Ditolak Alert --}}
-                                @if($pengajuan->laporan_status === 'Ditolak')
-                                    <div class="mb-5 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3">
-                                        <svg class="w-5 h-5 text-red-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-                                        <div>
-                                            <p class="text-xs font-bold text-red-800">Laporan Akhir Anda Ditolak</p>
-                                            <p class="text-xs text-red-600 mt-0.5 leading-relaxed">Petugas telah meninjau laporan Anda dan menyatakan tidak memenuhi syarat. Silakan unggah ulang laporan yang telah diperbaiki.</p>
-                                        </div>
-                                    </div>
-                                @elseif($pengajuan->laporan_status === 'Menunggu Review')
-                                    <div class="mb-5 p-4 bg-yellow-50 border border-yellow-200 rounded-xl flex items-start space-x-3">
-                                        <svg class="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                        <div>
-                                            <p class="text-xs font-bold text-yellow-800">Laporan Sedang Ditinjau Petugas</p>
-                                            <p class="text-xs text-yellow-700 mt-0.5 leading-relaxed">Laporan Anda telah berhasil diunggah dan sedang menunggu tinjauan dari petugas pembimbing. Harap tunggu notifikasi lebih lanjut.</p>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                {{-- Upload Form (tampil jika belum ada laporan atau ditolak) --}}
-                                @if($pengajuan->laporan_status === null || $pengajuan->laporan_status === 'Ditolak')
-                                    {{-- Panduan Upload --}}
-                                    <ul class="mb-5 space-y-1.5 text-xs text-gray-500">
-                                        <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-biogen-medium shrink-0 inline-block"></span><span>Format file: <strong class="text-gray-700">PDF saja</strong></span></li>
-                                        <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-biogen-medium shrink-0 inline-block"></span><span>Ukuran maksimal: <strong class="text-gray-700">2 MB</strong></span></li>
-                                        <li class="flex items-center space-x-2"><span class="w-1.5 h-1.5 rounded-full bg-biogen-medium shrink-0 inline-block"></span><span>Pastikan laporan sudah ditandatangani dan dicap resmi sebelum diunggah</span></li>
-                                    </ul>
-
-                                    <form method="POST" action="{{ route('pengguna.pengajuan.laporan.store', $pengajuan->public_id) }}" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="border-2 border-dashed border-gray-200 rounded-xl p-5 text-center bg-gray-50 hover:border-biogen-medium hover:bg-emerald-50/30 transition-all duration-200 cursor-pointer group"
-                                             onclick="document.getElementById('input_laporan').click()">
-                                            <svg class="w-10 h-10 text-gray-300 group-hover:text-biogen-medium mx-auto mb-2 transition-colors duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                            <p class="text-xs font-bold text-gray-600 group-hover:text-biogen-medium transition-colors duration-200">Klik untuk memilih file PDF</p>
-                                            <p class="text-[10px] text-gray-400 mt-1" id="laporan_filename">Belum ada file yang dipilih</p>
-                                        </div>
-                                        <input type="file" id="input_laporan" name="file_laporan_akhir" accept="application/pdf" class="hidden" required
-                                               onchange="document.getElementById('laporan_filename').textContent = this.files[0] ? this.files[0].name : 'Belum ada file yang dipilih'; document.getElementById('btn_kirim_laporan').disabled = false;">
-
-                                        <button type="submit" id="btn_kirim_laporan"
-                                            class="mt-4 w-full bg-biogen-medium hover:bg-biogen-light text-white text-sm font-bold py-3 rounded-xl shadow transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled>
-                                            <span class="flex items-center justify-center space-x-2">
-                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
-                                                <span>Kirim Laporan Akhir</span>
-                                            </span>
-                                        </button>
-                                    </form>
-                                @endif
-                            </div>
-                        </div>
-                    @endif
 
                     <!-- SKM Survey Questionnaire Form (Conditional for Selesai) -->
                     @if($pengajuan->status === 'Selesai')

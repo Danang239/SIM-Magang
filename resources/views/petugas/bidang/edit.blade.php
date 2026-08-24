@@ -22,9 +22,27 @@
     @endif
 
     <div class="max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-        <form method="POST" action="{{ route('petugas.bidang.update', $bidang->id) }}" class="space-y-6">
+        <form method="POST" action="{{ route('petugas.bidang.update', $bidang->id) }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
             @method('PUT')
+
+            <!-- Upload Gambar Banner Bidang -->
+            <div>
+                <x-input-label for="gambar" :value="__('Gambar / Banner Bidang (Opsional)')" />
+                @if($bidang->gambar)
+                    <div class="mt-2 mb-3 flex items-center space-x-4 p-2 bg-gray-50 rounded-xl border border-gray-200">
+                        <img src="{{ asset('storage/' . $bidang->gambar) }}" alt="{{ $bidang->nama_bidang }}" class="w-24 h-16 object-cover rounded-lg shadow-sm shrink-0">
+                        <div>
+                            <p class="text-xs font-semibold text-gray-700">Gambar Banner saat ini</p>
+                            <p class="text-[10px] text-gray-400">Pilih file baru di bawah ini jika ingin mengganti gambar ini.</p>
+                        </div>
+                    </div>
+                @endif
+                <input type="file" id="gambar" name="gambar" accept="image/*"
+                    class="mt-1 block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-gray-200 rounded-xl p-1 cursor-pointer">
+                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB. Gambar ini akan menjadi foto cover kartu bidang pada beranda.</p>
+                <x-input-error class="mt-1" :messages="$errors->get('gambar')" />
+            </div>
 
             <!-- Nama Bidang -->
             <div>

@@ -57,12 +57,13 @@ class GoogleController extends Controller
 
         Auth::login($user, true);
 
-        // Jika data profil (no_hp, instansi, atau program_studi) belum lengkap, arahkan ke edit profil dengan notifikasi
+        // Setelah login via Google, langsung arahkan ke halaman profile dengan alert/pemberitahuan
         if (empty($user->no_hp) || empty($user->instansi) || empty($user->program_studi)) {
             return redirect()->route('profile.edit')
-                ->with('info', 'Selamat datang! Silakan lengkapi Nomor HP, Asal Sekolah/Kampus, dan Program Studi Anda agar data pemohon dapat diproses oleh petugas.');
+                ->with('warning', 'Selamat datang ' . $user->name . '! Anda berhasil masuk menggunakan Google. Silakan lengkapi biodata Anda (Nomor WhatsApp, Asal Sekolah/Universitas, dan Program Studi) pada form di bawah ini agar data pemohon magang Anda valid.');
         }
 
-        return redirect()->intended(route('home'));
+        return redirect()->route('profile.edit')
+            ->with('info', 'Selamat datang kembali, ' . $user->name . '! Anda berhasil masuk menggunakan akun Google. Mohon periksa kembali ketersediaan biodata diri Anda.');
     }
 }

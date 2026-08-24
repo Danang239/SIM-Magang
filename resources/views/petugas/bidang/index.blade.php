@@ -72,8 +72,19 @@
                         @foreach($bidangs as $bidang)
                             <tr class="hover:bg-gray-50/70 transition-colors">
                                 <td class="px-6 py-4">
-                                    <p class="font-bold text-gray-800 text-sm">{{ $bidang->nama_bidang }}</p>
-                                    <p class="text-[10px] text-gray-400 mt-0.5 max-w-sm truncate">{{ $bidang->deskripsi }}</p>
+                                    <div class="flex items-center space-x-3">
+                                        @if($bidang->gambar)
+                                            <img src="{{ asset('storage/' . $bidang->gambar) }}" alt="{{ $bidang->nama_bidang }}" class="w-10 h-10 object-cover rounded-lg shadow-sm shrink-0 border border-gray-200" />
+                                        @else
+                                            <div class="w-10 h-10 rounded-lg bg-emerald-100/60 text-emerald-700 flex items-center justify-center font-bold text-xs shrink-0 border border-emerald-200">
+                                                {{ strtoupper(substr($bidang->nama_bidang, 0, 2)) }}
+                                            </div>
+                                        @endif
+                                        <div>
+                                            <p class="font-bold text-gray-800 text-sm">{{ $bidang->nama_bidang }}</p>
+                                            <p class="text-[10px] text-gray-400 mt-0.5 max-w-xs truncate">{{ $bidang->deskripsi }}</p>
+                                        </div>
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     <span class="inline-block text-[9px] bg-emerald-50 text-biogen-dark px-2 py-0.5 rounded font-bold uppercase border border-emerald-100">

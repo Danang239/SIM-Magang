@@ -26,8 +26,8 @@
 
                     <div class="absolute bottom-6 left-6 right-6 z-10 text-white">
                         <div class="flex flex-wrap gap-2 mb-3">
-                            <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full {{ $bidang->jenjang === 'Mahasiswa' ? 'bg-blue-500 text-white' : 'bg-orange-500 text-white' }}">
-                                Jalur {{ $bidang->jenjang }}
+                            <span class="inline-block text-[10px] font-extrabold uppercase tracking-wider px-3 py-1 rounded-full shadow-sm text-white" style="background-color: {{ strtolower($bidang->jenjang) === 'mahasiswa' ? '#2563eb' : '#ea580c' }};">
+                                JALUR {{ strtoupper($bidang->jenjang) }}
                             </span>
                             <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-emerald-600 text-white">
                                 Kategori {{ $bidang->kategori }}

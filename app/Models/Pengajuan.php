@@ -116,4 +116,17 @@ class Pengajuan extends Model
 
         return $skmCompleted;
     }
+
+    /**
+     * Accessor status efektif yang memperhitungkan otomatisasi pengakhiran magang.
+     * Apabila status Disetujui/Terjadwal/Aktif dan tanggal_selesai_rencana sudah terlewati, mengembalikan 'Selesai'.
+     */
+    public function getStatusEfektifAttribute(): string
+    {
+        if (in_array($this->status, ['Disetujui', 'Terjadwal', 'Aktif']) && $this->tanggal_selesai_rencana && $this->tanggal_selesai_rencana->lt(\Carbon\Carbon::today())) {
+            return 'Selesai';
+        }
+
+        return $this->status;
+    }
 }

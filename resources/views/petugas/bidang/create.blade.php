@@ -22,8 +22,17 @@
     @endif
 
     <div class="max-w-2xl bg-white rounded-2xl border border-gray-200 shadow-sm p-6">
-        <form method="POST" action="{{ route('petugas.bidang.store') }}" class="space-y-6">
+        <form method="POST" action="{{ route('petugas.bidang.store') }}" enctype="multipart/form-data" class="space-y-6">
             @csrf
+
+            <!-- Upload Gambar Banner Bidang -->
+            <div>
+                <x-input-label for="gambar" :value="__('Gambar / Banner Bidang (Opsional)')" />
+                <input type="file" id="gambar" name="gambar" accept="image/*"
+                    class="mt-1 block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100 border border-gray-200 rounded-xl p-1 cursor-pointer">
+                <p class="text-[10px] text-gray-400 mt-1">Format: JPG, PNG, WEBP. Maksimal 2MB. Gambar ini akan menjadi foto cover kartu bidang pada beranda.</p>
+                <x-input-error class="mt-1" :messages="$errors->get('gambar')" />
+            </div>
 
             <!-- Nama Bidang -->
             <div>

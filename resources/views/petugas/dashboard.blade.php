@@ -2,15 +2,15 @@
     <!-- Header Section -->
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-800 font-sans">Dashboard Operasional</h2>
-        <p class="text-xs text-gray-400 mt-1">Selamat datang kembali! Berikut ringkasan antrean kerja verifikasi hari ini.</p>
+        <p class="text-xs text-gray-400 mt-1">Selamat datang kembali! Berikut ringkasan antrean verifikasi dan pendaftar aktif hari ini.</p>
     </div>
 
-    <!-- Stat Cards -->
+    <!-- Stat Cards (5 Cards) -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <!-- Total Masuk -->
         <div class="bg-white p-4 rounded-2xl border border-gray-150 shadow-sm flex items-center space-x-3">
             <div class="p-2.5 bg-emerald-50 text-biogen-medium rounded-xl shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
             </div>
             <div class="min-w-0">
                 <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Total Pengajuan</p>
@@ -21,7 +21,7 @@
         <!-- Menunggu Verifikasi -->
         <div class="bg-white p-4 rounded-2xl border border-yellow-100 shadow-sm flex items-center space-x-3">
             <div class="p-2.5 bg-yellow-50 text-yellow-600 rounded-xl shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             </div>
             <div class="min-w-0">
                 <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Belum Verifikasi</p>
@@ -29,10 +29,10 @@
             </div>
         </div>
 
-        <!-- Disetujui Bulan Ini -->
+        <!-- Persetujuan Baru -->
         <div class="bg-white p-4 rounded-2xl border border-emerald-100 shadow-sm flex items-center space-x-3">
             <div class="p-2.5 bg-emerald-50 text-green-600 rounded-xl shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
             </div>
             <div class="min-w-0">
                 <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Persetujuan Baru</p>
@@ -40,36 +40,36 @@
             </div>
         </div>
 
-        <!-- Menunggu Review Laporan -->
-        <div class="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm flex items-center space-x-3">
-            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <!-- Peserta Aktif -->
+        <div class="bg-white p-4 rounded-2xl border border-purple-100 shadow-sm flex items-center space-x-3">
+            <div class="p-2.5 bg-purple-50 text-purple-600 rounded-xl shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Antrean Laporan</p>
-                <p class="text-xl font-bold text-gray-850 mt-0.5">{{ $stats['laporan_review'] }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Peserta Aktif</p>
+                <p class="text-xl font-bold text-gray-850 mt-0.5">{{ $stats['aktif'] }}</p>
             </div>
         </div>
 
-        <!-- Terlambat Lapor -->
-        <div class="bg-white p-4 rounded-2xl border border-red-100 shadow-sm flex items-center space-x-3">
-            <div class="p-2.5 bg-red-50 text-red-650 rounded-xl shrink-0">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <!-- Peserta Selesai -->
+        <div class="bg-white p-4 rounded-2xl border border-blue-100 shadow-sm flex items-center space-x-3">
+            <div class="p-2.5 bg-blue-50 text-blue-600 rounded-xl shrink-0">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
             </div>
             <div class="min-w-0">
-                <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Terlambat Lapor</p>
-                <p class="text-xl font-bold text-red-600 mt-0.5">{{ $stats['laporan_telat'] }}</p>
+                <p class="text-[9px] font-bold uppercase tracking-wider text-gray-400 truncate">Alumni / Selesai</p>
+                <p class="text-xl font-bold text-blue-600 mt-0.5">{{ $stats['selesai'] }}</p>
             </div>
         </div>
     </div>
 
     <!-- Alert / Tindakan Penting -->
     @if($stats['menunggu'] > 0)
-        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-8 flex space-x-3">
-            <svg class="w-5.5 h-5.5 text-yellow-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-4 mb-8 flex items-start space-x-3">
+            <svg class="w-6 h-6 text-yellow-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
             <div>
                 <p class="text-sm font-bold text-yellow-800">Ada {{ $stats['menunggu'] }} Pengajuan Menunggu Tindakan Anda</p>
-                <p class="text-xs text-yellow-700 mt-0.5 leading-relaxed">Segera tinjau berkas permohonan magang untuk menjaga ketersediaan kapasitas kuota rolling yang akurat.</p>
+                <p class="text-xs text-yellow-700 mt-0.5 leading-relaxed">Segera tinjau berkas permohonan magang untuk menjaga ketersediaan kapasitas kuota yang akurat.</p>
             </div>
         </div>
     @endif
@@ -130,38 +130,35 @@
             </div>
         </div>
 
-        <!-- Terlambat Lapor Panel (Right 1 Column) -->
+        <!-- Peserta Terjadwal / Aktif Panel (Right 1 Column) -->
         <div class="space-y-8">
             <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
-                    <h3 class="font-bold text-gray-800 text-sm font-sans">Peserta Terlambat Lapor</h3>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Peserta aktif yang melewati masa tenggang selesai magang.</p>
+                    <h3 class="font-bold text-gray-800 text-sm font-sans">Jadwal Magang Mendatang</h3>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Daftar peserta disetujui yang akan memulai magang.</p>
                 </div>
 
-                @if($laporanTelatList->isEmpty())
+                @if($terjadwalList->isEmpty())
                     <div class="text-center py-12 text-gray-400">
-                        <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <p class="text-xs font-semibold">Semua laporan tertib tepat waktu.</p>
+                        <svg class="w-10 h-10 text-gray-300 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        <p class="text-xs font-semibold">Belum ada peserta jadwal mendatang.</p>
                     </div>
                 @else
                     <div class="divide-y divide-gray-100 max-h-[350px] overflow-y-auto">
-                        @foreach($laporanTelatList as $telat)
-                            <div class="p-4 hover:bg-red-50/20 transition-all">
+                        @foreach($terjadwalList as $t)
+                            <div class="p-4 hover:bg-emerald-50/20 transition-all">
                                 <div class="flex justify-between items-start">
                                     <div>
-                                        <p class="font-bold text-gray-800 text-xs">{{ $telat->user->name }}</p>
-                                        <p class="text-[10px] text-gray-450 mt-0.5">{{ $telat->bidang->nama_bidang }} ({{ $telat->nomor_pengajuan }})</p>
+                                        <p class="font-bold text-gray-800 text-xs">{{ $t->user->name }}</p>
+                                        <p class="text-[10px] text-gray-450 mt-0.5">{{ $t->bidang->nama_bidang }} ({{ $t->nomor_pengajuan }})</p>
                                     </div>
-                                    <span class="inline-block text-[9px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full">
-                                        Terlambat
+                                    <span class="inline-block text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">
+                                        Terjadwal
                                     </span>
                                 </div>
                                 <div class="flex justify-between items-center mt-3 text-[10px] text-gray-400">
-                                    <span>Selesai Rencana: <strong>{{ \Carbon\Carbon::parse($telat->tanggal_selesai_rencana)->translatedFormat('d M Y') }}</strong></span>
-                                    @php
-                                        $diffDays = \Carbon\Carbon::parse($telat->tanggal_selesai_rencana)->diffInDays(now());
-                                    @endphp
-                                    <span class="text-red-650 font-bold font-sans">{{ $diffDays }} hari</span>
+                                    <span>Mulai: <strong>{{ \Carbon\Carbon::parse($t->tanggal_mulai)->translatedFormat('d M Y') }}</strong></span>
+                                    <span class="text-emerald-700 font-bold font-sans">{{ $t->durasi_bulan }} Bulan</span>
                                 </div>
                             </div>
                         @endforeach

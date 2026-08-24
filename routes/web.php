@@ -63,9 +63,6 @@ Route::middleware(['auth', 'role:Pengguna'])->prefix('pengguna')->name('pengguna
     Route::get('/pengajuan/{public_id}', [\App\Http\Controllers\Pengguna\DetailPengajuanController::class, 'show'])->name('pengajuan.show');
     Route::post('/pengajuan/{public_id}/batal', [\App\Http\Controllers\Pengguna\DetailPengajuanController::class, 'cancel'])->name('pengajuan.cancel');
 
-    // Unggah Laporan Akhir
-    Route::post('/pengajuan/{public_id}/laporan', [\App\Http\Controllers\Pengguna\LaporanAkhirController::class, 'store'])->name('pengajuan.laporan.store');
-
     // Pengisian Survei IKM / SKM
     Route::post('/pengajuan/{public_id}/skm', [\App\Http\Controllers\Pengguna\SkmController::class, 'store'])->name('pengajuan.skm.store');
 });
@@ -78,11 +75,6 @@ Route::middleware(['auth', 'role:Petugas|Administrator'])->prefix('petugas')->na
     Route::get('/verifikasi', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'index'])->name('verifikasi.index');
     Route::get('/verifikasi/{public_id}', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'show'])->name('verifikasi.show');
     Route::post('/verifikasi/{public_id}', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'verifikasi'])->name('verifikasi.process');
-
-    // Review Laporan Akhir
-    Route::get('/review-laporan', [\App\Http\Controllers\Petugas\ReviewLaporanController::class, 'index'])->name('review-laporan.index');
-    Route::get('/review-laporan/{public_id}', [\App\Http\Controllers\Petugas\ReviewLaporanController::class, 'show'])->name('review-laporan.show');
-    Route::post('/review-laporan/{public_id}', [\App\Http\Controllers\Petugas\ReviewLaporanController::class, 'review'])->name('review-laporan.process');
 
     // Kelola Bidang penempatan
     Route::resource('/bidang', \App\Http\Controllers\Petugas\BidangController::class);

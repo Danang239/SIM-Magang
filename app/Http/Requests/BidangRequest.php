@@ -37,6 +37,7 @@ class BidangRequest extends FormRequest
             'kuota_petugas.*' => ['nullable', 'integer', 'min:1', 'max:100'],
             'kapasitas' => ['nullable', 'integer', 'min:1', 'max:100'],
             'is_active' => ['required', 'boolean'],
+            'gambar' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
         ];
     }
 

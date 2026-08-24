@@ -16,16 +16,21 @@ class DashboardController extends Controller
         $today = Carbon::today()->toDateString();
         $startOfMonth = Carbon::now()->startOfMonth();
 
-        // Retrieve real statistics
+        // Retrieve real statistics for registration-to-acceptance workflow
         $stats = [
             'total' => Pengajuan::count(),
             'menunggu' => Pengajuan::where('status', 'Menunggu Verifikasi')->count(),
-            'disetujui_bulan_ini' => Pengajuan::where('status', 'Disetujui')
+            'disetujui_bulan_ini' => Pengajuan::whereIn('status', ['Disetujui', 'Terjadwal'])
                 ->where('updated_at', '>=', $startOfMonth)
                 ->count(),
-            'laporan_review' => Pengajuan::where('laporan_status', 'Menunggu Review')->count(),
-            'laporan_telat' => Pengajuan::where('status', 'Sedang Magang')
-                ->where('tanggal_selesai_rencana', '<', $today)
+            'aktif' => Pengajuan::whereIn('status', ['Disetujui', 'Terjadwal', 'Aktif'])
+                ->where('tanggal_selesai_rencana', '>=', $today)
+                ->count(),
+            'selesai' => Pengajuan::where('status', 'Selesai')
+                ->orWhere(function($query) use ($today) {
+                    $query->whereIn('status', ['Disetujui', 'Terjadwal', 'Aktif'])
+                          ->where('tanggal_selesai_rencana', '<', $today);
+                })
                 ->count(),
         ];
 
@@ -36,13 +41,14 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
-        // Retrieve list of overdue active participants
-        $laporanTelatList = Pengajuan::where('status', 'Sedang Magang')
-            ->where('tanggal_selesai_rencana', '<', $today)
+        // Retrieve recent approved applicants
+        $terjadwalList = Pengajuan::whereIn('status', ['Disetujui', 'Terjadwal'])
+            ->where('tanggal_selesai_rencana', '>=', $today)
             ->with(['user', 'bidang'])
-            ->orderBy('tanggal_selesai_rencana', 'asc')
+            ->orderBy('tanggal_mulai', 'asc')
+            ->take(5)
             ->get();
 
-        return view('petugas.dashboard', compact('stats', 'antrean', 'laporanTelatList'));
+        return view('petugas.dashboard', compact('stats', 'antrean', 'terjadwalList'));
     }
 }
