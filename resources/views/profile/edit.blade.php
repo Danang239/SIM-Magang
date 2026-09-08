@@ -2,7 +2,7 @@
     <x-layouts.publik>
         <div class="max-w-4xl mx-auto py-10 px-4 sm:px-6 lg:px-8 space-y-6" 
              x-data="{ 
-                 showModal: {{ (session('warning') || session('info') || session('status') || empty(auth()->user()->no_hp) || empty(auth()->user()->instansi) || empty(auth()->user()->program_studi)) ? 'true' : 'false' }},
+                 showModal: {{ (session('status') !== 'profile-updated' && (empty(auth()->user()->no_hp) || empty(auth()->user()->instansi) || empty(auth()->user()->program_studi))) ? 'true' : 'false' }},
                  scrollToBio() {
                      this.showModal = false;
                      $nextTick(() => {
@@ -11,8 +11,8 @@
                      });
                  }
              }">
-             
-            <!-- Interactive Pop-Up Modal for Google Login / Profile Bio Completion -->
+              
+            <!-- Interactive Pop-Up Modal for Google Login / Profile Bio Completion (Muncul saat biodata belum lengkap, hilang permanen setelah disimpan) -->
             <div x-show="showModal" 
                  x-cloak
                  class="fixed inset-0 z-[9999] flex items-center justify-center p-4 overflow-y-auto"
@@ -58,7 +58,7 @@
                         Selamat Datang di SIM-MAGANG!
                     </h3>
                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                        {{ session('warning') ?? session('info') ?? session('status') ?? 'Anda telah berhasil masuk menggunakan akun Google ('.auth()->user()->email.').' }}
+                        Anda berhasil masuk menggunakan akun Google ({{ auth()->user()->email }}). Silakan lengkapi biodata Anda pada form di bawah ini agar data pemohon magang Anda valid.
                     </p>
 
                     <!-- Info Box: Data Required -->

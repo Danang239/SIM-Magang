@@ -5,7 +5,6 @@ namespace App\Listeners;
 use App\Events\PengajuanStatusChanged;
 use App\Mail\PengajuanDisetujuiMail;
 use App\Mail\PengajuanDitolakMail;
-use App\Mail\LaporanDiterimaMail;
 use Illuminate\Support\Facades\Mail;
 
 class SendPengajuanStatusEmail
@@ -26,8 +25,6 @@ class SendPengajuanStatusEmail
             Mail::to($user->email)->queue(new PengajuanDisetujuiMail($pengajuan->id));
         } elseif ($pengajuan->status === 'Ditolak') {
             Mail::to($user->email)->queue(new PengajuanDitolakMail($pengajuan->id, $event->catatan));
-        } elseif ($pengajuan->status === 'Selesai') {
-            Mail::to($user->email)->queue(new LaporanDiterimaMail($pengajuan->id));
         }
     }
 }

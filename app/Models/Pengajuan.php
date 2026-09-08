@@ -58,6 +58,7 @@ class Pengajuan extends Model
     protected function casts(): array
     {
         return [
+            'tanggal_lahir' => 'date',
             'tanggal_mulai' => 'date',
             'tanggal_selesai_rencana' => 'date',
             'durasi_bulan' => 'integer',
@@ -73,11 +74,11 @@ class Pengajuan extends Model
     }
 
     /**
-     * Relasi ke Pembimbing (Petugas yang dipilih untuk membimbing pengajuan ini).
+     * Relasi ke Pembimbing (Master Pembimbing yang dipilih untuk membimbing pengajuan ini).
      */
     public function pembimbing(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'pembimbing_id');
+        return $this->belongsTo(Pembimbing::class, 'pembimbing_id');
     }
 
     /**
@@ -119,7 +120,6 @@ class Pengajuan extends Model
 
     /**
      * Accessor status efektif yang memperhitungkan otomatisasi pengakhiran magang.
-     * Apabila status Disetujui/Terjadwal/Aktif dan tanggal_selesai_rencana sudah terlewati, mengembalikan 'Selesai'.
      */
     public function getStatusEfektifAttribute(): string
     {

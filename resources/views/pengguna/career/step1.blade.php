@@ -76,10 +76,10 @@
                     </div>
 
                     <!-- Right: Calendar -->
-                    <div class="md:col-span-2 bg-white rounded-2xl border border-gray-150 shadow-sm p-6 flex flex-col justify-between">
+                    <div id="container-kalender" class="md:col-span-2 bg-white rounded-2xl border border-gray-150 shadow-sm p-6 flex flex-col justify-between transition-all duration-300">
                         <div>
                             <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-base font-bold text-gray-800 font-sans">Pilih Tanggal Mulai Magang</h2>
+                                <h2 class="text-base font-bold text-gray-800 font-sans">Pilih Tanggal Mulai Magang <span class="text-red-500">*</span></h2>
                                 <div class="flex items-center space-x-3 text-[10px] font-semibold">
                                     <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-sm bg-green-100 border border-green-200"></span><span class="text-gray-500">Tersedia</span></span>
                                     <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-sm bg-red-50 border border-red-100"></span><span class="text-gray-500">Penuh</span></span>
@@ -259,16 +259,19 @@
     }
 
     function submitStep1() {
+        const keahlian = document.getElementById('keahlian');
+        if (!keahlian || !keahlian.value.trim()) {
+            showFloatingError('Silakan isi uraian Keahlian / Kompetensi yang Anda miliki atau minati.', keahlian);
+            return;
+        }
+
         const tgl = document.getElementById('inputTanggalMulai').value;
-        const keahlian = document.getElementById('keahlian').value.trim();
-        if (!keahlian) {
-            alert('Silakan isi keahlian/kompetensi terlebih dahulu.');
-            return;
-        }
+        const containerKalender = document.getElementById('container-kalender');
         if (!tgl) {
-            alert('Silakan pilih tanggal mulai magang terlebih dahulu pada kalender.');
+            showFloatingError('Silakan pilih salah satu Tanggal Mulai Magang yang masih tersedia pada kalender.', containerKalender);
             return;
         }
+
         document.getElementById('formStep1').submit();
     }
     </script>

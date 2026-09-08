@@ -48,7 +48,7 @@ class DashboardController extends Controller
             ->orderBy('urutan', 'asc')
             ->get()
             ->map(function ($q) {
-                $ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0, 5 => 0];
+                $ratings = [1 => 0, 2 => 0, 3 => 0, 4 => 0];
                 foreach ($q->skmJawabans as $ans) {
                     if (isset($ratings[$ans->rating])) {
                         $ratings[$ans->rating]++;
@@ -59,7 +59,7 @@ class DashboardController extends Controller
                     'teks' => $q->teks_pertanyaan,
                     'average' => number_format($q->skmJawabans->avg('rating') ?? 0, 2),
                     'total_responses' => $q->skmJawabans->count(),
-                    'ratings' => array_values($ratings), // counts for [1, 2, 3, 4, 5]
+                    'ratings' => array_values($ratings), // counts for [1, 2, 3, 4]
                 ];
             });
 

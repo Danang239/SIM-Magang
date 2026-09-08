@@ -14,7 +14,7 @@ class CareerStepFinalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'foto_diri' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:2048'],
+            'foto_diri' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
             'nik_ktp' => ['required', 'string', 'max:30'],
             'no_hp' => ['required', 'string', 'regex:/^[0-9]+$/', 'min:10', 'max:15'],
             'instansi' => ['required', 'string', 'max:255'],
@@ -34,7 +34,7 @@ class CareerStepFinalRequest extends FormRequest
             'judul_magang' => ['required', 'string', 'max:255'],
             'tujuan_magang' => ['required', 'string', 'max:1000'],
             'nama_dosen_pembimbing' => ['required', 'string', 'max:255'],
-            'pembimbing_id' => ['nullable', 'integer', 'exists:users,id'],
+            'pembimbing_id' => ['nullable', 'integer', 'exists:pembimbings,id'],
             'tanda_tangan_digital' => ['required', 'string'],
             'kontak_darurat_nama' => ['required', 'string', 'max:100'],
             'kontak_darurat_no' => ['required', 'string', 'max:20'],
@@ -43,7 +43,7 @@ class CareerStepFinalRequest extends FormRequest
                 'required',
                 'file',
                 'mimes:pdf,jpg,jpeg,png',
-                'max:2048',
+                'max:5120',
             ],
             'syarat_ketentuan' => ['required', 'accepted'],
         ];
@@ -54,7 +54,7 @@ class CareerStepFinalRequest extends FormRequest
         return [
             'foto_diri.required' => 'Foto pas 4x6 berwarna wajib diunggah.',
             'foto_diri.mimes' => 'Format foto pas harus berupa JPG, JPEG, atau PNG.',
-            'foto_diri.max' => 'Ukuran file foto maksimal 2MB.',
+            'foto_diri.max' => 'Ukuran file foto maksimal 5MB.',
             'nik_ktp.required' => 'No. KTP/NIK wajib diisi.',
             'no_hp.required' => 'Nomor HP / WhatsApp wajib diisi.',
             'no_hp.regex' => 'Nomor HP hanya boleh berisi angka.',
@@ -85,7 +85,7 @@ class CareerStepFinalRequest extends FormRequest
             'file_surat_pengantar.required' => 'File surat pengantar wajib diunggah.',
             'file_surat_pengantar.file' => 'File surat pengantar tidak valid.',
             'file_surat_pengantar.mimes' => 'Format file hanya boleh PDF, JPG, atau PNG.',
-            'file_surat_pengantar.max' => 'Ukuran file maksimal 2MB.',
+            'file_surat_pengantar.max' => 'Ukuran file maksimal 5MB.',
             'syarat_ketentuan.required' => 'Anda harus menyetujui syarat & ketentuan surat pernyataan.',
             'syarat_ketentuan.accepted' => 'Anda harus menyetujui syarat & ketentuan surat pernyataan.',
         ];

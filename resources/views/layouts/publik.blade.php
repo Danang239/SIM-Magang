@@ -5,7 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'SIM-MAGANG BRMP Biogen') }}</title>
+        <title>{{ config('app.name', 'SIP BRMP Biogen') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('logo-brmp.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,6 +14,49 @@
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
         <style>
             html { scroll-behavior: smooth; }
+            @keyframes shake-field {
+                0%, 100% { transform: translateX(0); }
+                20%, 60% { transform: translateX(-8px); }
+                40%, 80% { transform: translateX(8px); }
+            }
+            .field-error-highlight {
+                animation: shake-field 0.5s ease-in-out !important;
+                border-color: #ef4444 !important;
+                box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.25) !important;
+            }
+            .field-container-error-highlight {
+                animation: shake-field 0.5s ease-in-out !important;
+                border-color: #ef4444 !important;
+                box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.2) !important;
+                border-radius: 1rem !important;
+            }
+
+            #floating-error-toast {
+                position: fixed !important;
+                top: 5rem !important;
+                right: 1.5rem !important;
+                z-index: 999999 !important;
+                max-width: 24rem !important;
+                width: calc(100% - 3rem) !important;
+                background-color: #ffffff !important;
+                border: 1px solid #f3f4f6 !important;
+                border-left: 4px solid #f59e0b !important;
+                border-radius: 1rem !important;
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+                padding: 1rem !important;
+                display: flex !important;
+                align-items: flex-start !important;
+                gap: 0.75rem !important;
+                transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.35s ease !important;
+                transform: translateX(120%) !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            #floating-error-toast.toast-show {
+                transform: translateX(0) !important;
+                opacity: 1 !important;
+                pointer-events: auto !important;
+            }
         </style>
 
         <!-- Scripts (includes Alpine.js via Vite) -->
@@ -22,6 +66,64 @@
           x-data="{ scrolled: false, mobileOpen: false }"
           @scroll.window.throttle.50ms="scrolled = window.scrollY > 20">
         
+        <!-- Global Floating Error Notification Toast (Tepat di Bawah Navbar Kanan / Bawah Profile) -->
+        <div id="floating-error-toast">
+            <div class="p-2 bg-amber-100 text-amber-700 rounded-xl shrink-0 mt-0.5">
+                <svg class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+            <div class="flex-grow pt-0.5 min-w-0">
+                <h4 id="floating-error-title" class="text-xs font-bold text-gray-900">Perhatian</h4>
+                <p id="floating-error-message" class="text-xs text-gray-600 font-medium mt-0.5 leading-relaxed"></p>
+            </div>
+            <button type="button" onclick="hideFloatingError()" class="text-gray-400 hover:text-gray-600 transition-colors shrink-0 p-0.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+        </div>
+
+        <script>
+            let globalToastTimeout = null;
+
+            window.showFloatingError = function(message, targetElement, customTitle) {
+                const toast = document.getElementById('floating-error-toast');
+                const msg = document.getElementById('floating-error-message');
+                const title = document.getElementById('floating-error-title');
+                if (!toast || !msg) return;
+
+                msg.textContent = message;
+                if (title) title.textContent = customTitle || 'Perhatian';
+
+                toast.classList.add('toast-show');
+
+                if (globalToastTimeout) clearTimeout(globalToastTimeout);
+                globalToastTimeout = setTimeout(() => {
+                    window.hideFloatingError();
+                }, 7000);
+
+                if (targetElement) {
+                    document.querySelectorAll('.field-error-highlight, .field-container-error-highlight').forEach(el => {
+                        el.classList.remove('field-error-highlight', 'field-container-error-highlight');
+                    });
+
+                    const isContainer = targetElement.tagName === 'DIV' || targetElement.tagName === 'CANVAS' || targetElement.tagName === 'SECTION';
+                    targetElement.classList.add(isContainer ? 'field-container-error-highlight' : 'field-error-highlight');
+
+                    targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                    if (typeof targetElement.focus === 'function' && targetElement.tagName !== 'DIV' && targetElement.tagName !== 'SECTION') {
+                        setTimeout(() => targetElement.focus(), 350);
+                    }
+                }
+            };
+
+            window.hideFloatingError = function() {
+                const toast = document.getElementById('floating-error-toast');
+                if (!toast) return;
+                toast.classList.remove('toast-show');
+            };
+        </script>
+
         <!-- Top Loading Progress Bar -->
         <div id="page-progress-bar" 
              class="fixed top-0 left-0 h-[3px] bg-gradient-to-r from-emerald-500 via-emerald-400 to-amber-300 z-[9999] transition-all duration-300 ease-out w-0 shadow-[0_0_10px_rgba(16,185,129,0.9)] opacity-0 pointer-events-none"></div>
@@ -84,7 +186,7 @@
                             <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-9 h-9 object-contain shrink-0">
                             <span :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-800' : 'text-white'"
                                   class="font-bold text-xl tracking-tight font-sans transition-colors duration-300">
-                                BRMP <span :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-biogen-medium' : 'text-biogen-light'">Biogen</span>
+                                SIP <span :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-biogen-medium' : 'text-biogen-light'">Biogen</span>
                             </span>
                         </a>
                     </div>
@@ -97,7 +199,7 @@
                                 <a href="{{ route('pengguna.riwayat') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Riwayat</a>
                                 <a href="{{ route('profile.edit') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Profil</a>
                             @else
-                                <a href="{{ auth()->user()->hasRole('Administrator') ? route('admin.dashboard') : route('petugas.dashboard') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Panel Internal</a>
+                                <a href="{{ route('admin.dashboard') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Panel Admin</a>
                             @endif
                         @endauth
                         <a href="{{ route('kontak') }}" :class="scrolled || !{{ json_encode(request()->routeIs('home')) }} ? 'text-gray-600 hover:text-biogen-medium' : 'text-white hover:text-biogen-light'" class="text-sm font-medium transition-colors duration-300">Kontak</a>
@@ -122,8 +224,8 @@
                                             @endif
                                         </a>
                                     @else
-                                        <a href="{{ auth()->user()->hasRole('Administrator') ? route('admin.dashboard') : route('petugas.dashboard') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-sm px-4 py-2 rounded-lg font-semibold shadow transition-all duration-200">
-                                            Panel Dashboard
+                                        <a href="{{ route('admin.dashboard') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-sm px-4 py-2 rounded-lg font-semibold shadow transition-all duration-200">
+                                            Panel Admin
                                         </a>
                                     @endif
                                     <form method="POST" action="{{ route('logout') }}" class="inline">
@@ -231,10 +333,10 @@
                             </a>
                         @else
                             <!-- Dashboard Internal for Staff -->
-                            <a href="{{ auth()->user()->hasRole('Administrator') ? route('admin.dashboard') : route('petugas.dashboard') }}" @click="mobileOpen = false" 
+                            <a href="{{ route('admin.dashboard') }}" @click="mobileOpen = false" 
                                class="flex items-center space-x-3 px-3.5 py-2.5 rounded-xl bg-emerald-700 text-white font-bold shadow-sm">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-                                <span class="text-xs">Panel Internal Dashboard</span>
+                                <span class="text-xs">Panel Admin Dashboard</span>
                             </a>
                         @endif
                     @endauth
@@ -375,7 +477,7 @@
                 <div class="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-3 text-center sm:text-left">
                     <div class="flex items-center space-x-2">
                         <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-7 h-7 object-contain">
-                        <span class="font-bold text-white text-lg font-sans">BRMP <span class="text-emerald-400">Biogen</span></span>
+                        <span class="font-bold text-white text-lg font-sans">SIP <span class="text-emerald-400">Biogen</span></span>
                     </div>
                     <span class="hidden sm:inline text-gray-700">|</span>
                     <span class="text-xs text-gray-400">SIM-MAGANG &copy; {{ date('Y') }} Kementerian Pertanian RI</span>
@@ -392,7 +494,7 @@
 
                     <!-- YouTube -->
                     <a href="https://www.youtube.com/@brmpbiogen" target="_blank" rel="noopener noreferrer" 
-                       title="YouTube BRMP Biogen Official" 
+                       title="YouTube @brmpbiogen" 
                        class="w-9 h-9 rounded-full bg-gray-800 hover:bg-red-600 text-gray-400 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                     </a>
@@ -404,25 +506,11 @@
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.96-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.82.57-1.33 1.52-1.37 2.52-.07 1.25.56 2.45 1.58 3.11.97.64 2.24.74 3.29.28 1.05-.44 1.83-1.47 1.95-2.61.07-2.72.03-5.45.04-8.17 0-3.03-.01-6.06.01-9.09z"/></svg>
                     </a>
 
-                    <!-- X (Twitter) -->
-                    <a href="https://x.com/brmp_biogen" target="_blank" rel="noopener noreferrer" 
-                       title="X (Twitter) @brmp_biogen" 
-                       class="w-9 h-9 rounded-full bg-gray-800 hover:bg-slate-700 text-gray-400 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                    </a>
-
                     <!-- Facebook -->
                     <a href="https://www.facebook.com/biogen.kementan" target="_blank" rel="noopener noreferrer" 
-                       title="Facebook BRMP Biogen Kementan" 
+                       title="Facebook @biogen.kementan" 
                        class="w-9 h-9 rounded-full bg-gray-800 hover:bg-blue-600 text-gray-400 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110">
                         <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 8H6v4h3v12h5V12h3.642L18 8h-4V6.333C14 5.374 14.5 5 15.5 5H18V0h-3.808C10.592 0 9 1.848 9 5.015V8z"/></svg>
-                    </a>
-
-                    <!-- WhatsApp -->
-                    <a href="https://wa.me/628111756776" target="_blank" rel="noopener noreferrer" 
-                       title="WhatsApp Call Center" 
-                       class="w-9 h-9 rounded-full bg-gray-800 hover:bg-emerald-600 text-gray-400 hover:text-white flex items-center justify-center transition-all duration-200 shadow-sm hover:scale-110">
-                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-1.157 4.226 4.354-1.143z"/></svg>
                     </a>
                 </div>
 

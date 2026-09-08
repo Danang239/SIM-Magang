@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Pendaftaran PKL Berhasil Dikirim</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            background-color: #f5f6f8;
+            margin: 0;
+            padding: 0;
+            -webkit-font-smoothing: antialiased;
+        }
+        .container {
+            max-width: 600px;
+            margin: 40px auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e5e7eb;
+        }
+        .header {
+            background: linear-gradient(135deg, #0b5e3c 0%, #15803d 100%);
+            padding: 30px;
+            text-align: center;
+            color: #ffffff;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+        .content {
+            padding: 36px 30px;
+            color: #374151;
+            line-height: 1.6;
+        }
+        .content h2 {
+            font-size: 18px;
+            color: #111827;
+            margin-top: 0;
+            font-weight: 700;
+        }
+        .alert-box {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 20px 0;
+            color: #065f46;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        .details-box {
+            background-color: #f9fafb;
+            border: 1px solid #f3f4f6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .details-label {
+            color: #6b7280;
+            font-weight: 600;
+        }
+        .details-val {
+            color: #111827;
+            font-weight: 700;
+            text-align: right;
+        }
+        .btn {
+            display: block;
+            background-color: #0b5e3c;
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 24px;
+            font-size: 14px;
+        }
+        .footer {
+            background-color: #f9fafb;
+            padding: 20px;
+            text-align: center;
+            color: #9ca3af;
+            font-size: 11px;
+            border-top: 1px solid #f3f4f6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>BRMP BIOGEN</h1>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a7f3d0; font-weight: bold; text-transform: uppercase;">Sistem Informasi PKL Biogen</p>
+        </div>
+        <div class="content">
+            <h2>Halo, {{ $pengajuan->user->name }}</h2>
+            <p>Terima kasih telah mendaftar program Praktik Kerja Lapangan (PKL) / Magang di <strong>Balai Besar Perakitan Materi dan Pemuliaan Tanaman Biogen (BRMP Biogen)</strong>.</p>
+            
+            <div class="alert-box">
+                ℹ️ <strong>Informasi Verifikasi:</strong><br>
+                Pengajuan Anda telah kami terima dan akan diverifikasi oleh Admin maksimal dalam <strong>5 hari kerja</strong>.
+            </div>
+            
+            <p>Berikut rincian pendaftaran yang telah Anda kirimkan:</p>
+            
+            <div class="details-box">
+                <div class="details-row">
+                    <span class="details-label">Nomor Pengajuan:</span>
+                    <span class="details-val">{{ $pengajuan->nomor_pengajuan }}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Bidang PKL:</span>
+                    <span class="details-val">{{ $pengajuan->bidang->nama_bidang ?? '-' }}</span>
+                </div>
+                @if($pengajuan->pembimbing)
+                <div class="details-row">
+                    <span class="details-label">Pembimbing:</span>
+                    <span class="details-val">{{ $pengajuan->pembimbing->nama }}</span>
+                </div>
+                @endif
+                <div class="details-row">
+                    <span class="details-label">Rencana Mulai:</span>
+                    <span class="details-val">{{ $pengajuan->tanggal_mulai ? $pengajuan->tanggal_mulai->translatedFormat('d F Y') : '-' }}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Durasi:</span>
+                    <span class="details-val">{{ $pengajuan->durasi_bulan }} Bulan</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Status Saat Ini:</span>
+                    <span class="details-val" style="color: #d97706;">Menunggu Verifikasi</span>
+                </div>
+            </div>
+
+            <p style="font-size: 13px; color: #6b7280;">Anda dapat memantau status verifikasi secara berkala melalui dashboard akun Anda.</p>
+
+            <a href="{{ route('pengguna.riwayat') }}" class="btn">Cek Status Pengajuan</a>
+        </div>
+        <div class="footer">
+            SIM-PKL &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
+        </div>
+    </div>
+</body>
+</html>

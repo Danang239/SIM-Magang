@@ -29,7 +29,7 @@ class ProfileUpdateRequest extends FormRequest
             'no_hp' => ['required', 'string', 'regex:/^[0-9]+$/', 'digits_between:10,15'],
             'instansi' => ['required', 'string', 'max:255'],
             'program_studi' => ['required', 'string', 'max:255'],
-            'foto_profil' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:1024'],
+            'foto_profil' => ['nullable', 'image', 'mimes:jpeg,jpg,png', 'max:5120'],
         ];
     }
 }

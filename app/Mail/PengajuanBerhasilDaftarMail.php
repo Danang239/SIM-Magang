@@ -10,7 +10,7 @@ use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class ReminderLaporanTelatMail extends Mailable implements ShouldQueue
+class PengajuanBerhasilDaftarMail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 
@@ -18,7 +18,7 @@ class ReminderLaporanTelatMail extends Mailable implements ShouldQueue
      * Create a new message instance.
      */
     public function __construct(
-        public Pengajuan $pengajuan
+        public int $pengajuanId
     ) {}
 
     /**
@@ -27,7 +27,7 @@ class ReminderLaporanTelatMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Peringatan: Keterlambatan Laporan Akhir Magang - BRMP Biogen',
+            subject: 'Pendaftaran PKL BRMP Biogen Diterima - Menunggu Verifikasi',
         );
     }
 
@@ -37,7 +37,10 @@ class ReminderLaporanTelatMail extends Mailable implements ShouldQueue
     public function content(): Content
     {
         return new Content(
-            view: 'emails.reminder_laporan_telat',
+            view: 'emails.pengajuan_berhasil_daftar',
+            with: [
+                'pengajuan' => Pengajuan::with(['user', 'bidang', 'pembimbing'])->findOrFail($this->pengajuanId),
+            ],
         );
     }
 }

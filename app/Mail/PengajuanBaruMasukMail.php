@@ -27,7 +27,7 @@ class PengajuanBaruMasukMail extends Mailable implements ShouldQueue
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Ada Pengajuan Magang Baru Masuk - SIM-MAGANG',
+            subject: '[Pengajuan Baru PKL] Pendaftaran Baru Masuk - SIM PKL Biogen',
         );
     }
 
@@ -39,7 +39,7 @@ class PengajuanBaruMasukMail extends Mailable implements ShouldQueue
         return new Content(
             view: 'emails.pengajuan_baru_masuk',
             with: [
-                'pengajuan' => Pengajuan::with(['user', 'bidang'])->findOrFail($this->pengajuanId),
+                'pengajuan' => Pengajuan::with(['user', 'bidang', 'pembimbing'])->findOrFail($this->pengajuanId),
             ],
         );
     }

@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -38,53 +36,6 @@ class UserController extends Controller
         $roles = Role::all();
 
         return view('admin.user.index', compact('users', 'roles'));
-    }
-
-    /**
-     * Show the form for creating a new Petugas account.
-     */
-    public function create()
-    {
-        return view('admin.user.create');
-    }
-
-    /**
-     * Store a newly created Petugas in storage.
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'no_hp' => ['required', 'string', 'regex:/^[0-9]+$/', 'min:10', 'max:15'],
-            'instansi' => ['nullable', 'string', 'max:255'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
-        ], [
-            'name.required' => 'Nama lengkap wajib diisi.',
-            'email.required' => 'Alamat email aktif wajib diisi.',
-            'email.email' => 'Format alamat email tidak valid. Pastikan menggunakan email asli yang aktif.',
-            'email.unique' => 'Email ini sudah terdaftar di sistem.',
-            'no_hp.required' => 'Nomor HP wajib diisi.',
-            'no_hp.regex' => 'Nomor HP hanya boleh berisi angka.',
-            'no_hp.min' => 'Nomor HP minimal 10 digit.',
-            'no_hp.max' => 'Nomor HP maksimal 15 digit.',
-            'password.required' => 'Password wajib diisi.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-        ]);
-
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'no_hp' => $request->no_hp,
-            'instansi' => $request->instansi,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Assign Petugas role
-        $user->assignRole('Petugas');
-
-        return redirect()->route('admin.user.index')
-            ->with('success', "Akun Petugas {$user->name} berhasil didaftarkan.");
     }
 
     /**

@@ -20,19 +20,16 @@ Route::get('/kontak', function () {
 Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('auth.google');
 Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('auth.google.callback');
 
-// Fallback route 'dashboard' used by Breeze auth controllers (VerifyEmail, etc.)
-// Redirects based on user's assigned role
+// Fallback route 'dashboard' used by Breeze auth controllers
 Route::get('/dashboard', function () {
     $user = auth()->user();
     if ($user->hasRole('Administrator')) {
         return redirect()->route('admin.dashboard');
-    } elseif ($user->hasRole('Petugas')) {
-        return redirect()->route('petugas.dashboard');
     }
     if (session()->has('bidang_id')) {
         return redirect()->route('pengguna.career.step1', ['bidang_id' => session('bidang_id')]);
     }
-    return redirect()->route('home');
+    return redirect()->route('pengguna.dashboard');
 })->middleware(['auth'])->name('dashboard');
 
 // 2. Route Pengguna (Magang/PKL Applicants)
@@ -44,7 +41,9 @@ Route::middleware(['auth', 'role:Pengguna'])->prefix('pengguna')->name('pengguna
         Route::get('/step1',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step1'])->name('step1');
         Route::post('/step1',  [\App\Http\Controllers\Pengguna\CareerController::class, 'step1Store'])->name('step1.store');
         Route::get('/step2',   [\App\Http\Controllers\Pengguna\CareerController::class, 'step2'])->name('step2');
-        Route::post('/step2',  [\App\Http\Controllers\Pengguna\CareerController::class, 'storeFinal'])->name('store');
+        Route::post('/step2',  [\App\Http\Controllers\Pengguna\CareerController::class, 'storeFinal'])
+            ->middleware('throttle:3,1')
+            ->name('store');
         Route::get('/konfirmasi/{public_id}', [\App\Http\Controllers\Pengguna\CareerController::class, 'konfirmasi'])->name('konfirmasi');
         // API endpoint for Alpine.js calendar
         Route::get('/api/kuota/{bidang}', [\App\Http\Controllers\Pengguna\CareerController::class, 'kuotaKalender'])->name('api.kuota');
@@ -64,29 +63,28 @@ Route::middleware(['auth', 'role:Pengguna'])->prefix('pengguna')->name('pengguna
     Route::post('/pengajuan/{public_id}/batal', [\App\Http\Controllers\Pengguna\DetailPengajuanController::class, 'cancel'])->name('pengajuan.cancel');
 
     // Pengisian Survei IKM / SKM
-    Route::post('/pengajuan/{public_id}/skm', [\App\Http\Controllers\Pengguna\SkmController::class, 'store'])->name('pengajuan.skm.store');
+    Route::post('/pengajuan/{public_id}/skm', [\App\Http\Controllers\Pengguna\SkmController::class, 'store'])
+        ->middleware('throttle:3,1')
+        ->name('pengajuan.skm.store');
 });
 
-// 3. Route Petugas (Operational Staff & Administrators)
-Route::middleware(['auth', 'role:Petugas|Administrator'])->prefix('petugas')->name('petugas.')->group(function () {
-    Route::get('/dashboard', [\App\Http\Controllers\Petugas\DashboardController::class, 'index'])->name('dashboard');
-    
-    // Verifikasi Pengajuan
-    Route::get('/verifikasi', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'index'])->name('verifikasi.index');
-    Route::get('/verifikasi/{public_id}', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'show'])->name('verifikasi.show');
-    Route::post('/verifikasi/{public_id}', [\App\Http\Controllers\Petugas\VerifikasiController::class, 'verifikasi'])->name('verifikasi.process');
-
-    // Kelola Bidang penempatan
-    Route::resource('/bidang', \App\Http\Controllers\Petugas\BidangController::class);
-});
-
-// 4. Route Administrator (System controller)
+// 3. Route Administrator (System & Admission Controller)
 Route::middleware(['auth', 'role:Administrator'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
-    
-    
-    // User Directory Management
-    Route::resource('/user', \App\Http\Controllers\Admin\UserController::class)->except(['show']);
+
+    // Riwayat Pengajuan & Verifikasi Satu Pintu
+    Route::get('/riwayat-pengajuan', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'index'])->name('riwayat-pengajuan.index');
+    Route::get('/riwayat-pengajuan/{public_id}', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'show'])->name('riwayat-pengajuan.show');
+    Route::post('/riwayat-pengajuan/{public_id}/verifikasi', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'verifikasi'])->name('riwayat-pengajuan.verifikasi');
+
+    // Master Data Pembimbing
+    Route::resource('/pembimbing', \App\Http\Controllers\Admin\PembimbingController::class)->except(['show']);
+
+    // Kelola Bidang Penempatan
+    Route::resource('/bidang', \App\Http\Controllers\Admin\BidangController::class)->except(['show']);
+
+    // User Directory Management (View, Edit, Update, Delete)
+    Route::resource('/user', \App\Http\Controllers\Admin\UserController::class)->only(['index', 'edit', 'update', 'destroy']);
 
     // SKM Questions CRUD Configuration
     Route::resource('/skm-pertanyaan', \App\Http\Controllers\Admin\SkmPertanyaanController::class)->except(['show']);
@@ -99,13 +97,9 @@ Route::middleware(['auth', 'role:Administrator'])->prefix('admin')->name('admin.
     Route::get('/rekap-skm', [\App\Http\Controllers\Admin\RekapSkmController::class, 'index'])->name('rekap-skm.index');
     Route::get('/rekap-skm/export-excel', [\App\Http\Controllers\Admin\RekapSkmController::class, 'exportExcel'])->name('rekap-skm.excel');
     Route::get('/rekap-skm/export-csv', [\App\Http\Controllers\Admin\RekapSkmController::class, 'exportCsv'])->name('rekap-skm.csv');
-
-    // Riwayat Pengajuan Magang (Filter & Detail)
-    Route::get('/riwayat-pengajuan', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'index'])->name('riwayat-pengajuan.index');
-    Route::get('/riwayat-pengajuan/{public_id}', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'show'])->name('riwayat-pengajuan.show');
 });
 
-// 5. Shared Authenticated Profile & Private File Serving Routes
+// 4. Shared Authenticated Profile & Private File Serving Routes
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -115,17 +109,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/pengajuan/{public_id}/file/{type}', [\App\Http\Controllers\Pengguna\DetailPengajuanController::class, 'downloadFile'])->name('pengajuan.file');
 });
 
-// 6. Temporary token-protected deployment route for Hostinger Shared Hosting (No SSH)
+// 5. Deployment Helper Route
 Route::get('/deploy-migrations-and-links/{token}', function ($token) {
-    if ($token !== 'brmp-biogen-deploy-token-2026') {
+    if ($token !== env('DEPLOY_TOKEN')) {
         abort(403, 'Akses ditolak.');
     }
     try {
-        // Run database migrations
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
 
-        // Run storage link
         \Illuminate\Support\Facades\Artisan::call('storage:link');
         $linkOutput = \Illuminate\Support\Facades\Artisan::output();
 

@@ -4,7 +4,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-        <title>{{ config('app.name', 'SIM-MAGANG BRMP Biogen') }}</title>
+        <title>{{ config('app.name', 'SIP BRMP Biogen') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('logo-brmp.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -76,7 +77,7 @@
                 <div class="relative z-10 flex items-center space-x-3">
                     <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-11 h-11 object-contain drop-shadow-md shrink-0">
                     <div>
-                        <span class="font-black text-2xl tracking-tight text-white block leading-none font-sans">BRMP Biogen</span>
+                        <span class="font-black text-2xl tracking-tight text-white block leading-none font-sans">SIP Biogen</span>
                         <span class="text-xs text-emerald-200 uppercase tracking-widest font-semibold mt-1 block">Balai Besar R&amp;D</span>
                     </div>
                 </div>
@@ -109,7 +110,7 @@
                     <a href="/" class="flex items-center space-x-2.5">
                         <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-9 h-9 object-contain shrink-0">
                         <span class="font-bold text-lg text-gray-800 font-sans tracking-tight">
-                            BRMP <span class="text-biogen-medium">Biogen</span>
+                            SIP <span class="text-biogen-medium">Biogen</span>
                         </span>
                     </a>
                 </div>

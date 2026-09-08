@@ -19,13 +19,12 @@ class RolePermissionSeeder extends Seeder
         // Create Permissions
         $permissions = [
             'kelola bidang',
+            'kelola pembimbing',
             'verifikasi pengajuan',
-            'review laporan',
             'kelola pengguna',
             'kelola skm',
             'lihat laporan tahunan',
             'akses dashboard admin',
-            'akses dashboard petugas',
             'akses dashboard pengguna',
             'buat pengajuan',
         ];
@@ -37,14 +36,6 @@ class RolePermissionSeeder extends Seeder
         // Create Roles and Assign Permissions
         $admin = Role::findOrCreate('Administrator');
         $admin->givePermissionTo(Permission::all());
-
-        $petugas = Role::findOrCreate('Petugas');
-        $petugas->givePermissionTo([
-            'kelola bidang',
-            'verifikasi pengajuan',
-            'review laporan',
-            'akses dashboard petugas',
-        ]);
 
         $pengguna = Role::findOrCreate('Pengguna');
         $pengguna->givePermissionTo([

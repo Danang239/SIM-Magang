@@ -11,8 +11,7 @@ class VerifikasiRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        // Only Petugas or Administrator can verify submissions
-        return auth()->check() && auth()->user()->hasAnyRole(['Petugas', 'Administrator']);
+        return auth()->check() && auth()->user()->hasRole('Administrator');
     }
 
     /**
@@ -23,7 +22,8 @@ class VerifikasiRequest extends FormRequest
         return [
             'action' => 'required|string|in:setujui,tolak',
             'catatan' => 'required_if:action,tolak|nullable|string|max:1000',
-            'file_surat_balasan' => 'required_if:action,setujui|nullable|file|mimes:pdf|max:2048',
+            'file_surat_balasan' => 'required_if:action,setujui|nullable|file|mimes:pdf|max:5120',
+            'pembimbing_id' => 'nullable|integer|exists:pembimbings,id',
         ];
     }
 
@@ -40,7 +40,7 @@ class VerifikasiRequest extends FormRequest
             'file_surat_balasan.required_if' => 'Surat balasan wajib diunggah dalam format PDF saat menyetujui pengajuan.',
             'file_surat_balasan.file' => 'File surat balasan tidak valid.',
             'file_surat_balasan.mimes' => 'Surat balasan harus berformat PDF.',
-            'file_surat_balasan.max' => 'Ukuran file surat balasan maksimal 2MB.',
+            'file_surat_balasan.max' => 'Ukuran file surat balasan maksimal 5MB.',
         ];
     }
 }

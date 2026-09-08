@@ -21,7 +21,7 @@ class DetailPengajuanController extends Controller
     {
         $pengajuan = Pengajuan::where('public_id', $publicId)
             ->where('user_id', auth()->id())
-            ->with(['bidang', 'bidang.pembimbing', 'statusLogs', 'statusLogs.user'])
+            ->with(['bidang', 'pembimbing', 'statusLogs', 'statusLogs.user'])
             ->firstOrFail();
 
         // Sort status logs descending or ascending as appropriate (timeline shows ascending sequence)
@@ -44,7 +44,7 @@ class DetailPengajuanController extends Controller
 
         // Security check: Only the applicant user OR staff/admin can access
         $user = auth()->user();
-        if ($pengajuan->user_id !== $user->id && !$user->hasAnyRole(['Petugas', 'Administrator'])) {
+        if ($pengajuan->user_id !== $user->id && !$user->hasRole('Administrator')) {
             abort(403, 'Anda tidak diizinkan mengakses file ini.');
         }
 

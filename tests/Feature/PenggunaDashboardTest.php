@@ -32,8 +32,8 @@ class PenggunaDashboardTest extends TestCase
     {
         $response = $this->get(route('home'));
         $response->assertStatus(200);
-        $response->assertSee('Laboratorium');
-        $response->assertSee('Bidang Penelitian');
+        $response->assertSee('Bidang PKL');
+        $response->assertSee('Kategori Mahasiswa');
     }
 
     /**
@@ -99,8 +99,8 @@ class PenggunaDashboardTest extends TestCase
         $user2 = User::factory()->create();
         $user2->assignRole('Pengguna');
 
-        $petugas = User::factory()->create();
-        $petugas->assignRole('Petugas');
+        $admin = User::factory()->create();
+        $admin->assignRole('Administrator');
 
         $bidang = Bidang::first();
         $pengajuan = Pengajuan::create([
@@ -125,8 +125,8 @@ class PenggunaDashboardTest extends TestCase
         $response = $this->actingAs($user2)->get(route('pengajuan.file', [$pengajuan->public_id, 'surat_pengantar']));
         $response->assertStatus(403);
 
-        // Staff (petugas) can download
-        $response = $this->actingAs($petugas)->get(route('pengajuan.file', [$pengajuan->public_id, 'surat_pengantar']));
+        // Administrator can download
+        $response = $this->actingAs($admin)->get(route('pengajuan.file', [$pengajuan->public_id, 'surat_pengantar']));
         $response->assertStatus(200);
     }
 

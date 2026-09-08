@@ -1,14 +1,8 @@
 <x-layouts.internal>
     <!-- Header Section -->
-    <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Pengguna</h2>
-            <p class="text-xs text-gray-400 mt-1">Daftar pengguna sistem SIM-MAGANG, atur role hak akses, dan tambah petugas operasional baru.</p>
-        </div>
-        <a href="{{ route('admin.user.create') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 inline-flex items-center space-x-2 w-fit">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
-            <span>Tambah Petugas</span>
-        </a>
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Pengguna</h2>
+        <p class="text-xs text-gray-400 mt-1">Daftar pengguna terdaftar di sistem SIM-MAGANG, pantau akun pendaftar magang dan akun administrator.</p>
     </div>
 
     <!-- Notifications -->

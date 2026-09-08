@@ -75,33 +75,48 @@ class SecurityHardeningTest extends TestCase
 
         $bidang = Bidang::first();
 
-        // Create application in "Sedang Magang" status
-        $pengajuan = Pengajuan::create([
-            'public_id' => '11111111-2222-3333-4444-66666666666b',
-            'nomor_pengajuan' => 'PKL-2026-7002',
-            'user_id' => $user->id,
-            'jenjang' => 'Mahasiswa',
-            'bidang_id' => $bidang->id,
-            'keahlian' => 'IT',
-            'durasi_bulan' => 3,
-            'tanggal_mulai' => now()->subMonth()->toDateString(),
-            'tanggal_selesai_rencana' => now()->addMonths(2)->toDateString(),
-            'status' => 'Sedang Magang',
-            'file_surat_pengantar' => 'surat.pdf',
-        ]);
-
         // Upload fake PDF containing text (which guesser sniffs as text/plain, not application/pdf)
         $fakePdfFile = UploadedFile::fake()->create('malicious.pdf', 100, 'text/plain');
 
-        $response = $this->actingAs($user)->post(route('pengguna.pengajuan.laporan.store', $pengajuan->public_id), [
-            'file_laporan_akhir' => $fakePdfFile,
-        ]);
+        $response = $this->actingAs($user)
+            ->withSession([
+                'bidang_id' => $bidang->id,
+                'career_step1' => [
+                    'keahlian' => 'PHP, Laravel',
+                    'durasi_bulan' => 3,
+                    'tanggal_mulai' => now()->addMonth()->toDateString(),
+                    'tanggal_selesai_rencana' => now()->addMonths(4)->toDateString(),
+                ],
+            ])
+            ->post(route('pengguna.career.store'), [
+                'foto_diri' => UploadedFile::fake()->image('foto.jpg'),
+                'nik_ktp' => '3201234567890001',
+                'no_hp' => '081234567890',
+                'instansi' => 'Institut Pertanian Bogor',
+                'program_studi' => 'Ilmu Komputer',
+                'nim_nisn' => 'G64123456',
+                'tempat_lahir' => 'Bogor',
+                'tanggal_lahir' => '2002-05-15',
+                'jenis_kelamin' => 'Laki-laki',
+                'alamat' => 'Jl. Raya Dramaga No. 1',
+                'nama_pimpinan_instansi' => 'Prof. Dr. Rektor',
+                'alamat_instansi' => 'Kampus IPB Dramaga',
+                'kontak_instansi' => '0251-8622642',
+                'tahun_masuk' => '2022',
+                'pendidikan_terakhir' => 'SMA',
+                'semester_saat_ini' => 'Semester 6',
+                'judul_magang' => 'Pengembangan Sistem',
+                'tujuan_magang' => 'Mempelajari implementasi sistem',
+                'nama_dosen_pembimbing' => 'Dr. Pembimbing M.Kom',
+                'tanda_tangan_digital' => 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+                'kontak_darurat_nama' => 'Ayah',
+                'kontak_darurat_no' => '081234567899',
+                'hubungan_kontak_darurat' => 'Orang Tua',
+                'file_surat_pengantar' => $fakePdfFile,
+                'syarat_ketentuan' => '1',
+            ]);
 
-        $response->assertSessionHasErrors(['file_laporan_akhir']);
-        $this->assertDatabaseMissing('pengajuans', [
-            'id' => $pengajuan->id,
-            'laporan_status' => 'Menunggu Review',
-        ]);
+        $response->assertSessionHasErrors(['file_surat_pengantar']);
     }
 
     /**

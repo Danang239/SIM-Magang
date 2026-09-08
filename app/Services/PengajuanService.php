@@ -17,13 +17,31 @@ class PengajuanService
     public function generateNomorPengajuan(): string
     {
         $tahun = now()->year;
+        $prefix = sprintf('PKL-%d-', $tahun);
 
-        // Hitung jumlah pengajuan di tahun ini dan increment
-        $urut = Pengajuan::whereYear('created_at', $tahun)
+        // Cari nomor pengajuan terakhir untuk tahun ini berdasarkan angka urutan tertinggi
+        $last = Pengajuan::where('nomor_pengajuan', 'like', $prefix . '%')
             ->lockForUpdate()
-            ->count() + 1;
+            ->orderByRaw('CAST(SUBSTRING(nomor_pengajuan, ' . (strlen($prefix) + 1) . ') AS UNSIGNED) DESC')
+            ->value('nomor_pengajuan');
 
-        return sprintf('PKL-%d-%04d', $tahun, $urut);
+        if ($last) {
+            $lastNumber = (int) substr($last, strlen($prefix));
+            $urut = $lastNumber + 1;
+        } else {
+            $urut = 1;
+        }
+
+        // Loop safety untuk memastikan nomor benar-benar belum terpakai di database
+        do {
+            $nomor = sprintf('%s%04d', $prefix, $urut);
+            $exists = Pengajuan::where('nomor_pengajuan', $nomor)->exists();
+            if ($exists) {
+                $urut++;
+            }
+        } while ($exists);
+
+        return $nomor;
     }
 
     /**

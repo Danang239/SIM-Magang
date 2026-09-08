@@ -20,7 +20,7 @@ class CareerStepTanggalRequest extends FormRequest
             'tanggal_mulai' => [
                 'required',
                 'date',
-                'after:today',
+                'after:' . \Carbon\Carbon::now()->addDays(13)->toDateString(),
                 function ($attribute, $value, $fail) {
                     $bidangId = session('bidang_id') ?? $this->bidang_id;
                     if (!$bidangId) {
@@ -55,7 +55,7 @@ class CareerStepTanggalRequest extends FormRequest
             'keahlian.required' => 'Keahlian wajib diisi.',
             'tanggal_mulai.required' => 'Tanggal mulai magang wajib dipilih.',
             'tanggal_mulai.date' => 'Format tanggal tidak valid.',
-            'tanggal_mulai.after' => 'Tanggal mulai harus setelah hari ini.',
+            'tanggal_mulai.after' => 'Tanggal mulai magang minimal harus berjarak 14 hari dari hari ini untuk proses verifikasi.',
         ];
     }
 }

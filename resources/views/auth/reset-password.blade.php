@@ -1,5 +1,11 @@
 <x-guest-layout>
-    <form method="POST" action="{{ route('password.store') }}">
+    <!-- Title -->
+    <div class="mb-8">
+        <h1 class="text-2xl font-extrabold text-gray-900 font-sans">Buat Password Baru</h1>
+        <p class="text-gray-500 text-sm mt-1">Silakan masukkan kata sandi baru untuk akun Anda.</p>
+    </div>
+
+    <form method="POST" action="{{ route('password.store') }}" class="space-y-5">
         @csrf
 
         <!-- Password Reset Token -->
@@ -7,41 +13,63 @@
 
         <!-- Email Address -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email', $request->email)" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label for="email" class="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
+            <input id="email" type="email" name="email" value="{{ old('email', $request->email) }}"
+                required autofocus autocomplete="username"
+                class="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800 placeholder-gray-400
+                       focus:outline-none focus:ring-2 focus:ring-biogen-medium focus:border-transparent transition-all duration-200
+                       @error('email') border-red-400 bg-red-50 @enderror">
+            @error('email')
+                <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Password -->
-        <div class="mt-4" x-data="{ showPass: false }">
-            <x-input-label for="password" :value="__('Password')" />
-            <div class="relative mt-1">
-                <input id="password" name="password" :type="showPass ? 'text' : 'password'" class="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-300 focus:ring-biogen-medium focus:border-biogen-medium text-sm" required autocomplete="new-password" />
-                <button type="button" @click="showPass = !showPass" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 focus:outline-none" tabindex="-1">
-                    <svg x-show="!showPass" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    <svg x-show="showPass" x-cloak class="w-4.5 h-4.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+        <div x-data="{ showPass: false }">
+            <label for="password" class="block text-sm font-semibold text-gray-700 mb-1.5">Password Baru</label>
+            <div class="relative">
+                <input id="password" :type="showPass ? 'text' : 'password'" name="password"
+                    required autocomplete="new-password"
+                    class="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800
+                           focus:outline-none focus:ring-2 focus:ring-biogen-medium focus:border-transparent transition-all duration-200
+                           @error('password') border-red-400 bg-red-50 @enderror"
+                    placeholder="Minimal 8 karakter">
+                <button type="button" @click="showPass = !showPass" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 focus:outline-none" tabindex="-1">
+                    <svg x-show="!showPass" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <svg x-show="showPass" x-cloak class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                 </button>
             </div>
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+            @error('password')
+                <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4" x-data="{ showConfirm: false }">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-            <div class="relative mt-1">
-                <input id="password_confirmation" name="password_confirmation" :type="showConfirm ? 'text' : 'password'" class="w-full pl-4 pr-10 py-2.5 rounded-xl border border-gray-300 focus:ring-biogen-medium focus:border-biogen-medium text-sm" required autocomplete="new-password" />
-                <button type="button" @click="showConfirm = !showConfirm" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 focus:outline-none" tabindex="-1">
-                    <svg x-show="!showConfirm" class="w-4.5 h-4.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-                    <svg x-show="showConfirm" x-cloak class="w-4.5 h-4.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+        <div x-data="{ showConfirm: false }">
+            <label for="password_confirmation" class="block text-sm font-semibold text-gray-700 mb-1.5">Konfirmasi Password Baru</label>
+            <div class="relative">
+                <input id="password_confirmation" :type="showConfirm ? 'text' : 'password'" name="password_confirmation"
+                    required autocomplete="new-password"
+                    class="w-full pl-4 pr-12 py-3 rounded-xl border border-gray-200 bg-gray-50 text-sm text-gray-800
+                           focus:outline-none focus:ring-2 focus:ring-biogen-medium focus:border-transparent transition-all duration-200
+                           @error('password_confirmation') border-red-400 bg-red-50 @enderror"
+                    placeholder="Ulangi password baru Anda">
+                <button type="button" @click="showConfirm = !showConfirm" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 focus:outline-none" tabindex="-1">
+                    <svg x-show="!showConfirm" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                    <svg x-show="showConfirm" x-cloak class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
                 </button>
             </div>
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+            @error('password_confirmation')
+                <p class="mt-1.5 text-xs text-red-500 font-medium">{{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
+        <div class="pt-2">
+            <button type="submit"
+                class="w-full bg-biogen-medium hover:bg-biogen-dark text-white font-bold py-3 px-6 rounded-xl
+                       shadow-sm hover:shadow-md transition-all duration-200 text-sm tracking-wide">
+                Simpan Password Baru
+            </button>
         </div>
     </form>
 </x-guest-layout>

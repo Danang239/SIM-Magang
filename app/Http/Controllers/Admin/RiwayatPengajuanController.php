@@ -3,18 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\VerifikasiRequest;
 use App\Models\Bidang;
+use App\Models\Pembimbing;
 use App\Models\Pengajuan;
+use App\Services\PengajuanService;
 use Illuminate\Http\Request;
 
 class RiwayatPengajuanController extends Controller
 {
+    public function __construct(
+        protected PengajuanService $pengajuanService
+    ) {}
+
     /**
-     * Display a listing of all historical applications with filters.
+     * Display a listing of all applications with filters.
      */
     public function index(Request $request)
     {
-        $query = Pengajuan::with(['user', 'bidang']);
+        $query = Pengajuan::with(['user', 'bidang', 'pembimbing']);
 
         // Filter Bidang
         if ($request->filled('bidang_id')) {
@@ -54,16 +61,68 @@ class RiwayatPengajuanController extends Controller
     }
 
     /**
-     * Display details of a specific application in read-only mode.
+     * Display details of a specific application and allow verification.
      */
     public function show(string $publicId)
     {
         $pengajuan = Pengajuan::where('public_id', $publicId)
-            ->with(['user', 'bidang', 'bidang.pembimbing', 'statusLogs', 'statusLogs.user'])
+            ->with(['user', 'bidang', 'pembimbing', 'statusLogs', 'statusLogs.user'])
             ->firstOrFail();
 
         $statusLogs = $pengajuan->statusLogs()->orderBy('created_at', 'asc')->get();
+        $pembimbings = Pembimbing::where('is_active', true)->orderBy('nama', 'asc')->get();
 
-        return view('admin.riwayat-pengajuan.show', compact('pengajuan', 'statusLogs'));
+        return view('admin.riwayat-pengajuan.show', compact('pengajuan', 'statusLogs', 'pembimbings'));
+    }
+
+    /**
+     * Process verification decision (Setujui / Tolak) by Admin.
+     */
+    public function verifikasi(VerifikasiRequest $request, string $publicId)
+    {
+        $pengajuan = Pengajuan::where('public_id', $publicId)->firstOrFail();
+
+        $action = $request->input('action');
+        $catatan = $request->input('catatan');
+
+        if ($request->filled('pembimbing_id')) {
+            $pengajuan->pembimbing_id = $request->input('pembimbing_id');
+            $pengajuan->save();
+        }
+
+        if ($action === 'setujui') {
+            if ($request->hasFile('file_surat_balasan')) {
+                $file = $request->file('file_surat_balasan');
+                $allowedMimes = ['application/pdf'];
+                $allowedExtensions = ['pdf'];
+                $ext = strtolower($file->getClientOriginalExtension());
+                if (!in_array($ext, $allowedExtensions) || !in_array($file->getMimeType(), $allowedMimes)) {
+                    return back()->withErrors(['file_surat_balasan' => 'Tipe file tidak diizinkan. Harus file PDF.'])->withInput();
+                }
+                
+                $filePath = $file->store('surat-balasan', 'local');
+                $pengajuan->file_surat_balasan = $filePath;
+                $pengajuan->save();
+            }
+
+            $this->pengajuanService->ubahStatus(
+                $pengajuan,
+                'Disetujui',
+                'Pengajuan disetujui oleh Administrator.',
+                auth()->id()
+            );
+            $msg = 'Pengajuan berhasil disetujui dan surat balasan telah diunggah.';
+        } else {
+            $this->pengajuanService->ubahStatus(
+                $pengajuan,
+                'Ditolak',
+                $catatan,
+                auth()->id()
+            );
+            $msg = 'Pengajuan berhasil ditolak.';
+        }
+
+        return redirect()->route('admin.riwayat-pengajuan.show', $pengajuan->public_id)
+            ->with('success', $msg);
     }
 }

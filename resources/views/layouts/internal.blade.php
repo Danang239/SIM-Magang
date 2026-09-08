@@ -6,7 +6,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'SIM-MAGANG BRMP Biogen') }}</title>
+        <title>{{ config('app.name', 'SIP BRMP Biogen') }}</title>
+        <link rel="icon" type="image/png" href="{{ asset('logo-brmp.png') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -73,7 +74,7 @@
                 <div class="px-6 py-5 border-b border-green-900 flex items-center space-x-3 bg-emerald-950">
                     <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-9 h-9 object-contain shrink-0">
                     <div>
-                        <h1 class="font-bold text-lg tracking-tight font-sans text-white">BRMP Biogen</h1>
+                        <h1 class="font-bold text-lg tracking-tight font-sans text-white">SIP Biogen</h1>
                         <p class="text-[10px] text-green-200 tracking-wider font-semibold uppercase leading-tight">SIM-MAGANG</p>
                     </div>
                 </div>
@@ -94,53 +95,44 @@
 
                 <!-- Menu Navigation -->
                 <nav class="px-4 space-y-1">
-                    @php
-                        $role = auth()->user()->roles->pluck('name')->first();
-                        $dashboardRoute = $role === 'Administrator' ? route('admin.dashboard') : route('petugas.dashboard');
-                    @endphp
-
-                    <a href="{{ $dashboardRoute }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('*.dashboard') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                    <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
                         <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                         Dashboard
                     </a>
 
-                    <!-- Petugas & Admin Shared Features -->
-                    @if($role === 'Petugas' || $role === 'Administrator')
-                        <div class="pt-4 pb-1">
-                            <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Operasional</p>
-                        </div>
-                        <a href="{{ route('petugas.verifikasi.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('petugas.verifikasi.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Verifikasi Pengajuan
-                        </a>
-                        <a href="{{ route('petugas.bidang.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('petugas.bidang.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                            Kelola Bidang
-                        </a>
-                    @endif
+                    <!-- Operasional PKL -->
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Layanan & PKL</p>
+                    </div>
+                    <a href="{{ route('admin.riwayat-pengajuan.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.riwayat-pengajuan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Pengajuan & Verifikasi
+                    </a>
+                    <a href="{{ route('admin.bidang.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.bidang.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                        Kelola Bidang
+                    </a>
+                    <a href="{{ route('admin.pembimbing.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.pembimbing.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                        Kelola Pembimbing
+                    </a>
 
-                    <!-- Admin Only Features -->
-                    @if($role === 'Administrator')
-                        <div class="pt-4 pb-1">
-                            <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Sistem & Admin</p>
-                        </div>
-                        <a href="{{ route('admin.user.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.user.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                            Kelola Pengguna
-                        </a>
-                        <a href="{{ route('admin.skm-pertanyaan.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.skm-pertanyaan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Konfigurasi SKM
-                        </a>
-                        <a href="{{ route('admin.rekap-skm.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.rekap-skm.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Rekap SKM
-                        </a>
-                        <a href="{{ route('admin.riwayat-pengajuan.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.riwayat-pengajuan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                            Riwayat Pengajuan
-                        </a>
-                    @endif
+                    <!-- Sistem & Admin -->
+                    <div class="pt-4 pb-1">
+                        <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Sistem & Laporan</p>
+                    </div>
+                    <a href="{{ route('admin.user.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.user.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Kelola Pengguna
+                    </a>
+                    <a href="{{ route('admin.skm-pertanyaan.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.skm-pertanyaan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Konfigurasi SKM
+                    </a>
+                    <a href="{{ route('admin.rekap-skm.index') }}" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.rekap-skm.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                        Rekap SKM
+                    </a>
                 </nav>
             </div>
 
@@ -186,7 +178,7 @@
                         <div class="flex items-center space-x-3">
                             <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-8 h-8 object-contain">
                             <div>
-                                <h1 class="font-bold text-base tracking-tight text-white">BRMP Biogen</h1>
+                                <h1 class="font-bold text-base tracking-tight text-white">SIP Biogen</h1>
                                 <p class="text-[9px] text-green-200 tracking-wider font-semibold uppercase">SIM-MAGANG</p>
                             </div>
                         </div>
@@ -210,51 +202,42 @@
 
                     <!-- Menu Navigation Mobile -->
                     <nav class="px-4 space-y-1">
-                        @php
-                            $role = auth()->user()->roles->pluck('name')->first();
-                            $dashboardRoute = $role === 'Administrator' ? route('admin.dashboard') : route('petugas.dashboard');
-                        @endphp
-
-                        <a href="{{ $dashboardRoute }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('*.dashboard') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                        <a href="{{ route('admin.dashboard') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
                             <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                             Dashboard
                         </a>
 
-                        @if($role === 'Petugas' || $role === 'Administrator')
-                            <div class="pt-3 pb-1">
-                                <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Operasional</p>
-                            </div>
-                            <a href="{{ route('petugas.verifikasi.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('petugas.verifikasi.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Verifikasi Pengajuan
-                            </a>
-                            <a href="{{ route('petugas.bidang.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('petugas.bidang.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
-                                Kelola Bidang
-                            </a>
-                        @endif
+                        <div class="pt-3 pb-1">
+                            <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Layanan & PKL</p>
+                        </div>
+                        <a href="{{ route('admin.riwayat-pengajuan.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.riwayat-pengajuan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Pengajuan & Verifikasi
+                        </a>
+                        <a href="{{ route('admin.bidang.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.bidang.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                            Kelola Bidang
+                        </a>
+                        <a href="{{ route('admin.pembimbing.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.pembimbing.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                            Kelola Pembimbing
+                        </a>
 
-                        @if($role === 'Administrator')
-                            <div class="pt-3 pb-1">
-                                <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Sistem & Admin</p>
-                            </div>
-                            <a href="{{ route('admin.user.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.user.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Kelola Pengguna
-                            </a>
-                            <a href="{{ route('admin.skm-pertanyaan.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.skm-pertanyaan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Konfigurasi SKM
-                            </a>
-                            <a href="{{ route('admin.rekap-skm.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.rekap-skm.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                                Rekap SKM
-                            </a>
-                            <a href="{{ route('admin.riwayat-pengajuan.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.riwayat-pengajuan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
-                                <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                                Riwayat Pengajuan
-                            </a>
-                        @endif
+                        <div class="pt-3 pb-1">
+                            <p class="px-4 text-[10px] font-bold text-green-300 uppercase tracking-wider">Sistem & Admin</p>
+                        </div>
+                        <a href="{{ route('admin.user.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.user.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Kelola Pengguna
+                        </a>
+                        <a href="{{ route('admin.skm-pertanyaan.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.skm-pertanyaan.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            Konfigurasi SKM
+                        </a>
+                        <a href="{{ route('admin.rekap-skm.index') }}" @click="sidebarOpen = false" class="flex items-center px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-biogen-medium hover:text-white transition-all duration-200 {{ request()->routeIs('admin.rekap-skm.*') ? 'bg-biogen-medium text-white shadow-md' : 'text-green-100' }}">
+                            <svg class="w-5 h-5 me-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                            Rekap SKM
+                        </a>
                     </nav>
                 </div>
 
@@ -293,7 +276,7 @@
                     @endphp
 
                     <!-- Notifications Icon (Quick Link to Verifikasi Queue) -->
-                    <a href="{{ route('petugas.verifikasi.index') }}" 
+                    <a href="{{ route('admin.riwayat-pengajuan.index', ['status' => 'Menunggu Verifikasi']) }}" 
                        title="{{ $pendingVerifikasiCount > 0 ? $pendingVerifikasiCount . ' Pengajuan Menunggu Verifikasi' : 'Semua pengajuan sudah diverifikasi' }}"
                        class="text-gray-400 hover:text-emerald-700 transition-colors p-2 rounded-xl hover:bg-emerald-50 relative group">
                         <span class="sr-only">Notifikasi Verifikasi</span>

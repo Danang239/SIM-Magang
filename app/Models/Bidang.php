@@ -6,9 +6,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable(['nama_bidang', 'deskripsi', 'jenjang', 'kategori', 'pembimbing_id', 'kapasitas', 'is_active', 'jobdesc', 'gambar'])]
 class Bidang extends Model
@@ -24,30 +23,22 @@ class Bidang extends Model
     }
 
     /**
-     * Relasi ke Pembimbing Utama (Legacy single pembimbing).
+     * Relasi ke Pembimbing (Many-to-Many via bidang_pembimbing pivot).
      */
-    public function pembimbing(): BelongsTo
+    public function pembimbings(): BelongsToMany
     {
-        return $this->belongsTo(User::class, 'pembimbing_id');
-    }
-
-    /**
-     * Relasi ke Multi-Petugas Pembimbing (Many-to-Many via bidang_petugas pivot).
-     */
-    public function petugasList(): BelongsToMany
-    {
-        return $this->belongsToMany(User::class, 'bidang_petugas', 'bidang_id', 'petugas_id')
+        return $this->belongsToMany(Pembimbing::class, 'bidang_pembimbing')
             ->withPivot('kuota')
             ->withTimestamps();
     }
 
     /**
-     * Total kapasitas bidang (penjumlahan kuota seluruh petugas di bidang ini).
+     * Total kapasitas bidang (penjumlahan kuota seluruh pembimbing di bidang ini).
      */
     public function getKapasitasTotalAttribute(): int
     {
-        if ($this->petugasList()->exists()) {
-            return (int) $this->petugasList()->sum('bidang_petugas.kuota');
+        if ($this->pembimbings()->exists()) {
+            return (int) $this->pembimbings()->sum('bidang_pembimbing.kuota');
         }
 
         return (int) $this->kapasitas;

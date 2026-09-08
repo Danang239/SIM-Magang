@@ -52,7 +52,7 @@
                     @click.prevent="$refs.photo.click()">
                     Pilih Foto Baru
                 </button>
-                <p class="text-[10px] text-gray-400 mt-1">JPEG, JPG, PNG. Maksimal 1MB.</p>
+                <p class="text-[10px] text-gray-400 mt-1">Format JPG, PNG. Maksimal 5MB (Opsional / Tidak Wajib Diisi).</p>
                 <x-input-error class="mt-1" :messages="$errors->get('foto_profil')" />
             </div>
         </div>

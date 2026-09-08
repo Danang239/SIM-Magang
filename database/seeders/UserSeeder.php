@@ -27,27 +27,7 @@ class UserSeeder extends Seeder
         ]);
         $admin->assignRole('Administrator');
 
-        // 2. Petugas 1
-        $petugas1 = User::create([
-            'name' => 'Petugas Budi',
-            'email' => 'budi@biogen.go.id',
-            'password' => Hash::make('password'),
-            'no_hp' => '081234567891',
-            'instansi' => 'BRMP Biogen',
-        ]);
-        $petugas1->assignRole('Petugas');
-
-        // 3. Petugas 2
-        $petugas2 = User::create([
-            'name' => 'Petugas Susi',
-            'email' => 'susi@biogen.go.id',
-            'password' => Hash::make('password'),
-            'no_hp' => '081234567892',
-            'instansi' => 'BRMP Biogen',
-        ]);
-        $petugas2->assignRole('Petugas');
-
-        // 4. Pengguna 1 (Mahasiswa)
+        // 2. Pengguna 1 (Mahasiswa)
         $pengguna1 = User::create([
             'name' => 'Danang Tri',
             'email' => 'danang@example.com',
@@ -58,7 +38,7 @@ class UserSeeder extends Seeder
         ]);
         $pengguna1->assignRole('Pengguna');
 
-        // 5. Pengguna 2 (Siswa)
+        // 3. Pengguna 2 (Siswa)
         $pengguna2 = User::create([
             'name' => 'Ahmad Roni',
             'email' => 'roni@example.com',

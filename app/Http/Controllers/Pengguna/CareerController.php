@@ -29,13 +29,18 @@ class CareerController extends Controller
             return redirect()->route('home')->with('error', 'Silakan pilih bidang magang terlebih dahulu.');
         }
 
-        // Simpan ke session
-        session(['bidang_id' => $bidangId]);
-        if ($request->has('pembimbing_id')) {
-            session(['pembimbing_id' => $request->query('pembimbing_id')]);
+        // Pastikan pembimbing dipilih jika query parameter ada, atau ambil dari session.
+        $pembimbingId = $request->query('pembimbing_id') ?? session('pembimbing_id');
+        
+        if (!$pembimbingId) {
+            return redirect()->route('home')->with('error', 'Pendaftaran gagal: Anda wajib memilih pembimbing lapangan untuk bidang ini.');
         }
 
-        $bidang = Bidang::with('pembimbing')->findOrFail($bidangId);
+        // Simpan ke session
+        session(['bidang_id' => $bidangId]);
+        session(['pembimbing_id' => $pembimbingId]);
+
+        $bidang = Bidang::with('pembimbings')->findOrFail($bidangId);
         
         if (!$request->has('resume')) {
             session()->forget(['career_step1']);
@@ -83,7 +88,7 @@ class CareerController extends Controller
             return redirect()->route('pengguna.career.step1')->with('error', 'Silakan lengkapi langkah 1 terlebih dahulu.');
         }
 
-        $bidang = Bidang::with('pembimbing')->findOrFail($bidangId);
+        $bidang = Bidang::with('pembimbings')->findOrFail($bidangId);
 
         return view('pengguna.career.step2', compact('bidang', 'step1'));
     }
@@ -198,19 +203,35 @@ class CareerController extends Controller
                 \App\Models\Notifikasi::create([
                     'user_id' => auth()->id(),
                     'judul' => 'Pengajuan Berhasil Dikirim',
-                    'pesan' => "Pengajuan magang Anda dengan nomor {$nomorPengajuan} berhasil dikirim dan sedang menunggu verifikasi petugas.",
+                    'pesan' => "Pengajuan PKL Anda dengan nomor {$nomorPengajuan} berhasil dikirim dan sedang menunggu verifikasi admin (maksimal 5 hari kerja).",
                 ]);
 
                 return $pengajuan;
             });
 
             // Bersihkan session career
-            session()->forget(['career_step1', 'bidang_id']);
+            session()->forget(['career_step1', 'bidang_id', 'pembimbing_id']);
 
-            // Kirim notifikasi email ke Pembimbing bidang jika ada dan memiliki email
+            // Kirim notifikasi email
             try {
-                if ($pengajuan->bidang && $pengajuan->bidang->pembimbing && $pengajuan->bidang->pembimbing->email) {
-                    \Illuminate\Support\Facades\Mail::to($pengajuan->bidang->pembimbing->email)
+                $currentUser = auth()->user();
+                $applicantEmail = $currentUser?->email ?? $pengajuan->user?->email;
+
+                // 1. Kirim email validasi & konfirmasi ke Pengguna (Pendaftar)
+                if ($applicantEmail) {
+                    \Illuminate\Support\Facades\Mail::to($applicantEmail)
+                        ->send(new \App\Mail\PengajuanBerhasilDaftarMail($pengajuan->id));
+                }
+
+                // 2. Kirim email notifikasi pengajuan baru ke Admin
+                $adminEmails = \App\Models\User::role('Administrator')->pluck('email')->filter();
+                $customAdminEmail = env('ADMIN_NOTIFICATION_EMAIL');
+                if ($customAdminEmail) {
+                    $adminEmails->push($customAdminEmail);
+                }
+
+                foreach ($adminEmails->unique() as $adminEmail) {
+                    \Illuminate\Support\Facades\Mail::to($adminEmail)
                         ->send(new \App\Mail\PengajuanBaruMasukMail($pengajuan->id));
                 }
             } catch (\Exception $mailException) {
@@ -219,7 +240,7 @@ class CareerController extends Controller
             }
 
             return redirect()->route('pengguna.career.konfirmasi', $pengajuan->public_id)
-                ->with('success', 'Pengajuan berhasil dikirim!');
+                ->with('success', 'Pengajuan PKL berhasil dikirim!');
 
         } catch (\Exception $e) {
             return back()->withErrors(['general' => $e->getMessage()])->withInput();
@@ -231,7 +252,7 @@ class CareerController extends Controller
     {
         $pengajuan = Pengajuan::where('public_id', $publicId)
             ->where('user_id', auth()->id())
-            ->with(['bidang', 'bidang.pembimbing'])
+            ->with(['bidang', 'pembimbing'])
             ->firstOrFail();
 
         return view('pengguna.career.konfirmasi', compact('pengajuan'));

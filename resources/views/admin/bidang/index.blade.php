@@ -2,10 +2,10 @@
     <!-- Header Section -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 font-sans">Daftar Bidang Penempatan</h2>
-            <p class="text-xs text-gray-400 mt-1">Kelola divisi, kapasitas rolling, pembimbing, dan status aktif bidang penempatan magang/PKL.</p>
+            <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Bidang Penempatan</h2>
+            <p class="text-xs text-gray-400 mt-1">Kelola bidang PKL/magang, kriteria jenjang, deskripsi jobdesc, dan pembimbing yang ditugaskan.</p>
         </div>
-        <a href="{{ route('petugas.bidang.create') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 inline-flex items-center space-x-2 w-fit">
+        <a href="{{ route('admin.bidang.create') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 inline-flex items-center space-x-2 w-fit">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             <span>Tambah Bidang</span>
         </a>
@@ -27,7 +27,7 @@
 
     <!-- Search Panel -->
     <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 mb-6">
-        <form method="GET" action="{{ route('petugas.bidang.index') }}" class="flex items-center space-x-3">
+        <form method="GET" action="{{ route('admin.bidang.index') }}" class="flex items-center space-x-3">
             <div class="relative flex-grow max-w-md">
                 <input type="text" name="search" value="{{ request('search') }}"
                     class="w-full text-xs rounded-xl border border-gray-200 pl-9 pr-4 py-2.5 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none transition"
@@ -40,7 +40,7 @@
                 Cari
             </button>
             @if(request('search'))
-                <a href="{{ route('petugas.bidang.index') }}" class="px-4 py-2.5 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-500 rounded-xl text-xs font-semibold transition-colors">
+                <a href="{{ route('admin.bidang.index') }}" class="px-4 py-2.5 bg-gray-50 border border-gray-200 hover:bg-gray-100 text-gray-500 rounded-xl text-xs font-semibold transition-colors">
                     Reset
                 </a>
             @endif
@@ -63,7 +63,7 @@
                             <th class="px-6 py-4">Jenjang</th>
                             <th class="px-6 py-4">Kategori</th>
                             <th class="px-6 py-4">Kapasitas Slot</th>
-                            <th class="px-6 py-4">Pembimbing</th>
+                            <th class="px-6 py-4">Pembimbing Ditugaskan</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -100,44 +100,37 @@
                                     {{ $bidang->kapasitas_total }} Slot
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if($bidang->petugasList->isNotEmpty())
-                                        <div class="space-y-1">
-                                            @foreach($bidang->petugasList as $p)
-                                                <div class="flex items-center space-x-1.5 text-xs">
-                                                    <span class="font-semibold text-gray-800">{{ $p->name }}</span>
-                                                    <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-emerald-100 text-emerald-800 border border-emerald-200">
-                                                        {{ $p->pivot->kuota }} Slot
-                                                    </span>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    @elseif($bidang->pembimbing)
-                                        <p class="font-semibold text-gray-800">{{ $bidang->pembimbing->name }}</p>
-                                    @else
-                                        <span class="text-gray-400 italic text-[11px]">Belum ditugaskan</span>
-                                    @endif
+                                    <div class="flex flex-wrap gap-1 max-w-xs">
+                                        @forelse($bidang->pembimbings as $pembimbing)
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-gray-100 text-gray-700 border border-gray-200">
+                                                {{ $pembimbing->nama }} ({{ $pembimbing->pivot->kuota ?? $pembimbing->kuota_default }})
+                                            </span>
+                                        @empty
+                                            <span class="text-gray-400 italic text-[10px]">Belum ditentukan</span>
+                                        @endforelse
+                                    </div>
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($bidang->is_active)
-                                        <span class="inline-block text-[9px] bg-green-100 text-green-700 font-bold px-2 py-0.5 rounded-full uppercase">Aktif</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                                            Aktif
+                                        </span>
                                     @else
-                                        <span class="inline-block text-[9px] bg-red-100 text-red-700 font-bold px-2 py-0.5 rounded-full uppercase">Non-Aktif</span>
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600">
+                                            Nonaktif
+                                        </span>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4 text-right whitespace-nowrap">
-                                    <div class="inline-flex items-center space-x-2">
-                                        <!-- Edit -->
-                                        <a href="{{ route('petugas.bidang.edit', $bidang->id) }}" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 text-[10px] font-bold px-3 py-1.5 rounded-lg shadow-sm transition-all">
-                                            Edit
+                                <td class="px-6 py-4 text-right">
+                                    <div class="flex items-center justify-end space-x-2">
+                                        <a href="{{ route('admin.bidang.edit', $bidang->id) }}" class="p-1.5 text-gray-400 hover:text-biogen-medium hover:bg-emerald-50 rounded-lg transition" title="Edit Bidang">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
                                         </a>
-                                        <!-- Delete Form -->
-                                        <form method="POST" action="{{ route('petugas.bidang.destroy', $bidang->id) }}"
-                                            class="inline-block"
-                                            onsubmit="return confirm('Apakah Anda yakin ingin menghapus bidang {{ $bidang->nama_bidang }}?');">
+                                        <form action="{{ route('admin.bidang.destroy', $bidang->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus bidang ini?');" class="inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 text-[10px] font-bold px-3 py-1.5 rounded-lg transition-all">
-                                                Hapus
+                                            <button type="submit" class="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition" title="Hapus Bidang">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                                             </button>
                                         </form>
                                     </div>
@@ -150,7 +143,7 @@
 
             <!-- Pagination -->
             @if($bidangs->hasPages())
-                <div class="px-6 py-4 border-t border-gray-100 bg-gray-50">
+                <div class="px-6 py-4 border-t border-gray-100">
                     {{ $bidangs->links() }}
                 </div>
             @endif

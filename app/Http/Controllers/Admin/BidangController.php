@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers\Petugas;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\BidangRequest;
 use App\Models\Bidang;
-use App\Models\User;
+use App\Models\Pembimbing;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BidangController extends Controller
 {
@@ -15,9 +16,8 @@ class BidangController extends Controller
      */
     public function index(Request $request)
     {
-        $query = Bidang::with(['pembimbing', 'petugasList']);
+        $query = Bidang::with('pembimbings');
 
-        // Search by nama_bidang
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where('nama_bidang', 'like', '%' . $search . '%');
@@ -25,7 +25,7 @@ class BidangController extends Controller
 
         $bidangs = $query->orderBy('nama_bidang', 'asc')->paginate(10)->withQueryString();
 
-        return view('petugas.bidang.index', compact('bidangs'));
+        return view('admin.bidang.index', compact('bidangs'));
     }
 
     /**
@@ -33,10 +33,9 @@ class BidangController extends Controller
      */
     public function create()
     {
-        // Get all users who can be pembimbing (Petugas or Administrator roles)
-        $pembimbings = User::role(['Petugas', 'Administrator'])->orderBy('name', 'asc')->get();
+        $pembimbings = Pembimbing::where('is_active', true)->orderBy('nama', 'asc')->get();
 
-        return view('petugas.bidang.create', compact('pembimbings'));
+        return view('admin.bidang.create', compact('pembimbings'));
     }
 
     /**
@@ -46,15 +45,14 @@ class BidangController extends Controller
     {
         $data = $request->validated();
         
-        $petugasIds = $request->input('petugas_ids', []);
-        $kuotaPetugas = $request->input('kuota_petugas', []);
+        $pembimbingIds = $request->input('pembimbing_ids', []);
+        $kuotaPembimbing = $request->input('kuota_pembimbing', []);
 
-        // Calculate total capacity from assigned petugas quotas if available
         $totalKuota = 0;
         $syncData = [];
 
-        foreach ($petugasIds as $pId) {
-            $k = isset($kuotaPetugas[$pId]) ? max(1, (int) $kuotaPetugas[$pId]) : 5;
+        foreach ($pembimbingIds as $pId) {
+            $k = isset($kuotaPembimbing[$pId]) ? max(1, (int) $kuotaPembimbing[$pId]) : 5;
             $syncData[$pId] = ['kuota' => $k];
             $totalKuota += $k;
         }
@@ -68,10 +66,10 @@ class BidangController extends Controller
         $bidang = Bidang::create($data);
 
         if (!empty($syncData)) {
-            $bidang->petugasList()->sync($syncData);
+            $bidang->pembimbings()->sync($syncData);
         }
 
-        return redirect()->route('petugas.bidang.index')
+        return redirect()->route('admin.bidang.index')
             ->with('success', 'Bidang penempatan berhasil ditambahkan.');
     }
 
@@ -80,10 +78,10 @@ class BidangController extends Controller
      */
     public function edit(Bidang $bidang)
     {
-        $bidang->load('petugasList');
-        $pembimbings = User::role(['Petugas', 'Administrator'])->orderBy('name', 'asc')->get();
+        $bidang->load('pembimbings');
+        $pembimbings = Pembimbing::where('is_active', true)->orderBy('nama', 'asc')->get();
 
-        return view('petugas.bidang.edit', compact('bidang', 'pembimbings'));
+        return view('admin.bidang.edit', compact('bidang', 'pembimbings'));
     }
 
     /**
@@ -93,14 +91,14 @@ class BidangController extends Controller
     {
         $data = $request->validated();
 
-        $petugasIds = $request->input('petugas_ids', []);
-        $kuotaPetugas = $request->input('kuota_petugas', []);
+        $pembimbingIds = $request->input('pembimbing_ids', []);
+        $kuotaPembimbing = $request->input('kuota_pembimbing', []);
 
         $totalKuota = 0;
         $syncData = [];
 
-        foreach ($petugasIds as $pId) {
-            $k = isset($kuotaPetugas[$pId]) ? max(1, (int) $kuotaPetugas[$pId]) : 5;
+        foreach ($pembimbingIds as $pId) {
+            $k = isset($kuotaPembimbing[$pId]) ? max(1, (int) $kuotaPembimbing[$pId]) : 5;
             $syncData[$pId] = ['kuota' => $k];
             $totalKuota += $k;
         }
@@ -108,16 +106,16 @@ class BidangController extends Controller
         $data['kapasitas'] = $totalKuota > 0 ? $totalKuota : ($data['kapasitas'] ?? $bidang->kapasitas);
 
         if ($request->hasFile('gambar')) {
-            if ($bidang->gambar && \Illuminate\Support\Facades\Storage::disk('public')->exists($bidang->gambar)) {
-                \Illuminate\Support\Facades\Storage::disk('public')->delete($bidang->gambar);
+            if ($bidang->gambar && Storage::disk('public')->exists($bidang->gambar)) {
+                Storage::disk('public')->delete($bidang->gambar);
             }
             $data['gambar'] = $request->file('gambar')->store('bidang', 'public');
         }
 
         $bidang->update($data);
-        $bidang->petugasList()->sync($syncData);
+        $bidang->pembimbings()->sync($syncData);
 
-        return redirect()->route('petugas.bidang.index')
+        return redirect()->route('admin.bidang.index')
             ->with('success', 'Bidang penempatan berhasil diperbarui.');
     }
 
@@ -126,14 +124,14 @@ class BidangController extends Controller
      */
     public function destroy(Bidang $bidang)
     {
-        // Check if there are associated applications (prevent deletion error)
         if ($bidang->pengajuans()->exists()) {
-            return back()->with('error', 'Bidang tidak dapat dihapus karena sudah digunakan dalam pengajuan magang/PKL.');
+            return back()->with('error', 'Bidang tidak dapat dihapus karena sudah digunakan dalam riwayat pengajuan PKL.');
         }
 
+        $bidang->pembimbings()->detach();
         $bidang->delete();
 
-        return redirect()->route('petugas.bidang.index')
+        return redirect()->route('admin.bidang.index')
             ->with('success', 'Bidang penempatan berhasil dihapus.');
     }
 }

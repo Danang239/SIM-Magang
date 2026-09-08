@@ -75,7 +75,7 @@
             </div>
             <div>
                 <p class="text-[11px] font-bold uppercase tracking-wider text-gray-400">Rata-Rata Kepuasan (SKM)</p>
-                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ $stats['skm_average'] }} / 5.00</p>
+                <p class="text-2xl font-bold text-gray-800 mt-0.5">{{ $stats['skm_average'] }} / 4.00</p>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@
     <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm mb-8">
         <div class="border-b border-gray-100 pb-4 mb-6">
             <h3 class="font-bold text-gray-850 font-sans text-sm tracking-wide uppercase text-gray-400">Analisis Detail Instrumen SKM</h3>
-            <p class="text-[11px] text-gray-400 mt-0.5">Persentase distribusi rating 1-5 bintang untuk masing-masing kuesioner layanan.</p>
+            <p class="text-[11px] text-gray-400 mt-0.5">Persentase distribusi jawaban responden (Skala 1–4) untuk masing-masing kuesioner layanan.</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -114,7 +114,7 @@
                             {{ $q['id'] }}. {{ $q['teks'] }}
                         </p>
                         <p class="text-[10px] text-gray-400 mt-1 font-semibold">
-                            Rata-Rata: <span class="text-yellow-600 font-bold">{{ $q['average'] }} / 5.00</span> 
+                            Rata-Rata: <span class="text-yellow-600 font-bold">{{ $q['average'] }} / 4.00</span> 
                             ({{ $q['total_responses'] }} Responden)
                         </p>
                     </div>
@@ -210,8 +210,8 @@
 
             // SKM Questions Pie Charts
             const skmQuestions = {!! json_encode($skmQuestions) !!};
-            const ratingLabels = ['1 Star', '2 Stars', '3 Stars', '4 Stars', '5 Stars'];
-            const ratingColors = ['#ef4444', '#f97316', '#eab308', '#3b82f6', '#10b981'];
+            const ratingLabels = ['1. Sangat Tidak Setuju', '2. Tidak Setuju', '3. Setuju', '4. Sangat Setuju'];
+            const ratingColors = ['#ef4444', '#f97316', '#3b82f6', '#10b981'];
 
             skmQuestions.forEach(function (q) {
                 if (q.total_responses > 0) {

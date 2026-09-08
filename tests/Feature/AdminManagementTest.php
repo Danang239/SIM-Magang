@@ -26,37 +26,31 @@ class AdminManagementTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Kelola Pengguna');
 
-        // 2. Create new Petugas account
-        $responseCreate = $this->actingAs($admin)->post(route('admin.user.store'), [
-            'name' => 'Petugas Baru',
-            'email' => 'new.petugas@mail.com',
+        // 2. Existing target user
+        $targetUser = User::factory()->create([
+            'name' => 'Target Pengguna',
+            'email' => 'target@mail.com',
             'no_hp' => '0812345678912',
-            'instansi' => 'BB-Biogen',
-            'password' => 'password123',
-            'password_confirmation' => 'password123',
+            'instansi' => 'Institut Pertanian Bogor',
         ]);
-        $responseCreate->assertRedirect(route('admin.user.index'));
-        
-        $newPetugas = User::where('email', 'new.petugas@mail.com')->first();
-        $this->assertNotNull($newPetugas);
-        $this->assertTrue($newPetugas->hasRole('Petugas'));
+        $targetUser->assignRole('Pengguna');
 
         // 3. Edit user info & change role
-        $responseEdit = $this->actingAs($admin)->put(route('admin.user.update', $newPetugas->id), [
-            'name' => 'Petugas Diedit',
-            'email' => 'new.petugas@mail.com',
+        $responseEdit = $this->actingAs($admin)->put(route('admin.user.update', $targetUser->id), [
+            'name' => 'Pengguna Diedit',
+            'email' => 'target@mail.com',
             'no_hp' => '0812345678912',
             'instansi' => 'Unit Pelayanan Standardisasi',
-            'role' => 'Administrator', // Upgrade to Admin
+            'role' => 'Administrator', // Change role
         ]);
         $responseEdit->assertRedirect(route('admin.user.index'));
-        $this->assertTrue($newPetugas->fresh()->hasRole('Administrator'));
-        $this->assertEquals('Unit Pelayanan Standardisasi', $newPetugas->fresh()->instansi);
+        $this->assertTrue($targetUser->fresh()->hasRole('Administrator'));
+        $this->assertEquals('Unit Pelayanan Standardisasi', $targetUser->fresh()->instansi);
 
         // 4. Delete user
-        $responseDelete = $this->actingAs($admin)->delete(route('admin.user.destroy', $newPetugas->id));
+        $responseDelete = $this->actingAs($admin)->delete(route('admin.user.destroy', $targetUser->id));
         $responseDelete->assertRedirect(route('admin.user.index'));
-        $this->assertDatabaseMissing('users', ['id' => $newPetugas->id]);
+        $this->assertDatabaseMissing('users', ['id' => $targetUser->id]);
 
         // 5. SKM Questions CRUD
         $responseSkmIndex = $this->actingAs($admin)->get(route('admin.skm-pertanyaan.index'));
@@ -65,21 +59,21 @@ class AdminManagementTest extends TestCase
         // Create SKM Question
         $responseSkmCreate = $this->actingAs($admin)->post(route('admin.skm-pertanyaan.store'), [
             'teks_pertanyaan' => 'Apakah sarana laboratorium sangat memadai?',
-            'urutan' => 15,
+            'urutan' => 99,
             'is_active' => 1,
         ]);
         $responseSkmCreate->assertRedirect(route('admin.skm-pertanyaan.index'));
         $this->assertDatabaseHas('skm_pertanyaan', [
             'teks_pertanyaan' => 'Apakah sarana laboratorium sangat memadai?',
-            'urutan' => 15,
+            'urutan' => 99,
         ]);
 
-        $question = SkmPertanyaan::where('urutan', 15)->first();
+        $question = SkmPertanyaan::where('urutan', 99)->first();
 
         // Update SKM Question
         $responseSkmUpdate = $this->actingAs($admin)->put(route('admin.skm-pertanyaan.update', $question->id), [
             'teks_pertanyaan' => 'Apakah sarana laboratorium modern and sangat memadai?',
-            'urutan' => 15,
+            'urutan' => 99,
             'is_active' => 0, // deactivate
         ]);
         $responseSkmUpdate->assertRedirect(route('admin.skm-pertanyaan.index'));

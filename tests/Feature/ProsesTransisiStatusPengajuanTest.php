@@ -5,9 +5,7 @@ namespace Tests\Feature;
 use App\Models\Bidang;
 use App\Models\Pengajuan;
 use App\Models\User;
-use App\Mail\ReminderLaporanTelatMail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Artisan;
 use Carbon\Carbon;
 use Tests\TestCase;
@@ -23,8 +21,6 @@ class ProsesTransisiStatusPengajuanTest extends TestCase
      */
     public function test_automated_status_transitions(): void
     {
-        Mail::fake();
-
         $user1 = User::factory()->create();
         $user1->assignRole('Pengguna');
 
@@ -66,7 +62,7 @@ class ProsesTransisiStatusPengajuanTest extends TestCase
             'file_surat_pengantar' => 'surat.pdf',
         ]);
 
-        // 3. Application that is active (Sedang Magang) but finished date passed and no report submitted -> triggers reminder email
+        // 3. Application that is active (Sedang Magang) but finished date passed -> transitions to Selesai
         $pOverdue = Pengajuan::create([
             'public_id' => '33333333-3333-3333-3333-333333333333',
             'nomor_pengajuan' => 'PKL-2026-8003',
@@ -79,7 +75,6 @@ class ProsesTransisiStatusPengajuanTest extends TestCase
             'tanggal_selesai_rencana' => now()->subDays(2)->toDateString(), // Past end date
             'status' => 'Sedang Magang',
             'file_surat_pengantar' => 'surat.pdf',
-            'laporan_status' => null, // No report uploaded
         ]);
 
         // Run the command
@@ -100,9 +95,11 @@ class ProsesTransisiStatusPengajuanTest extends TestCase
             'status' => 'Sedang Magang',
         ]);
 
-        // Assert 3: Reminder email queued for user 3
-        Mail::assertQueued(ReminderLaporanTelatMail::class, function ($mail) use ($user3) {
-            return $mail->hasTo($user3->email);
-        });
+        // Assert 3: Sedang Magang became Selesai
+        $this->assertEquals('Selesai', $pOverdue->fresh()->status);
+        $this->assertDatabaseHas('pengajuan_status_logs', [
+            'pengajuan_id' => $pOverdue->id,
+            'status' => 'Selesai',
+        ]);
     }
 }

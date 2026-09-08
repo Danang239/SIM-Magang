@@ -4,9 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\Pengajuan;
 use App\Services\PengajuanService;
-use App\Mail\ReminderLaporanTelatMail;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
 use Carbon\Carbon;
 
 class ProsesTransisiStatusPengajuan extends Command
@@ -23,7 +21,7 @@ class ProsesTransisiStatusPengajuan extends Command
      *
      * @var string
      */
-    protected $description = 'Melakukan transisi status pengajuan magang otomatis berdasarkan tanggal, serta mengirim email pengingat laporan akhir yang telat';
+    protected $description = 'Melakukan transisi status pengajuan magang otomatis berdasarkan tanggal';
 
     /**
      * Create a new command instance.
@@ -43,7 +41,6 @@ class ProsesTransisiStatusPengajuan extends Command
         $this->info("Memulai proses transisi status pengajuan magang harian: {$today}");
 
         // 1. Transisi: Disetujui -> Terjadwal
-        // Semua pengajuan yang disetujui diposisikan ke status Terjadwal
         $disetujuans = Pengajuan::where('status', 'Disetujui')->get();
         $this->info("Menemukan " . $disetujuans->count() . " pengajuan berstatus Disetujui untuk ditransisikan.");
         foreach ($disetujuans as $p) {
@@ -56,7 +53,6 @@ class ProsesTransisiStatusPengajuan extends Command
         }
 
         // 2. Transisi: Terjadwal -> Sedang Magang
-        // Terjadi jika tanggal_mulai <= hari ini
         $magangMulai = Pengajuan::where('status', 'Terjadwal')
             ->where('tanggal_mulai', '<=', $today)
             ->get();
@@ -71,22 +67,19 @@ class ProsesTransisiStatusPengajuan extends Command
             );
         }
 
-        // 3. Pengingat Keterlambatan Laporan
-        // Status Sedang Magang, tanggal_selesai_rencana < hari ini, laporan_status bukan Menunggu Review / Diterima
-        $laporanTelats = Pengajuan::where('status', 'Sedang Magang')
+        // 3. Transisi: Sedang Magang -> Selesai
+        $magangSelesai = Pengajuan::where('status', 'Sedang Magang')
             ->where('tanggal_selesai_rencana', '<', $today)
-            ->where(function ($q) {
-                $q->whereNull('laporan_status')
-                  ->orWhereNotIn('laporan_status', ['Menunggu Review', 'Diterima']);
-            })
-            ->with('user')
             ->get();
 
-        $this->info("Menemukan " . $laporanTelats->count() . " peserta aktif yang terlambat melapor.");
-        foreach ($laporanTelats as $p) {
-            if ($p->user && $p->user->email) {
-                Mail::to($p->user->email)->queue(new ReminderLaporanTelatMail($p));
-            }
+        $this->info("Menemukan " . $magangSelesai->count() . " pengajuan yang telah melewati batas tanggal selesai.");
+        foreach ($magangSelesai as $p) {
+            $this->pengajuanService->ubahStatus(
+                $p,
+                'Selesai',
+                'Transisi otomatis: Masa pelaksanaan PKL telah selesai.',
+                null
+            );
         }
 
         $this->info('Proses transisi status pengajuan magang selesai.');

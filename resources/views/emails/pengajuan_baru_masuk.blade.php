@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Pengajuan Magang Baru Masuk</title>
+    <title>Pendaftaran PKL Baru Masuk</title>
     <style>
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -33,7 +33,7 @@
             letter-spacing: -0.5px;
         }
         .content {
-            padding: 40px 30px;
+            padding: 36px 30px;
             color: #374151;
             line-height: 1.6;
         }
@@ -63,6 +63,7 @@
         .details-val {
             color: #111827;
             font-weight: 700;
+            text-align: right;
         }
         .btn {
             display: block;
@@ -73,11 +74,8 @@
             border-radius: 8px;
             font-weight: bold;
             text-align: center;
-            margin-top: 30px;
+            margin-top: 24px;
             font-size: 14px;
-        }
-        .btn:hover {
-            background-color: #2f9a32;
         }
         .footer {
             background-color: #f9fafb;
@@ -93,41 +91,51 @@
     <div class="container">
         <div class="header">
             <h1>BRMP BIOGEN</h1>
-            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a7f3d0; font-weight: bold; text-transform: uppercase;">Notifikasi Pengajuan Baru</p>
+            <p style="margin: 5px 0 0 0; font-size: 12px; color: #a7f3d0; font-weight: bold; text-transform: uppercase;">Notifikasi Pengajuan Baru (Admin)</p>
         </div>
         <div class="content">
-            <h2>Halo, Pembimbing Bidang</h2>
-            <p>Terdapat pengajuan pendaftaran program magang baru yang masuk ke bidang Anda. Silakan melakukan peninjauan berkas calon peserta magang ini.</p>
+            <h2>Halo, Administrator</h2>
+            <p>Terdapat pendaftar baru yang telah mengirimkan berkas pengajuan program PKL di BRMP Biogen dan menunggu untuk diverifikasi.</p>
             
-            <p>Berikut adalah detail pengajuan:</p>
+            <p>Berikut adalah detail pendaftaran:</p>
             
             <div class="details-box">
                 <div class="details-row">
-                    <span class="details-label">Nama Pemohon</span>
+                    <span class="details-label">Nama Pemohon:</span>
                     <span class="details-val">{{ $pengajuan->user->name }}</span>
                 </div>
                 <div class="details-row">
-                    <span class="details-label">Nomor Pengajuan</span>
+                    <span class="details-label">Asal Instansi/Kampus:</span>
+                    <span class="details-val">{{ $pengajuan->instansi ?? $pengajuan->user->instansi ?? '-' }}</span>
+                </div>
+                <div class="details-row">
+                    <span class="details-label">Nomor Pengajuan:</span>
                     <span class="details-val">{{ $pengajuan->nomor_pengajuan }}</span>
                 </div>
                 <div class="details-row">
-                    <span class="details-label">Bidang Penempatan</span>
-                    <span class="details-val">{{ $pengajuan->bidang->nama_bidang }}</span>
+                    <span class="details-label">Bidang PKL:</span>
+                    <span class="details-val">{{ $pengajuan->bidang->nama_bidang ?? '-' }}</span>
+                </div>
+                @if($pengajuan->pembimbing)
+                <div class="details-row">
+                    <span class="details-label">Pembimbing Dituju:</span>
+                    <span class="details-val">{{ $pengajuan->pembimbing->nama }}</span>
+                </div>
+                @endif
+                <div class="details-row">
+                    <span class="details-label">Rencana Tanggal Mulai:</span>
+                    <span class="details-val">{{ $pengajuan->tanggal_mulai ? $pengajuan->tanggal_mulai->translatedFormat('d F Y') : '-' }}</span>
                 </div>
                 <div class="details-row">
-                    <span class="details-label">Tanggal Masuk</span>
-                    <span class="details-val">{{ $pengajuan->created_at->translatedFormat('d F Y') }}</span>
-                </div>
-                <div class="details-row">
-                    <span class="details-label">Durasi Magang</span>
+                    <span class="details-label">Durasi:</span>
                     <span class="details-val">{{ $pengajuan->durasi_bulan }} Bulan</span>
                 </div>
             </div>
 
-            <a href="{{ route('petugas.verifikasi.show', $pengajuan->public_id) }}" class="btn">Tinjau & Verifikasi Pengajuan</a>
+            <a href="{{ route('admin.riwayat-pengajuan.show', $pengajuan->public_id) }}" class="btn">Tinjau & Verifikasi di Dashboard Admin</a>
         </div>
         <div class="footer">
-            SIM-MAGANG &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            SIM-PKL &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
             Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
         </div>
     </div>

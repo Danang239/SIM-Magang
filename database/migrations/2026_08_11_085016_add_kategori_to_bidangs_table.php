@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('bidangs', function (Blueprint $table) {
-            $table->enum('kategori', ['Pertanian', 'Non Pertanian'])->default('Pertanian')->after('jenjang');
+            $table->string('kategori', 50)->default('Mahasiswa')->after('jenjang');
         });
     }
 

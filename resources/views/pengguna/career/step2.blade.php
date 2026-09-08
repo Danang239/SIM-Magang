@@ -1,4 +1,5 @@
 <x-layouts.publik>
+
     <div class="min-h-screen bg-biogen-bg py-12 px-4 sm:px-6 lg:px-8">
         <div class="max-w-4xl mx-auto mt-10">
             <!-- Header -->
@@ -33,11 +34,11 @@
                 </div>
             </div>
 
-            <!-- Error messages -->
+            <!-- Error messages banner -->
             @if($errors->any())
-                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
-                    <p class="font-bold mb-2">Mohon lengkapi bagian berikut:</p>
-                    <ul class="list-disc pl-5 space-y-1">
+                <div id="server-error-banner" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                    <p class="font-bold mb-2">Mohon periksa kembali formulir Anda:</p>
+                    <ul class="list-disc pl-5 space-y-1 text-xs">
                         @foreach($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
@@ -49,7 +50,7 @@
                 <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">{{ session('error') }}</div>
             @endif
 
-            <form method="POST" action="{{ route('pengguna.career.store') }}" enctype="multipart/form-data" class="space-y-6" id="form-pengajuan">
+            <form method="POST" action="{{ route('pengguna.career.store') }}" enctype="multipart/form-data" class="space-y-6" id="form-pengajuan" onsubmit="return validateFormPengajuan()">
                 @csrf
 
                 <!-- Panel 1: Unggah Foto Diri 4x6 & A. Data Pribadi -->
@@ -60,7 +61,7 @@
                     </h2>
 
                     <!-- Upload Foto Berwarna 4x6 -->
-                    <div class="p-4 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6" x-data="{ photoPreview: null }">
+                    <div id="container-foto-diri" class="p-4 bg-gray-50 rounded-2xl border border-gray-200 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-6 transition-all duration-300" x-data="{ photoPreview: null }">
                         <div class="w-28 h-40 shrink-0 overflow-hidden rounded-xl border-2 border-dashed border-gray-300 bg-gray-200 flex flex-col items-center justify-center text-center relative shadow-sm" style="width: 112px; height: 160px; max-width: 112px; max-height: 160px;">
                             <template x-if="!photoPreview">
                                 <div class="p-2">
@@ -73,13 +74,26 @@
                             </template>
                         </div>
                         <div class="space-y-2 flex-1">
-                            <label for="foto_diri" class="block text-xs font-bold text-gray-700">Unggah Pas Foto Berwarna (4x6) <span class="text-red-500">*</span></label>
-                            <p class="text-[11px] text-gray-500 leading-relaxed">Wajib mengunggah foto pas diri berwarna latar belakang merah/biru/polos untuk keperluan identitas berkas magang. Foto posisi landscape/potret akan otomatis terpotong simetris 4x6.</p>
-                            <input type="file" name="foto_diri" id="foto_diri" accept=".jpg,.jpeg,.png" required
+                            <label for="foto_diri" class="block text-xs font-bold text-gray-700">Unggah Pas Foto Berwarna (4x6) <span class="text-red-500">* (Maks. 5MB)</span></label>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Wajib mengunggah foto pas diri berwarna latar belakang merah/biru/polos untuk keperluan identitas berkas magang. Foto akan otomatis terpotong simetris 4x6.</p>
+                            <input type="file" name="foto_diri" id="foto_diri" accept=".jpg,.jpeg,.png"
                                 class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
                                 @change="
                                     const file = $event.target.files[0];
                                     if (file) {
+                                        if (file.size > 5 * 1024 * 1024) {
+                                            $event.target.value = '';
+                                            photoPreview = null;
+                                            showFloatingError('Ukuran file Pas Foto melebihi batas 5MB (' + (file.size / (1024 * 1024)).toFixed(1) + ' MB). Silakan pilih foto lain.', document.getElementById('container-foto-diri'));
+                                            return;
+                                        }
+                                        const validTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+                                        if (!validTypes.includes(file.type)) {
+                                            $event.target.value = '';
+                                            photoPreview = null;
+                                            showFloatingError('Format file foto harus berupa JPG, JPEG, atau PNG.', document.getElementById('container-foto-diri'));
+                                            return;
+                                        }
                                         const reader = new FileReader();
                                         reader.onload = (e) => {
                                             const img = new Image();
@@ -129,7 +143,7 @@
 
                         <div>
                             <label for="nik_ktp" class="block text-xs font-bold text-gray-700 mb-1">No. KTP / NIK <span class="text-red-500">*</span></label>
-                            <input type="text" name="nik_ktp" id="nik_ktp" value="{{ old('nik_ktp') }}" required
+                            <input type="text" name="nik_ktp" id="nik_ktp" value="{{ old('nik_ktp') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="16 digit Nomor Induk Kependudukan">
                         </div>
@@ -138,21 +152,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="nim_nisn" class="block text-xs font-bold text-gray-700 mb-1">No. Induk Mahasiswa / Siswa (NIM/NISN) <span class="text-red-500">*</span></label>
-                            <input type="text" name="nim_nisn" id="nim_nisn" value="{{ old('nim_nisn') }}" required
+                            <input type="text" name="nim_nisn" id="nim_nisn" value="{{ old('nim_nisn') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Nomor Induk dari Kampus/Sekolah">
                         </div>
 
                         <div>
                             <label for="no_hp" class="block text-xs font-bold text-gray-700 mb-1">No. Telepon / HP / WhatsApp <span class="text-red-500">*</span></label>
-                            <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', auth()->user()->no_hp) }}" required
+                            <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', auth()->user()->no_hp) }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: 081234567890">
                         </div>
 
                         <div>
                             <label for="jenis_kelamin" class="block text-xs font-bold text-gray-700 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
-                            <select name="jenis_kelamin" id="jenis_kelamin" required
+                            <select name="jenis_kelamin" id="jenis_kelamin"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs">
                                 <option value="">-- Pilih Jenis Kelamin --</option>
                                 <option value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
@@ -164,21 +178,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="tempat_lahir" class="block text-xs font-bold text-gray-700 mb-1">Tempat Lahir <span class="text-red-500">*</span></label>
-                            <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}" required
+                            <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Kota tempat lahir">
                         </div>
 
                         <div>
                             <label for="tanggal_lahir" class="block text-xs font-bold text-gray-700 mb-1">Tanggal Lahir <span class="text-red-500">*</span></label>
-                            <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}" required
+                            <input type="date" name="tanggal_lahir" id="tanggal_lahir" value="{{ old('tanggal_lahir') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs">
                         </div>
                     </div>
 
                     <div>
                         <label for="alamat" class="block text-xs font-bold text-gray-700 mb-1">Alamat Lengkap KTP / Domisili <span class="text-red-500">*</span></label>
-                        <textarea name="alamat" id="alamat" rows="2" required
+                        <textarea name="alamat" id="alamat" rows="2"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                             placeholder="Alamat domisili lengkap dengan RT/RW, Kelurahan, Kecamatan, Kota & Kode Pos">{{ old('alamat') }}</textarea>
                     </div>
@@ -194,14 +208,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama Perguruan Tinggi / Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="instansi" id="instansi" value="{{ old('instansi', auth()->user()->instansi) }}" required
+                            <input type="text" name="instansi" id="instansi" value="{{ old('instansi', auth()->user()->instansi) }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: Universitas Pakuan / SMK Negeri 1 Bogor">
                         </div>
 
                         <div>
                             <label for="nama_pimpinan_instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama Rektor / Kepala Sekolah / Pimpinan <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_pimpinan_instansi" id="nama_pimpinan_instansi" value="{{ old('nama_pimpinan_instansi') }}" required
+                            <input type="text" name="nama_pimpinan_instansi" id="nama_pimpinan_instansi" value="{{ old('nama_pimpinan_instansi') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Nama Rektor / Dekan / Kepala Sekolah beserta gelar">
                         </div>
@@ -210,14 +224,14 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="alamat_instansi" class="block text-xs font-bold text-gray-700 mb-1">Alamat Perguruan Tinggi / Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="alamat_instansi" id="alamat_instansi" value="{{ old('alamat_instansi') }}" required
+                            <input type="text" name="alamat_instansi" id="alamat_instansi" value="{{ old('alamat_instansi') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Alamat jalan instansi/kampus">
                         </div>
 
                         <div>
                             <label for="kontak_instansi" class="block text-xs font-bold text-gray-700 mb-1">No. Telepon / Faks / Email Instansi <span class="text-red-500">*</span></label>
-                            <input type="text" name="kontak_instansi" id="kontak_instansi" value="{{ old('kontak_instansi') }}" required
+                            <input type="text" name="kontak_instansi" id="kontak_instansi" value="{{ old('kontak_instansi') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Nomor telepon atau email resmi fakultas/sekolah">
                         </div>
@@ -233,7 +247,7 @@
 
                         <div>
                             <label for="program_studi" class="block text-xs font-bold text-gray-700 mb-1">Jurusan / Program Studi <span class="text-red-500">*</span></label>
-                            <input type="text" name="program_studi" id="program_studi" value="{{ old('program_studi', auth()->user()->program_studi) }}" required
+                            <input type="text" name="program_studi" id="program_studi" value="{{ old('program_studi', auth()->user()->program_studi) }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Misal: Ilmu Komputer / Bioteknologi / Agribisnis">
                         </div>
@@ -242,21 +256,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="tahun_masuk" class="block text-xs font-bold text-gray-700 mb-1">Tahun Masuk <span class="text-red-500">*</span></label>
-                            <input type="text" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}" required
+                            <input type="text" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: 2023">
                         </div>
 
                         <div>
                             <label for="pendidikan_terakhir" class="block text-xs font-bold text-gray-700 mb-1">Pendidikan Terakhir <span class="text-red-500">*</span></label>
-                            <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}" required
+                            <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: SMA / SMK / D3 / S1">
                         </div>
 
                         <div>
                             <label for="semester_saat_ini" class="block text-xs font-bold text-gray-700 mb-1">Semester Saat Ini / Tahun <span class="text-red-500">*</span></label>
-                            <input type="text" name="semester_saat_ini" id="semester_saat_ini" value="{{ old('semester_saat_ini') }}" required
+                            <input type="text" name="semester_saat_ini" id="semester_saat_ini" value="{{ old('semester_saat_ini') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: Semester 5 / Kelas XI">
                         </div>
@@ -272,14 +286,14 @@
 
                     <div>
                         <label for="judul_magang" class="block text-xs font-bold text-gray-700 mb-1">Judul Magang / PKL <span class="text-red-500">*</span></label>
-                        <input type="text" name="judul_magang" id="judul_magang" value="{{ old('judul_magang') }}" required
+                        <input type="text" name="judul_magang" id="judul_magang" value="{{ old('judul_magang') }}"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                             placeholder="Judul topik penelitian/praktikum magang yang diajukan">
                     </div>
 
                     <div>
                         <label for="tujuan_magang" class="block text-xs font-bold text-gray-700 mb-1">Tujuan Magang / PKL <span class="text-red-500">*</span></label>
-                        <textarea name="tujuan_magang" id="tujuan_magang" rows="3" required
+                        <textarea name="tujuan_magang" id="tujuan_magang" rows="3"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                             placeholder="Jelaskan tujuan dan capaian yang ingin diperoleh selama magang di BRMP Biogen...">{{ old('tujuan_magang') }}</textarea>
                     </div>
@@ -287,7 +301,7 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="nama_dosen_pembimbing" class="block text-xs font-bold text-gray-700 mb-1">Nama Dosen / Guru Pembimbing dari Kampus/Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="nama_dosen_pembimbing" id="nama_dosen_pembimbing" value="{{ old('nama_dosen_pembimbing') }}" required
+                            <input type="text" name="nama_dosen_pembimbing" id="nama_dosen_pembimbing" value="{{ old('nama_dosen_pembimbing') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Nama Dosen Pembimbing Lapangan beserta gelar">
                         </div>
@@ -310,21 +324,21 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="kontak_darurat_nama" class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap Kontak <span class="text-red-500">*</span></label>
-                            <input type="text" name="kontak_darurat_nama" id="kontak_darurat_nama" value="{{ old('kontak_darurat_nama') }}" required
+                            <input type="text" name="kontak_darurat_nama" id="kontak_darurat_nama" value="{{ old('kontak_darurat_nama') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Nama wali/kerabat">
                         </div>
 
                         <div>
                             <label for="kontak_darurat_no" class="block text-xs font-bold text-gray-700 mb-1">Nomor HP / WhatsApp <span class="text-red-500">*</span></label>
-                            <input type="text" name="kontak_darurat_no" id="kontak_darurat_no" value="{{ old('kontak_darurat_no') }}" required
+                            <input type="text" name="kontak_darurat_no" id="kontak_darurat_no" value="{{ old('kontak_darurat_no') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: 08123456789">
                         </div>
 
                         <div>
                             <label for="hubungan_kontak_darurat" class="block text-xs font-bold text-gray-700 mb-1">Hubungan Kontak <span class="text-red-500">*</span></label>
-                            <input type="text" name="hubungan_kontak_darurat" id="hubungan_kontak_darurat" value="{{ old('hubungan_kontak_darurat') }}" required
+                            <input type="text" name="hubungan_kontak_darurat" id="hubungan_kontak_darurat" value="{{ old('hubungan_kontak_darurat') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Misal: Ayah / Ibu / Kakak">
                         </div>
@@ -337,9 +351,10 @@
                         <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold mr-2">E</span>
                         Unggah Surat Pengantar Resmi
                     </h2>
-                    <p class="text-xs text-gray-500 mb-4">Wajib mengunggah surat pengantar resmi dari sekolah atau universitas Anda. Format: PDF, JPG, PNG (Maks. 2MB).</p>
+                    <p class="text-xs text-gray-500 mb-4">Wajib mengunggah surat pengantar resmi dari sekolah atau universitas Anda. Format: PDF, JPG, PNG (Maks. 5MB).</p>
 
-                    <div class="border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 relative cursor-pointer"
+                    <div id="dropzone-surat-pengantar"
+                        class="border-2 border-dashed rounded-2xl p-8 text-center transition-all duration-300 relative cursor-pointer"
                         :class="isDragging ? 'border-emerald-500 bg-emerald-50/80 scale-[1.01] shadow-lg ring-4 ring-emerald-500/10' : (fileName ? 'border-emerald-400 bg-emerald-50/30' : 'border-gray-200 bg-gray-50/50 hover:border-emerald-400 hover:bg-gray-50')"
                         x-data="{ fileName: '', isDragging: false }"
                         @dragover.prevent="isDragging = true"
@@ -347,7 +362,14 @@
                         @drop.prevent="
                             isDragging = false;
                             const f = $event.dataTransfer.files[0];
-                            if(f) { fileName = f.name; $refs.fileInput.files = $event.dataTransfer.files; }
+                            if(f) {
+                                if (f.size > 5 * 1024 * 1024) {
+                                    showFloatingError('Ukuran file Surat Pengantar melebihi batas 5MB (' + (f.size / (1024 * 1024)).toFixed(1) + ' MB). Silakan pilih berkas maksimal 5MB.', $el);
+                                    return;
+                                }
+                                fileName = f.name;
+                                $refs.fileInput.files = $event.dataTransfer.files;
+                            }
                         ">
                         
                         <div class="w-14 h-14 rounded-2xl bg-emerald-100/80 text-emerald-600 mx-auto mb-3 flex items-center justify-center transition-transform duration-300"
@@ -390,16 +412,28 @@
                             id="file_surat_pengantar"
                             name="file_surat_pengantar"
                             accept=".pdf,.jpg,.jpeg,.png"
-                            required
                             class="hidden"
                             x-ref="fileInput"
-                            @change="fileName = $event.target.files[0]?.name || ''">
-                        <p class="text-[9px] text-gray-400 mt-3">Format: PDF, JPG, PNG • Ukuran file maksimal 2MB</p>
+                            @change="
+                                const f = $event.target.files[0];
+                                if (f) {
+                                    if (f.size > 5 * 1024 * 1024) {
+                                        $event.target.value = '';
+                                        fileName = '';
+                                        showFloatingError('Ukuran file Surat Pengantar melebihi batas 5MB (' + (f.size / (1024 * 1024)).toFixed(1) + ' MB). Silakan pilih berkas maksimal 5MB.', document.getElementById('dropzone-surat-pengantar'));
+                                        return;
+                                    }
+                                    fileName = f.name;
+                                } else {
+                                    fileName = '';
+                                }
+                            ">
+                        <p class="text-[9px] text-gray-400 mt-3">Format: PDF, JPG, PNG • Ukuran file maksimal 5MB</p>
                     </div>
                 </div>
 
                 <!-- Panel 6: Tanda Tangan Digital Pad (HTML5 Canvas) -->
-                <div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 space-y-4" x-data="signaturePad()">
+                <div id="container-signature" class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 space-y-4 transition-all duration-300" x-data="signaturePad()">
                     <h2 class="text-base font-bold text-gray-800 font-sans border-b border-gray-100 pb-3 flex items-center justify-between">
                         <span class="flex items-center">
                             <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold mr-2">F</span>
@@ -416,20 +450,20 @@
                         <span x-show="isEmpty" class="absolute pointer-events-none text-xs text-gray-400 font-semibold italic">Gambar tanda tangan Anda di sini...</span>
                     </div>
 
-                    <input type="hidden" name="tanda_tangan_digital" id="tanda_tangan_digital" x-model="signatureData" required>
+                    <input type="hidden" name="tanda_tangan_digital" id="tanda_tangan_digital" x-model="signatureData">
                     <p class="text-[10px] text-gray-400">Dokumen ini akan ditandatangani secara elektronik sebagai bukti sah pengajuan berkas di BRMP Biogen.</p>
                 </div>
 
                 <!-- Panel 7: Syarat & Ketentuan Checkbox -->
-                <div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 flex items-start space-x-3" x-data="{}">
-                    <input type="checkbox" name="syarat_ketentuan" id="syarat_ketentuan" value="1" required
-                        class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mt-1">
-                    <label for="syarat_ketentuan" class="text-xs text-gray-600 leading-relaxed">
+                <div id="container-syarat-ketentuan" class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 flex items-start space-x-3 transition-all duration-300" x-data="{}">
+                    <input type="checkbox" name="syarat_ketentuan" id="syarat_ketentuan" value="1"
+                        class="rounded border-gray-300 text-emerald-600 focus:ring-emerald-500 mt-1 cursor-pointer">
+                    <label for="syarat_ketentuan" class="text-xs text-gray-600 leading-relaxed cursor-pointer select-none">
                         Saya telah membaca, memahami, dan menyetujui seluruh isi
                         <button type="button" @click.prevent="$dispatch('open-modal', 'modal-syarat-ketentuan')" class="text-emerald-600 hover:underline font-bold focus:outline-none">
                             Surat Pernyataan &amp; Ketentuan Magang BRMP Biogen
                         </button>
-                        serta menyatakan data di atas adalah benar.
+                        serta menyatakan data di atas adalah benar. <span class="text-red-500 font-bold">*</span>
                     </label>
                 </div>
 
@@ -543,8 +577,101 @@
         </div>
     </x-modal>
 
-    <!-- Script Signature Pad Canvas -->
+    <!-- Script Validation & Signature Pad -->
     <script>
+        function validateFormPengajuan() {
+            // 1. Validasi Pas Foto
+            const fotoInput = document.getElementById('foto_diri');
+            const containerFoto = document.getElementById('container-foto-diri');
+            if (!fotoInput.files || fotoInput.files.length === 0) {
+                showFloatingError('Pas Foto Berwarna 4x6 (Panel A) wajib diunggah.', containerFoto);
+                return false;
+            }
+            if (fotoInput.files[0].size > 5 * 1024 * 1024) {
+                showFloatingError('Ukuran file Pas Foto melebihi batas 5MB (' + (fotoInput.files[0].size / (1024 * 1024)).toFixed(1) + ' MB).', containerFoto);
+                return false;
+            }
+
+            // 2. Validasi Data Pribadi
+            const requiredFields = [
+                { id: 'nik_ktp', label: 'No. KTP / NIK (Panel A)' },
+                { id: 'nim_nisn', label: 'NIM / NISN (Panel A)' },
+                { id: 'no_hp', label: 'Nomor HP / WhatsApp (Panel A)' },
+                { id: 'jenis_kelamin', label: 'Jenis Kelamin (Panel A)' },
+                { id: 'tempat_lahir', label: 'Tempat Lahir (Panel A)' },
+                { id: 'tanggal_lahir', label: 'Tanggal Lahir (Panel A)' },
+                { id: 'alamat', label: 'Alamat Lengkap KTP / Domisili (Panel A)' },
+                { id: 'instansi', label: 'Nama Perguruan Tinggi / Sekolah (Panel B)' },
+                { id: 'nama_pimpinan_instansi', label: 'Nama Rektor / Kepala Sekolah / Pimpinan (Panel B)' },
+                { id: 'alamat_instansi', label: 'Alamat Perguruan Tinggi / Sekolah (Panel B)' },
+                { id: 'kontak_instansi', label: 'Kontak Instansi (Panel B)' },
+                { id: 'program_studi', label: 'Jurusan / Program Studi (Panel B)' },
+                { id: 'tahun_masuk', label: 'Tahun Masuk (Panel B)' },
+                { id: 'pendidikan_terakhir', label: 'Pendidikan Terakhir (Panel B)' },
+                { id: 'semester_saat_ini', label: 'Semester Saat Ini / Tahun (Panel B)' },
+                { id: 'judul_magang', label: 'Judul Magang / PKL (Panel C)' },
+                { id: 'tujuan_magang', label: 'Tujuan Magang / PKL (Panel C)' },
+                { id: 'nama_dosen_pembimbing', label: 'Nama Dosen / Guru Pembimbing (Panel C)' },
+                { id: 'kontak_darurat_nama', label: 'Nama Kontak Darurat (Panel D)' },
+                { id: 'kontak_darurat_no', label: 'Nomor Kontak Darurat (Panel D)' },
+                { id: 'hubungan_kontak_darurat', label: 'Hubungan Kontak Darurat (Panel D)' },
+            ];
+
+            for (const field of requiredFields) {
+                const el = document.getElementById(field.id);
+                if (!el || !el.value.trim()) {
+                    showFloatingError('Kolom ' + field.label + ' wajib diisi.', el);
+                    return false;
+                }
+            }
+
+            // Validasi Nomor HP Angka
+            const noHp = document.getElementById('no_hp');
+            if (noHp && !/^[0-9]+$/.test(noHp.value.trim())) {
+                showFloatingError('Nomor HP / WhatsApp hanya boleh berisi angka.', noHp);
+                return false;
+            }
+
+            // 3. Validasi Surat Pengantar
+            const fileSurat = document.getElementById('file_surat_pengantar');
+            const dropzoneSurat = document.getElementById('dropzone-surat-pengantar');
+            if (!fileSurat.files || fileSurat.files.length === 0) {
+                showFloatingError('Berkas Surat Pengantar Resmi (Panel E) wajib diunggah.', dropzoneSurat);
+                return false;
+            }
+            if (fileSurat.files[0].size > 5 * 1024 * 1024) {
+                showFloatingError('Ukuran file Surat Pengantar melebihi batas 5MB (' + (fileSurat.files[0].size / (1024 * 1024)).toFixed(1) + ' MB).', dropzoneSurat);
+                return false;
+            }
+
+            // 4. Validasi Tanda Tangan Digital
+            const tandaTangan = document.getElementById('tanda_tangan_digital');
+            const containerSignature = document.getElementById('container-signature');
+            if (!tandaTangan.value) {
+                showFloatingError('Tanda Tangan Digital (Panel F) wajib digambar pada area kanvas.', containerSignature);
+                return false;
+            }
+
+            // 5. Validasi Syarat & Ketentuan Checkbox
+            const syarat = document.getElementById('syarat_ketentuan');
+            const containerSyarat = document.getElementById('container-syarat-ketentuan');
+            if (!syarat || !syarat.checked) {
+                showFloatingError('Anda wajib mencentang persetujuan Surat Pernyataan & Ketentuan Magang (Panel 7).', containerSyarat);
+                return false;
+            }
+
+            return true;
+        }
+
+        // Auto Scroll jika ada error dari Server saat load
+        document.addEventListener('DOMContentLoaded', () => {
+            const serverBanner = document.getElementById('server-error-banner');
+            if (serverBanner) {
+                serverBanner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showFloatingError('Terdapat data yang belum lengkap atau format tidak sesuai. Mohon periksa kembali kolom formulir.', serverBanner);
+            }
+        });
+
         function signaturePad() {
             return {
                 isDrawing: false,
@@ -576,6 +703,7 @@
                     this.canvas.addEventListener('touchmove', (e) => {
                         e.preventDefault();
                         const touch = e.touches[0];
+                        const rect = this.canvas.getBoundingClientRect();
                         this.draw({ clientX: touch.clientX, clientY: touch.clientY });
                     });
                     this.canvas.addEventListener('touchend', () => this.stopDrawing());

@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class BidangRequest extends FormRequest
@@ -12,7 +11,7 @@ class BidangRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->hasAnyRole(['Petugas', 'Administrator']);
+        return auth()->check() && auth()->user()->hasRole('Administrator');
     }
 
     /**
@@ -25,19 +24,14 @@ class BidangRequest extends FormRequest
             'deskripsi' => ['required', 'string', 'max:2000'],
             'jobdesc' => ['nullable', 'string', 'max:4000'],
             'jenjang' => ['required', 'string', 'in:Siswa,Mahasiswa'],
-            'kategori' => ['required', 'string', 'in:Pertanian,Non Pertanian'],
-            'pembimbing_id' => [
-                'nullable',
-                'integer',
-                'exists:users,id',
-            ],
-            'petugas_ids' => ['nullable', 'array'],
-            'petugas_ids.*' => ['integer', 'exists:users,id'],
-            'kuota_petugas' => ['nullable', 'array'],
-            'kuota_petugas.*' => ['nullable', 'integer', 'min:1', 'max:100'],
+            'kategori' => ['required', 'string', 'in:Mahasiswa,Siswa'],
+            'pembimbing_ids' => ['nullable', 'array'],
+            'pembimbing_ids.*' => ['integer', 'exists:pembimbings,id'],
+            'kuota_pembimbing' => ['nullable', 'array'],
+            'kuota_pembimbing.*' => ['nullable', 'integer', 'min:1', 'max:100'],
             'kapasitas' => ['nullable', 'integer', 'min:1', 'max:100'],
             'is_active' => ['required', 'boolean'],
-            'gambar' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:2048'],
+            'gambar' => ['nullable', 'image', 'mimes:jpeg,jpg,png,webp', 'max:5120'],
         ];
     }
 
@@ -53,8 +47,6 @@ class BidangRequest extends FormRequest
             'deskripsi.max' => 'Deskripsi bidang maksimal 2000 karakter.',
             'jenjang.required' => 'Jenjang pendidikan wajib dipilih.',
             'jenjang.in' => 'Jenjang pendidikan hanya boleh Siswa atau Mahasiswa.',
-            'pembimbing_id.exists' => 'Pembimbing yang dipilih tidak ditemukan.',
-            'kapasitas.required' => 'Kapasitas kuota rolling wajib diisi.',
             'kapasitas.integer' => 'Kapasitas kuota harus berupa angka.',
             'kapasitas.min' => 'Kapasitas minimal adalah 1 slot.',
             'kapasitas.max' => 'Kapasitas maksimal adalah 100 slot.',

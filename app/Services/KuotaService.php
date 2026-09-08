@@ -55,8 +55,8 @@ class KuotaService
         $today = Carbon::today();
         $akhir = $today->copy()->addMonths($bulanKedepan);
 
-        // Iterasi setiap hari dari besok sampai batas
-        $tanggal = $today->copy()->addDay();
+        // Iterasi setiap hari mulai 14 hari dari hari ini (Jeda Verifikasi) sampai batas bulan
+        $tanggal = $today->copy()->addDays(14);
         while ($tanggal->lte($akhir)) {
             $tanggalStr = $tanggal->toDateString();
             $terisi = $this->hitungSlotTerisi($bidang->id, $tanggalStr, $durasiBulan);

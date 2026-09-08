@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Guest;
 
 use App\Http\Controllers\Controller;
 use App\Models\Bidang;
+use App\Models\Pembimbing;
+use App\Models\Pengajuan;
 use Illuminate\Http\Request;
 
 class BidangDetailController extends Controller
@@ -13,35 +15,41 @@ class BidangDetailController extends Controller
      */
     public function show(Bidang $bidang)
     {
-        $bidang->load('petugasList');
+        $bidang->load('pembimbings');
 
-        $petugasWithQuota = $bidang->petugasList->map(function ($petugas) use ($bidang) {
-            $kuota = $petugas->pivot->kuota ?? 5;
-            $activeCount = \App\Models\Pengajuan::where('bidang_id', $bidang->id)
-                ->where('pembimbing_id', $petugas->id)
-                ->whereIn('status', ['Disetujui', 'Terjadwal', 'Sedang Magang'])
+        $pembimbingWithQuota = $bidang->pembimbings->where('is_active', true)->map(function ($pembimbing) use ($bidang) {
+            $kuota = $pembimbing->pivot->kuota ?? $pembimbing->kuota_default ?? 5;
+            $activeCount = Pengajuan::where('bidang_id', $bidang->id)
+                ->where('pembimbing_id', $pembimbing->id)
+                ->whereIn('status', ['Disetujui', 'Terjadwal', 'Sedang Magang', 'Aktif'])
                 ->count();
 
-            $petugas->sisa_kuota = max(0, $kuota - $activeCount);
-            $petugas->kuota_total = $kuota;
+            $pembimbing->sisa_kuota = max(0, $kuota - $activeCount);
+            $pembimbing->kuota_total = $kuota;
 
-            return $petugas;
+            return $pembimbing;
         });
 
-        // Fallback jika belum ada petugasList di pivot
-        if ($petugasWithQuota->isEmpty() && $bidang->pembimbing) {
-            $p = $bidang->pembimbing;
-            $activeCount = \App\Models\Pengajuan::where('bidang_id', $bidang->id)
-                ->whereIn('status', ['Disetujui', 'Terjadwal', 'Sedang Magang'])
-                ->count();
-            $p->sisa_kuota = max(0, $bidang->kapasitas - $activeCount);
-            $p->kuota_total = $bidang->kapasitas;
-            $petugasWithQuota = collect([$p]);
+        // Fallback jika belum ada relasi pivot, ambil semua pembimbing aktif
+        if ($pembimbingWithQuota->isEmpty()) {
+            $allActive = Pembimbing::where('is_active', true)->get()->map(function ($pembimbing) use ($bidang) {
+                $kuota = $pembimbing->kuota_default ?? 5;
+                $activeCount = Pengajuan::where('bidang_id', $bidang->id)
+                    ->where('pembimbing_id', $pembimbing->id)
+                    ->whereIn('status', ['Disetujui', 'Terjadwal', 'Sedang Magang', 'Aktif'])
+                    ->count();
+
+                $pembimbing->sisa_kuota = max(0, $kuota - $activeCount);
+                $pembimbing->kuota_total = $kuota;
+
+                return $pembimbing;
+            });
+            $pembimbingWithQuota = $allActive;
         }
 
-        $kapasitasTotal = $petugasWithQuota->sum('kuota_total') ?: $bidang->kapasitas;
-        $sisaKuotaTotal = $petugasWithQuota->sum('sisa_kuota');
+        $kapasitasTotal = $pembimbingWithQuota->sum('kuota_total') ?: $bidang->kapasitas;
+        $sisaKuotaTotal = $pembimbingWithQuota->sum('sisa_kuota');
 
-        return view('guest.bidang.show', compact('bidang', 'petugasWithQuota', 'kapasitasTotal', 'sisaKuotaTotal'));
+        return view('guest.bidang.show', compact('bidang', 'pembimbingWithQuota', 'kapasitasTotal', 'sisaKuotaTotal'));
     }
 }

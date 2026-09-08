@@ -94,7 +94,7 @@
                     </div>
 
                     <!-- Right Column: Sidebar Info & CTA -->
-                    <div class="space-y-6" x-data="{ selectedPembimbing: '{{ $petugasWithQuota->first()?->id }}' }">
+                    <div class="space-y-6" x-data="{ selectedPembimbing: '' }">
                         <div class="bg-gray-50 rounded-2xl border border-gray-150 p-6 space-y-5">
                             <h3 class="text-base font-bold text-gray-800 font-sans border-b border-gray-200 pb-3">Informasi Kuota &amp; Pembimbing</h3>
                             
@@ -109,21 +109,21 @@
                             </div>
 
                             <!-- List Pembimbing & Pilihan Radio Button Opsional -->
-                            <div class="pt-3 border-t border-gray-200 space-y-3">
-                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Pilih Pembimbing Lapangan <span class="text-emerald-600">(Opsional)</span></label>
+                            <div id="container-pembimbing" class="pt-3 border-t border-gray-200 space-y-3 p-2 transition-all duration-300">
+                                <label class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">Pilih Pembimbing Lapangan <span class="text-red-500">* (Wajib)</span></label>
                                 
-                                @forelse($petugasWithQuota as $petugas)
+                                @forelse($pembimbingWithQuota as $pembimbing)
                                     <label class="flex items-center justify-between p-3.5 rounded-xl border transition-all cursor-pointer"
-                                        :class="selectedPembimbing == '{{ $petugas->id }}' ? 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-white border-gray-200 hover:border-emerald-300'">
+                                        :class="selectedPembimbing == '{{ $pembimbing->id }}' ? 'bg-emerald-50/80 border-emerald-500 ring-2 ring-emerald-500/20' : 'bg-white border-gray-200 hover:border-emerald-300'">
                                         <div class="flex items-center space-x-3">
-                                            <input type="radio" name="pembimbing_choice" value="{{ $petugas->id }}" x-model="selectedPembimbing" class="text-emerald-600 focus:ring-emerald-500">
+                                            <input type="radio" name="pembimbing_choice" value="{{ $pembimbing->id }}" x-model="selectedPembimbing" class="text-emerald-600 focus:ring-emerald-500">
                                             <div>
-                                                <p class="font-bold text-gray-800 text-xs">{{ $petugas->name }}</p>
-                                                <p class="text-[10px] text-gray-400">Pembimbing Lapangan</p>
+                                                <p class="font-bold text-gray-800 text-xs">{{ $pembimbing->nama ?? $pembimbing->name }}</p>
+                                                <p class="text-[10px] text-gray-400">{{ $pembimbing->jabatan ?: 'Pembimbing Lapangan' }}</p>
                                             </div>
                                         </div>
-                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full {{ $petugas->sisa_kuota > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700' }}">
-                                            {{ $petugas->sisa_kuota }} Slot
+                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full {{ $pembimbing->sisa_kuota > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700' }}">
+                                            {{ $pembimbing->sisa_kuota }} Slot
                                         </span>
                                     </label>
                                 @empty
@@ -138,8 +138,10 @@
                         <div>
                             @auth
                                 @if(auth()->user()->hasRole('Pengguna'))
-                                    <a :href="'{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing"
-                                        class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200">
+                                    <a x-bind:href="selectedPembimbing ? '{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing : '#'"
+                                        @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
+                                        class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                                        :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
                                         Daftar Magang Sekarang
                                     </a>
                                 @else
@@ -148,8 +150,10 @@
                                     </div>
                                 @endif
                             @else
-                                <a :href="'{{ route('login') }}?redirect=' + encodeURIComponent('{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing)"
-                                    class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200">
+                                <a x-bind:href="selectedPembimbing ? '{{ route('login') }}?redirect=' + encodeURIComponent('{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing) : '#'"
+                                    @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
+                                    class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                                    :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
                                     Daftar Magang
                                 </a>
                             @endauth
