@@ -8,7 +8,9 @@ use App\Models\Bidang;
 use App\Models\Pembimbing;
 use App\Models\Pengajuan;
 use App\Services\PengajuanService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class RiwayatPengajuanController extends Controller
 {
@@ -124,5 +126,79 @@ class RiwayatPengajuanController extends Controller
 
         return redirect()->route('admin.riwayat-pengajuan.show', $pengajuan->public_id)
             ->with('success', $msg);
+    }
+
+    /**
+     * Export Form-1 PT application data to clean official PDF.
+     */
+    public function exportPdf(string $publicId)
+    {
+        $pengajuan = Pengajuan::where('public_id', $publicId)
+            ->with(['user', 'bidang', 'pembimbing'])
+            ->firstOrFail();
+
+        $logoBase64 = '';
+        $logoPath = public_path('logo-brmp.png');
+        if (file_exists($logoPath)) {
+            $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $logoData = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $logoType . ';base64,' . base64_encode($logoData);
+        }
+
+        $fotoBase64 = '';
+        if ($pengajuan->foto_diri && Storage::disk('local')->exists($pengajuan->foto_diri)) {
+            $fotoPath = Storage::disk('local')->path($pengajuan->foto_diri);
+            $fotoType = pathinfo($fotoPath, PATHINFO_EXTENSION);
+            $fotoData = file_get_contents($fotoPath);
+            $fotoBase64 = 'data:image/' . $fotoType . ';base64,' . base64_encode($fotoData);
+        }
+
+        $ttdBase64 = $pengajuan->tanda_tangan_digital;
+
+        $pdf = Pdf::loadView('admin.riwayat-pengajuan.export-pdf', compact('pengajuan', 'logoBase64', 'fotoBase64', 'ttdBase64'))
+            ->setPaper('a4', 'portrait')
+            ->setOption(['isRemoteEnabled' => true, 'isHtml5ParserEnabled' => true]);
+
+        $fileName = 'Form-1_Form-2_PKL_' . str_replace(['/', '\\', ' '], '_', $pengajuan->nomor_pengajuan) . '_' . str_replace(' ', '_', $pengajuan->user->name) . '.pdf';
+
+        return $pdf->download($fileName);
+    }
+
+    /**
+     * Export Form-1 & Form-2 application data to clean Word document (.doc).
+     */
+    public function exportWord(string $publicId)
+    {
+        $pengajuan = Pengajuan::where('public_id', $publicId)
+            ->with(['user', 'bidang', 'pembimbing'])
+            ->firstOrFail();
+
+        $logoBase64 = '';
+        $logoPath = public_path('logo-brmp.png');
+        if (file_exists($logoPath)) {
+            $logoType = pathinfo($logoPath, PATHINFO_EXTENSION);
+            $logoData = file_get_contents($logoPath);
+            $logoBase64 = 'data:image/' . $logoType . ';base64,' . base64_encode($logoData);
+        }
+
+        $fotoBase64 = '';
+        if ($pengajuan->foto_diri && Storage::disk('local')->exists($pengajuan->foto_diri)) {
+            $fotoPath = Storage::disk('local')->path($pengajuan->foto_diri);
+            $fotoType = pathinfo($fotoPath, PATHINFO_EXTENSION);
+            $fotoData = file_get_contents($fotoPath);
+            $fotoBase64 = 'data:image/' . $fotoType . ';base64,' . base64_encode($fotoData);
+        }
+
+        $ttdBase64 = $pengajuan->tanda_tangan_digital;
+
+        $viewContent = view('admin.riwayat-pengajuan.export-word', compact('pengajuan', 'logoBase64', 'fotoBase64', 'ttdBase64'))->render();
+
+        $fileName = 'Form-1_Form-2_PKL_' . str_replace(['/', '\\', ' '], '_', $pengajuan->nomor_pengajuan) . '_' . str_replace(' ', '_', $pengajuan->user->name) . '.doc';
+
+        return response($viewContent, 200, [
+            'Content-Type' => 'application/msword; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+            'Cache-Control' => 'no-cache, must-revalidate',
+        ]);
     }
 }

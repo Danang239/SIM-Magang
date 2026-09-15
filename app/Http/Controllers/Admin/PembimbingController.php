@@ -51,20 +51,20 @@ class PembimbingController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'no_hp' => ['nullable', 'string', 'max:20'],
             'jabatan' => ['nullable', 'string', 'max:255'],
-            'kuota_default' => ['required', 'integer', 'min:1', 'max:50'],
             'is_active' => ['boolean'],
             'bidang_ids' => ['nullable', 'array'],
             'bidang_ids.*' => ['exists:bidangs,id'],
         ]);
 
         $validated['is_active'] = $request->has('is_active');
+        $validated['kuota_default'] = 5;
 
         $pembimbing = Pembimbing::create($validated);
 
         if (!empty($validated['bidang_ids'])) {
             $syncData = [];
             foreach ($validated['bidang_ids'] as $bidangId) {
-                $syncData[$bidangId] = ['kuota' => $pembimbing->kuota_default];
+                $syncData[$bidangId] = ['kuota' => 5];
             }
             $pembimbing->bidangs()->sync($syncData);
         }
@@ -95,7 +95,6 @@ class PembimbingController extends Controller
             'email' => ['nullable', 'email', 'max:255'],
             'no_hp' => ['nullable', 'string', 'max:20'],
             'jabatan' => ['nullable', 'string', 'max:255'],
-            'kuota_default' => ['required', 'integer', 'min:1', 'max:50'],
             'is_active' => ['boolean'],
             'bidang_ids' => ['nullable', 'array'],
             'bidang_ids.*' => ['exists:bidangs,id'],
@@ -108,9 +107,9 @@ class PembimbingController extends Controller
         $syncData = [];
         if (!empty($validated['bidang_ids'])) {
             foreach ($validated['bidang_ids'] as $bidangId) {
-                // Pertahankan kuota per bidang jika sudah ada, atau gunakan default
+                // Pertahankan kuota per bidang jika sudah ada, atau gunakan default 5
                 $existing = $pembimbing->bidangs()->where('bidang_id', $bidangId)->first();
-                $kuota = $existing ? ($existing->pivot->kuota ?? $pembimbing->kuota_default) : $pembimbing->kuota_default;
+                $kuota = $existing ? ($existing->pivot->kuota ?? 5) : 5;
                 $syncData[$bidangId] = ['kuota' => $kuota];
             }
         }

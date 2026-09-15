@@ -103,7 +103,7 @@
             <a href="{{ route('login') }}" class="btn">Masuk ke Portal Peserta</a>
         </div>
         <div class="footer">
-            SIM-MAGANG &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            SIP Biogen &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
             Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
         </div>
     </div>

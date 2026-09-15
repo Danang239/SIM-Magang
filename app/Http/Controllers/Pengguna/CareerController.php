@@ -24,9 +24,14 @@ class CareerController extends Controller
     // ─── STEP 1: Pilih Durasi, Keahlian & Tanggal ────────────────────────────
     public function step1(Request $request)
     {
+        if ($activePengajuan = $this->getActivePengajuan()) {
+            return redirect()->route('pengguna.pengajuan.show', $activePengajuan->public_id)
+                ->with('error', "Anda masih memiliki pengajuan PKL aktif (No. {$activePengajuan->nomor_pengajuan}) yang sedang diproses. Anda tidak dapat membuat pengajuan baru sebelum pengajuan sebelumnya selesai, dibatalkan, atau ditolak.");
+        }
+
         $bidangId = $request->query('bidang_id') ?? session('bidang_id');
         if (!$bidangId) {
-            return redirect()->route('home')->with('error', 'Silakan pilih bidang magang terlebih dahulu.');
+            return redirect()->route('home')->with('error', 'Silakan pilih bidang PKL terlebih dahulu.');
         }
 
         // Pastikan pembimbing dipilih jika query parameter ada, atau ambil dari session.
@@ -50,13 +55,18 @@ class CareerController extends Controller
 
         // Indikator kalender awal dengan durasi default 2 bulan
         $durasiDefault = isset($step1Data['durasi_bulan']) ? (int) $step1Data['durasi_bulan'] : 2;
-        $kalender = $this->kuotaService->getKalenderTersedia($bidang, $durasiDefault, 4);
+        $kalender = $this->kuotaService->getKalenderTersedia($bidang, $durasiDefault, 4, $pembimbingId ? (int)$pembimbingId : null);
 
         return view('pengguna.career.step1', compact('bidang', 'step1Data', 'kalender', 'durasiDefault'));
     }
 
     public function step1Store(CareerStepTanggalRequest $request)
     {
+        if ($activePengajuan = $this->getActivePengajuan()) {
+            return redirect()->route('pengguna.pengajuan.show', $activePengajuan->public_id)
+                ->with('error', "Anda masih memiliki pengajuan PKL aktif (No. {$activePengajuan->nomor_pengajuan}).");
+        }
+
         $validated = $request->validated();
         $bidangId = session('bidang_id');
 
@@ -81,6 +91,11 @@ class CareerController extends Controller
     // ─── STEP 2: Biodata Lengkap & Upload Surat Pengantar & S&K ─────────────
     public function step2()
     {
+        if ($activePengajuan = $this->getActivePengajuan()) {
+            return redirect()->route('pengguna.pengajuan.show', $activePengajuan->public_id)
+                ->with('error', "Anda masih memiliki pengajuan PKL aktif (No. {$activePengajuan->nomor_pengajuan}).");
+        }
+
         $step1 = session('career_step1');
         $bidangId = session('bidang_id');
 
@@ -95,6 +110,11 @@ class CareerController extends Controller
 
     public function storeFinal(CareerStepFinalRequest $request)
     {
+        if ($activePengajuan = $this->getActivePengajuan()) {
+            return redirect()->route('pengguna.pengajuan.show', $activePengajuan->public_id)
+                ->with('error', "Anda masih memiliki pengajuan PKL aktif (No. {$activePengajuan->nomor_pengajuan}).");
+        }
+
         $step1 = session('career_step1');
         $bidangId = session('bidang_id');
 
@@ -115,11 +135,14 @@ class CareerController extends Controller
 
         try {
             $pengajuan = DB::transaction(function () use ($request, $step1, $bidangId) {
+                $pembimbingId = $request->pembimbing_id ?? session('pembimbing_id');
+
                 // Validasi ulang kuota dengan lock (cegah race condition)
                 $kuotaValid = $this->kuotaService->validateUlang(
                     $bidangId,
                     $step1['tanggal_mulai'],
-                    $step1['durasi_bulan']
+                    $step1['durasi_bulan'],
+                    $pembimbingId ? (int)$pembimbingId : null
                 );
 
                 if (!$kuotaValid) {
@@ -166,7 +189,6 @@ class CareerController extends Controller
                     'tanggal_selesai_rencana' => $step1['tanggal_selesai_rencana'],
                     'status' => 'Menunggu Verifikasi',
                     'file_surat_pengantar' => $filePath,
-                    'laporan_status' => 'Belum Ada',
                     'skm_saran' => null,
                     // Form-1 Biodata & Instansi
                     'nik_ktp' => $request->nik_ktp,
@@ -263,7 +285,9 @@ class CareerController extends Controller
     {
         $request->validate(['durasi' => ['required', 'integer', 'in:2,3,4,5,6']]);
 
-        $kalender = $this->kuotaService->getKalenderTersedia($bidang, (int) $request->durasi, 4);
+        $pembimbingId = $request->query('pembimbing_id') ?? session('pembimbing_id');
+
+        $kalender = $this->kuotaService->getKalenderTersedia($bidang, (int) $request->durasi, 4, $pembimbingId ? (int)$pembimbingId : null);
 
         return response()->json($kalender);
     }
@@ -341,5 +365,19 @@ class CareerController extends Controller
 
         imagedestroy($srcImage);
         imagedestroy($dstImage);
+    }
+
+    /**
+     * Dapatkan pengajuan PKL aktif milik user saat ini jika ada
+     */
+    private function getActivePengajuan(): ?Pengajuan
+    {
+        if (!auth()->check()) {
+            return null;
+        }
+
+        return Pengajuan::where('user_id', auth()->id())
+            ->whereIn('status', ['Menunggu Verifikasi', 'Disetujui', 'Terjadwal', 'Sedang Magang', 'Aktif'])
+            ->first();
     }
 }

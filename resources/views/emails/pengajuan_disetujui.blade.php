@@ -135,7 +135,7 @@
             <a href="{{ route('pengguna.pengajuan.show', $pengajuan->public_id) }}" class="btn">Lengkapi SKM Sekarang</a>
         </div>
         <div class="footer">
-            SIM-MAGANG &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            SIP Biogen &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
             Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
         </div>
     </div>

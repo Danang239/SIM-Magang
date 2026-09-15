@@ -2,8 +2,8 @@
     <!-- Header Section -->
     <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Bidang Penempatan</h2>
-            <p class="text-xs text-gray-400 mt-1">Kelola bidang PKL/magang, kriteria jenjang, deskripsi jobdesc, dan pembimbing yang ditugaskan.</p>
+            <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Bidang &amp; Kuota Penempatan</h2>
+            <p class="text-xs text-gray-400 mt-1">Kelola bidang PKL/magang, alokasi kapasitas kuota, ruang lingkup bidang, dan pembimbing yang ditugaskan.</p>
         </div>
         <a href="{{ route('admin.bidang.create') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-xs px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 inline-flex items-center space-x-2 w-fit">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>

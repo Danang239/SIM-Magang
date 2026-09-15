@@ -135,7 +135,7 @@
             <a href="{{ route('admin.riwayat-pengajuan.show', $pengajuan->public_id) }}" class="btn">Tinjau & Verifikasi di Dashboard Admin</a>
         </div>
         <div class="footer">
-            SIM-PKL &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            SIP Biogen &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
             Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
         </div>
     </div>

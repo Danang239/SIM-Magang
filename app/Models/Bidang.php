@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['nama_bidang', 'deskripsi', 'jenjang', 'kategori', 'pembimbing_id', 'kapasitas', 'is_active', 'jobdesc', 'gambar'])]
+#[Fillable(['nama_bidang', 'deskripsi', 'jenjang', 'kategori', 'pembimbing_id', 'kapasitas', 'is_active', 'gambar'])]
 class Bidang extends Model
 {
     use HasFactory;

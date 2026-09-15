@@ -50,7 +50,6 @@ class LaporanMagangExport implements FromCollection, WithHeadings, WithMapping
             'Tanggal Mulai',
             'Tanggal Selesai Rencana',
             'Status Utama',
-            'Status Laporan',
             'Saran SKM'
         ];
     }
@@ -81,7 +80,6 @@ class LaporanMagangExport implements FromCollection, WithHeadings, WithMapping
             $row->tanggal_mulai ? $row->tanggal_mulai->toDateString() : '-',
             $row->tanggal_selesai_rencana ? $row->tanggal_selesai_rencana->toDateString() : '-',
             $row->status,
-            $row->laporan_status ?? 'Belum Ada',
             $row->skm_saran ?? '-'
         ];
     }

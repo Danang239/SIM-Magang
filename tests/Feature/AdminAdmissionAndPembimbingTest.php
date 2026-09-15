@@ -49,7 +49,6 @@ class AdminAdmissionAndPembimbingTest extends TestCase
             'email' => 'peneliti.utama@biogen.go.id',
             'no_hp' => '081234567899',
             'jabatan' => 'Peneliti Ahli Utama',
-            'kuota_default' => 8,
             'is_active' => '1',
             'bidang_ids' => [$bidang->id],
         ]);
@@ -57,7 +56,6 @@ class AdminAdmissionAndPembimbingTest extends TestCase
 
         $this->assertDatabaseHas('pembimbings', [
             'nama' => 'Dr. Peneliti Utama, M.Si',
-            'kuota_default' => 8,
         ]);
 
         $pembimbing = Pembimbing::where('email', 'peneliti.utama@biogen.go.id')->first();
@@ -67,12 +65,11 @@ class AdminAdmissionAndPembimbingTest extends TestCase
         // 3. Update Pembimbing
         $responseUpdate = $this->actingAs($admin)->put(route('admin.pembimbing.update', $pembimbing->id), [
             'nama' => 'Dr. Peneliti Utama, M.Si (Updated)',
-            'kuota_default' => 10,
             'is_active' => '1',
             'bidang_ids' => [$bidang->id],
         ]);
         $responseUpdate->assertRedirect(route('admin.pembimbing.index'));
-        $this->assertEquals(10, $pembimbing->fresh()->kuota_default);
+        $this->assertEquals('Dr. Peneliti Utama, M.Si (Updated)', $pembimbing->fresh()->nama);
     }
 
     /**

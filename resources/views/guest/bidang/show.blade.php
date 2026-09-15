@@ -41,60 +41,40 @@
 
                 <!-- Content Body -->
                 <div class="p-8 sm:p-12 grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <!-- Left Column: Details -->
-                    <div class="lg:col-span-2 space-y-8">
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-800 mb-3 font-sans">Deskripsi Bidang</h2>
-                            <p class="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                                {{ $bidang->deskripsi ?: 'Tidak ada deskripsi untuk bidang penelitian ini.' }}
-                            </p>
-                        </div>
-
-                        <div>
-                            <h2 class="text-xl font-bold text-gray-800 mb-4 font-sans flex items-center">
-                                <svg class="w-5 h-5 mr-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002-2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+                    <!-- Left Column: Ruang Lingkup Bidang -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-gray-50/70 rounded-2xl border border-gray-150 p-6 sm:p-8">
+                            <h2 class="text-lg sm:text-xl font-bold text-gray-800 mb-4 font-sans flex items-center text-biogen-dark">
+                                <svg class="w-5 h-5 mr-2.5 text-emerald-600 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                                 </svg>
-                                Job Description &amp; Aktivitas
+                                Ruang Lingkup Bidang
                             </h2>
-
-                            @if($bidang->jobdesc)
-                                @php
-                                    $rawJobdesc = trim($bidang->jobdesc);
-                                    if (str_contains($rawJobdesc, "\n")) {
-                                        $items = array_filter(array_map('trim', explode("\n", $rawJobdesc)));
-                                    } else {
-                                        $items = array_filter(array_map('trim', preg_split('/(?=\d+\.\s*)/', $rawJobdesc)));
-                                    }
-                                @endphp
-
-                                <div class="space-y-3">
-                                    @foreach($items as $item)
-                                        @php
-                                            $cleanItem = preg_replace('/^\d+\.\s*/', '', $item);
-                                        @endphp
-                                        @if(!empty($cleanItem))
-                                            <div class="flex items-start p-4 bg-gray-50/80 rounded-2xl border border-gray-150 shadow-sm hover:border-emerald-300 hover:bg-emerald-50/40 transition-all duration-200">
-                                                <div class="w-7 h-7 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-xs shrink-0 mr-3.5 mt-0.5 shadow-sm">
-                                                    {{ $loop->iteration }}
-                                                </div>
-                                                <p class="text-sm text-gray-700 leading-relaxed font-medium">
-                                                    {{ $cleanItem }}
-                                                </p>
-                                            </div>
-                                        @endif
-                                    @endforeach
-                                </div>
-                            @else
-                                <div class="text-sm text-gray-500 italic bg-gray-50 p-5 rounded-2xl border border-gray-200">
-                                    Belum ada detail deskripsi pekerjaan untuk program magang ini.
-                                </div>
-                            @endif
+                            <p class="text-sm text-gray-700 leading-relaxed whitespace-pre-line text-justify">
+                                {{ $bidang->deskripsi ?: 'Tidak ada informasi ruang lingkup untuk bidang penempatan ini.' }}
+                            </p>
                         </div>
                     </div>
 
                     <!-- Right Column: Sidebar Info & CTA -->
-                    <div class="space-y-6" x-data="{ selectedPembimbing: '' }">
+                    @php
+                        $statusPembimbingMap = [];
+                        foreach($pembimbingWithQuota as $p) {
+                            $statusPembimbingMap[$p->id] = [
+                                'is_di_luar_rentang' => $p->is_di_luar_rentang ?? false,
+                                'sisa_kuota' => $p->sisa_kuota,
+                                'tanggal_tersedia' => $p->tanggal_tersedia_terdekat ? $p->tanggal_tersedia_terdekat->translatedFormat('d M Y') : null,
+                            ];
+                        }
+                    @endphp
+
+                    <div class="space-y-6" x-data="{ 
+                        selectedPembimbing: '', 
+                        statusMap: {{ json_encode($statusPembimbingMap) }},
+                        isFullOutOfRange() {
+                            return this.selectedPembimbing && this.statusMap[this.selectedPembimbing]?.is_di_luar_rentang === true;
+                        }
+                    }">
                         <div class="bg-gray-50 rounded-2xl border border-gray-150 p-6 space-y-5">
                             <h3 class="text-base font-bold text-gray-800 font-sans border-b border-gray-200 pb-3">Informasi Kuota &amp; Pembimbing</h3>
                             
@@ -122,9 +102,29 @@
                                                 <p class="text-[10px] text-gray-400">{{ $pembimbing->jabatan ?: 'Pembimbing Lapangan' }}</p>
                                             </div>
                                         </div>
-                                        <span class="text-[11px] font-bold px-2 py-0.5 rounded-full {{ $pembimbing->sisa_kuota > 0 ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-700' }}">
-                                            {{ $pembimbing->sisa_kuota }} Slot
-                                        </span>
+                                        @if($pembimbing->sisa_kuota > 0)
+                                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                                                {{ $pembimbing->sisa_kuota }} Slot
+                                            </span>
+                                        @elseif($pembimbing->is_di_luar_rentang ?? false)
+                                            <div class="text-right">
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-100 text-red-800 border border-red-200">
+                                                    Penuh Total (4 Bulan)
+                                                </span>
+                                                <p class="text-[10px] font-medium text-gray-500 mt-0.5">
+                                                    Tersedia: {{ $pembimbing->tanggal_tersedia_terdekat->translatedFormat('d M Y') }}
+                                                </p>
+                                            </div>
+                                        @else
+                                            <div class="text-right">
+                                                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-200">
+                                                    Penuh Saat Ini
+                                                </span>
+                                                <p class="text-[10px] font-medium text-emerald-700 mt-0.5">
+                                                    Tersedia: {{ $pembimbing->tanggal_tersedia_terdekat->translatedFormat('d M Y') }} ({{ $pembimbing->slot_tersedia_terdekat ?? 1 }} Slot)
+                                                </p>
+                                            </div>
+                                        @endif
                                     </label>
                                 @empty
                                     <div class="text-xs text-gray-500 italic p-3 bg-white rounded-xl border border-gray-200">
@@ -138,24 +138,60 @@
                         <div>
                             @auth
                                 @if(auth()->user()->hasRole('Pengguna'))
-                                    <a x-bind:href="selectedPembimbing ? '{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing : '#'"
-                                        @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
-                                        class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                                        :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
-                                        Daftar Magang Sekarang
-                                    </a>
+                                    @if(isset($activePengajuan) && $activePengajuan)
+                                        <div class="p-4 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-2">
+                                            <p class="text-xs text-amber-900 font-bold flex items-center justify-center">
+                                                <svg class="w-4 h-4 mr-1 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                                Anda Memiliki Pengajuan PKL Aktif
+                                            </p>
+                                            <p class="text-[11px] text-amber-800 leading-relaxed">
+                                                No. <strong>{{ $activePengajuan->nomor_pengajuan }}</strong> ({{ $activePengajuan->bidang->nama_bidang }}). Anda hanya dapat memiliki 1 pengajuan PKL aktif yang sedang berjalan.
+                                            </p>
+                                            <a href="{{ route('pengguna.pengajuan.show', $activePengajuan->public_id) }}"
+                                                class="inline-block mt-1 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-xs">
+                                                Lihat Detail Pengajuan Saya
+                                            </a>
+                                        </div>
+                                    @else
+                                        <!-- Jika kuota pembimbing penuh 4 bulan: blokir tombol -->
+                                        <template x-if="isFullOutOfRange()">
+                                            <button type="button"
+                                                @click="window.showFloatingError('Kuota pembimbing ini telah penuh hingga 4 bulan ke depan (tersedia kembali ' + (statusMap[selectedPembimbing]?.tanggal_tersedia || '') + '). Silakan pilih pembimbing lain.', document.getElementById('container-pembimbing'), 'Kuota Penuh');"
+                                                class="block w-full bg-gray-200 text-gray-500 text-center py-4 rounded-xl font-bold border border-gray-300 cursor-not-allowed shadow-none">
+                                                Pendaftaran Ditutup (Kuota Penuh 4 Bulan)
+                                            </button>
+                                        </template>
+                                        <template x-if="!isFullOutOfRange()">
+                                            <a x-bind:href="selectedPembimbing ? '{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing : '#'"
+                                                @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
+                                                class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                                                :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
+                                                Daftar PKL Sekarang
+                                            </a>
+                                        </template>
+                                    @endif
                                 @else
                                     <div class="text-center text-xs text-amber-600 bg-amber-50 border border-amber-200 rounded-xl p-4">
                                         Anda masuk sebagai <strong>{{ auth()->user()->roles->first()?->name }}</strong>. Silakan masuk menggunakan akun Pengguna untuk mendaftar.
                                     </div>
                                 @endif
                             @else
-                                <a x-bind:href="selectedPembimbing ? '{{ route('login') }}?redirect=' + encodeURIComponent('{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing) : '#'"
-                                    @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
-                                    class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
-                                    :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
-                                    Daftar Magang
-                                </a>
+                                <!-- Tamu belum login: Jika pembimbing penuh 4 bulan, cegah login/daftar -->
+                                <template x-if="isFullOutOfRange()">
+                                    <button type="button"
+                                        @click="window.showFloatingError('Kuota pembimbing ini telah penuh hingga 4 bulan ke depan (tersedia kembali ' + (statusMap[selectedPembimbing]?.tanggal_tersedia || '') + '). Silakan pilih pembimbing lain.', document.getElementById('container-pembimbing'), 'Kuota Penuh');"
+                                        class="block w-full bg-gray-200 text-gray-500 text-center py-4 rounded-xl font-bold border border-gray-300 cursor-not-allowed shadow-none">
+                                        Pendaftaran Ditutup (Kuota Penuh 4 Bulan)
+                                    </button>
+                                </template>
+                                <template x-if="!isFullOutOfRange()">
+                                    <a x-bind:href="selectedPembimbing ? '{{ route('login') }}?redirect=' + encodeURIComponent('{{ route('pengguna.career.step1') }}?bidang_id={{ $bidang->id }}&pembimbing_id=' + selectedPembimbing) : '#'"
+                                        @click="if(!selectedPembimbing) { window.showFloatingError('Silakan pilih salah satu Pembimbing Lapangan terlebih dahulu pada daftar.', document.getElementById('container-pembimbing'), 'Pilih Pembimbing Lapangan'); $event.preventDefault(); }"
+                                        class="block w-full bg-emerald-600 hover:bg-emerald-700 text-white text-center py-4 rounded-xl font-bold shadow-md hover:shadow-lg transition-all duration-200"
+                                        :class="!selectedPembimbing ? 'opacity-85 hover:bg-emerald-600 hover:shadow-md' : ''">
+                                        Daftar PKL
+                                    </a>
+                                </template>
                             @endauth
                         </div>
                     </div>

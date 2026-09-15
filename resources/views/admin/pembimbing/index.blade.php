@@ -65,8 +65,7 @@
                             <th class="px-6 py-4">Nama Pembimbing</th>
                             <th class="px-6 py-4">NIP / Jabatan</th>
                             <th class="px-6 py-4">Kontak / Email</th>
-                            <th class="px-6 py-4">Bidang Binaan</th>
-                            <th class="px-6 py-4">Kuota Default</th>
+                            <th class="px-6 py-4">Bidang Binaan &amp; Kuota</th>
                             <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
@@ -94,20 +93,15 @@
                                     <p class="text-[11px] text-gray-400">{{ $p->no_hp ?? '-' }}</p>
                                 </td>
                                 <td class="px-6 py-4">
-                                    <div class="flex flex-wrap gap-1 max-w-xs">
+                                    <div class="flex flex-wrap gap-1.5 max-w-xs">
                                         @forelse($p->bidangs as $b)
-                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">
-                                                {{ $b->nama_bidang }} ({{ $b->pivot->kuota ?? $p->kuota_default }})
+                                            <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
+                                                {{ $b->nama_bidang }}: <span class="ml-1 font-bold text-emerald-950">{{ $b->pivot->kuota ?? 5 }} Kuota</span>
                                             </span>
                                         @empty
-                                            <span class="text-gray-400 italic text-[11px]">Belum dihubungkan</span>
+                                            <span class="text-gray-400 italic text-[11px]">Belum ditugaskan ke bidang</span>
                                         @endforelse
                                     </div>
-                                </td>
-                                <td class="px-6 py-4">
-                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-800">
-                                        {{ $p->kuota_default }} Peserta
-                                    </span>
                                 </td>
                                 <td class="px-6 py-4">
                                     @if($p->is_active)

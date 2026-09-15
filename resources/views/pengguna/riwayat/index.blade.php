@@ -4,8 +4,8 @@
             <!-- Header Section -->
             <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
                 <div>
-                    <h1 class="text-2xl font-bold text-gray-800 font-sans">Riwayat Pengajuan Magang & PKL</h1>
-                    <p class="text-xs text-gray-500 mt-1">Lihat dan lacak semua pengajuan magang yang telah Anda buat.</p>
+                    <h1 class="text-2xl font-bold text-gray-800 font-sans">Riwayat Pengajuan PKL</h1>
+                    <p class="text-xs text-gray-500 mt-1">Lihat dan lacak semua pengajuan PKL yang telah Anda buat.</p>
                 </div>
                 <a href="{{ route('pengguna.career.step1') }}" class="bg-biogen-medium hover:bg-biogen-light text-white text-sm px-5 py-2.5 rounded-xl font-bold shadow-sm hover:shadow transition-all duration-200 inline-flex items-center space-x-2 w-fit">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>

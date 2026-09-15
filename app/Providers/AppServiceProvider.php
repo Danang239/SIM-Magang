@@ -14,12 +14,9 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    /**
-     * Bootstrap any application services.
-     */
     public function boot(): void
     {
-        if (config('app.env') === 'production') {
+        if (request()->header('x-forwarded-proto') === 'https' || request()->isSecure() || config('app.env') === 'production' || str_contains(request()->getHost(), 'trycloudflare.com') || str_contains(request()->getHost(), 'loca.lt') || str_contains(request()->getHost(), 'pinggy.link')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
         }
 

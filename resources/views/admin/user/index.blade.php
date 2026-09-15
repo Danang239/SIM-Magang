@@ -2,7 +2,7 @@
     <!-- Header Section -->
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-800 font-sans">Kelola Pengguna</h2>
-        <p class="text-xs text-gray-400 mt-1">Daftar pengguna terdaftar di sistem SIM-MAGANG, pantau akun pendaftar magang dan akun administrator.</p>
+        <p class="text-xs text-gray-400 mt-1">Daftar pengguna terdaftar di sistem SIP Biogen, pantau akun pendaftar magang dan akun administrator.</p>
     </div>
 
     <!-- Notifications -->

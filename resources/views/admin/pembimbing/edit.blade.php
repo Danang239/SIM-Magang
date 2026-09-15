@@ -77,16 +77,6 @@
                 </div>
             </div>
 
-            <!-- Kuota Default -->
-            <div>
-                <label for="kuota_default" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Kapasitas Kuota Default (Peserta) <span class="text-red-500">*</span>
-                </label>
-                <input type="number" name="kuota_default" id="kuota_default" value="{{ old('kuota_default', $pembimbing->kuota_default) }}" min="1" max="50" required
-                    class="w-full md:w-48 text-xs rounded-xl border border-gray-200 px-4 py-2.5 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none transition">
-                <p class="text-[11px] text-gray-400 mt-1">Jumlah maksimal mahasiswa yang dapat dibimbing dalam rentang tanggal bersamaan.</p>
-            </div>
-
             <!-- Pilih Bidang yang Dibimbing -->
             @php
                 $assignedBidangIds = old('bidang_ids', $pembimbing->bidangs->pluck('id')->toArray());

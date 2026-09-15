@@ -55,10 +55,10 @@
 
                     <!-- Title & Subtitle -->
                     <h3 class="text-lg font-extrabold text-gray-900 font-sans tracking-tight" id="modal-title">
-                        Selamat Datang di SIM-MAGANG!
+                        Selamat Datang di SIP Biogen!
                     </h3>
                     <p class="text-xs text-gray-500 mt-1 leading-relaxed">
-                        Anda berhasil masuk menggunakan akun Google ({{ auth()->user()->email }}). Silakan lengkapi biodata Anda pada form di bawah ini agar data pemohon magang Anda valid.
+                        Anda berhasil masuk menggunakan akun Google ({{ auth()->user()->email }}). Silakan lengkapi biodata Anda pada form di bawah ini agar data pemohon PKL Anda valid.
                     </p>
 
                     <!-- Info Box: Data Required -->

@@ -12,61 +12,117 @@ class KuotaService
     /**
      * Status pengajuan yang dianggap "aktif" dan mengonsumsi slot kuota.
      */
-    protected array $statusAktif = ['Disetujui', 'Terjadwal', 'Sedang Magang'];
+    protected array $statusAktif = ['Menunggu Verifikasi', 'Disetujui', 'Terjadwal', 'Sedang Magang', 'Aktif'];
 
     /**
      * Hitung jumlah pengajuan aktif yang overlap dengan rentang tanggal tertentu.
      * Digunakan untuk kalender front-end.
      *
-     * @param  int    $bidangId
-     * @param  string $tanggal     Format: Y-m-d
-     * @param  int    $durasiBuilan
-     * @return int    Jumlah slot yang sudah terisi
+     * @param  int       $bidangId
+     * @param  string    $tanggal        Format: Y-m-d
+     * @param  int       $durasiBulan
+     * @param  int|null  $pembimbingId
+     * @return int       Jumlah slot yang sudah terisi
      */
-    public function hitungSlotTerisi(int $bidangId, string $tanggal, int $durasiBulan): int
+    public function hitungSlotTerisi(int $bidangId, string $tanggal, int $durasiBulan, ?int $pembimbingId = null): int
     {
         $tanggalMulai = Carbon::parse($tanggal)->startOfDay();
         $tanggalSelesai = $tanggalMulai->copy()->addMonths($durasiBulan)->subDay()->endOfDay();
 
-        return Pengajuan::where('bidang_id', $bidangId)
+        $query = Pengajuan::where('bidang_id', $bidangId)
             ->whereIn('status', $this->statusAktif)
-            ->where(function ($query) use ($tanggalMulai, $tanggalSelesai) {
-                $query->where(function ($q) use ($tanggalMulai, $tanggalSelesai) {
-                    // Pengajuan yang mulainya ada di dalam rentang kita
-                    $q->where('tanggal_mulai', '<=', $tanggalSelesai)
-                      ->where('tanggal_selesai_rencana', '>=', $tanggalMulai);
-                });
-            })
-            ->count();
+            ->where(function ($q) use ($tanggalMulai, $tanggalSelesai) {
+                $q->where('tanggal_mulai', '<=', $tanggalSelesai)
+                  ->where('tanggal_selesai_rencana', '>=', $tanggalMulai);
+            });
+
+        if ($pembimbingId) {
+            $query->where('pembimbing_id', $pembimbingId);
+        }
+
+        return $query->count();
+    }
+
+    /**
+     * Dapatkan kapasitas maksimal untuk bidang / pembimbing
+     */
+    public function getKapasitas(Bidang $bidang, ?int $pembimbingId = null): int
+    {
+        if ($pembimbingId) {
+            $pembimbing = $bidang->pembimbings()->where('pembimbings.id', $pembimbingId)->first();
+            if ($pembimbing) {
+                return (int) ($pembimbing->pivot->kuota ?? $pembimbing->kuota_default ?? 5);
+            }
+            $pembimbingModel = \App\Models\Pembimbing::find($pembimbingId);
+            if ($pembimbingModel) {
+                return (int) ($pembimbingModel->kuota_default ?? 5);
+            }
+        }
+
+        return (int) $bidang->kapasitas;
     }
 
     /**
      * Generate data kalender ketersediaan untuk bulan-bulan tertentu.
-     * Mengembalikan array tanggal beserta status ketersediaannya.
+     * Mengembalikan array tanggal beserta status 3 warna:
+     * - 'jeda_verifikasi' (Abu-abu): Kurang dari 14 hari dari hari pendaftaran
+     * - 'penuh' (Merah): Kapasitas kuota pada rentang durasi tersebut sudah penuh
+     * - 'tersedia' (Hijau): Sudah melewati 14 hari dan kuota masih tersedia
      *
-     * @param  Bidang $bidang
-     * @param  int    $durasiBulan
-     * @param  int    $bulanKedepan  Berapa bulan ke depan yang ditampilkan
-     * @return array  [ 'Y-m-d' => ['tersedia' => bool, 'terisi' => int, 'kapasitas' => int] ]
+     * @param  Bidang    $bidang
+     * @param  int       $durasiBulan
+     * @param  int       $bulanKedepan
+     * @param  int|null  $pembimbingId
+     * @return array
      */
-    public function getKalenderTersedia(Bidang $bidang, int $durasiBulan, int $bulanKedepan = 3): array
+    public function getKalenderTersedia(Bidang $bidang, int $durasiBulan, int $bulanKedepan = 4, ?int $pembimbingId = null): array
     {
         $hasil = [];
         $today = Carbon::today();
-        $akhir = $today->copy()->addMonths($bulanKedepan);
+        $kapasitas = $this->getKapasitas($bidang, $pembimbingId);
 
-        // Iterasi setiap hari mulai 14 hari dari hari ini (Jeda Verifikasi) sampai batas bulan
-        $tanggal = $today->copy()->addDays(14);
+        // Awal dari bulan saat ini s/d $bulanKedepan bulan ke depan
+        $tanggal = $today->copy()->startOfMonth();
+        $akhir = $today->copy()->addMonths($bulanKedepan)->endOfMonth();
+        $batasVerifikasi = $today->copy()->addDays(14);
+
         while ($tanggal->lte($akhir)) {
             $tanggalStr = $tanggal->toDateString();
-            $terisi = $this->hitungSlotTerisi($bidang->id, $tanggalStr, $durasiBulan);
 
-            $hasil[$tanggalStr] = [
-                'tersedia' => $terisi < $bidang->kapasitas,
-                'terisi' => $terisi,
-                'kapasitas' => $bidang->kapasitas,
-                'slot_sisa' => max(0, $bidang->kapasitas - $terisi),
-            ];
+            if ($tanggal->lt($today)) {
+                // Hari lampau
+                $hasil[$tanggalStr] = [
+                    'tipe' => 'lampau',
+                    'tersedia' => false,
+                    'alasan' => 'Tanggal sudah lewat',
+                    'terisi' => 0,
+                    'kapasitas' => $kapasitas,
+                    'slot_sisa' => 0,
+                ];
+            } elseif ($tanggal->lt($batasVerifikasi)) {
+                // Masa Jeda Verifikasi 14 Hari (Abu-Abu)
+                $hasil[$tanggalStr] = [
+                    'tipe' => 'jeda_verifikasi',
+                    'tersedia' => false,
+                    'alasan' => 'Masa jeda verifikasi berkas & administrasi (14 hari kerja)',
+                    'terisi' => 0,
+                    'kapasitas' => $kapasitas,
+                    'slot_sisa' => 0,
+                ];
+            } else {
+                // Tanggal >= Hari Ini + 14 Hari -> Cek Overlap Kuota
+                $terisi = $this->hitungSlotTerisi($bidang->id, $tanggalStr, $durasiBulan, $pembimbingId);
+                $isTersedia = $terisi < $kapasitas;
+
+                $hasil[$tanggalStr] = [
+                    'tipe' => $isTersedia ? 'tersedia' : 'penuh',
+                    'tersedia' => $isTersedia,
+                    'alasan' => $isTersedia ? 'Tersedia untuk dipilih' : 'Slot penuh pada periode ini',
+                    'terisi' => $terisi,
+                    'kapasitas' => $kapasitas,
+                    'slot_sisa' => max(0, $kapasitas - $terisi),
+                ];
+            }
 
             $tanggal->addDay();
         }
@@ -78,28 +134,41 @@ class KuotaService
      * Validasi ulang ketersediaan slot DENGAN lockForUpdate() untuk mencegah race condition.
      * Dipanggil di dalam DB::transaction() pada submit akhir.
      *
-     * @param  int    $bidangId
-     * @param  string $tanggalMulai   Format: Y-m-d
-     * @param  int    $durasiBulan
-     * @return bool   true = masih tersedia, false = penuh
+     * @param  int       $bidangId
+     * @param  string    $tanggalMulai   Format: Y-m-d
+     * @param  int       $durasiBulan
+     * @param  int|null  $pembimbingId
+     * @return bool      true = masih tersedia, false = penuh
      * @throws \Exception
      */
-    public function validateUlang(int $bidangId, string $tanggalMulai, int $durasiBulan): bool
+    public function validateUlang(int $bidangId, string $tanggalMulai, int $durasiBulan, ?int $pembimbingId = null): bool
     {
         $bidang = Bidang::lockForUpdate()->findOrFail($bidangId);
+        $kapasitas = $this->getKapasitas($bidang, $pembimbingId);
 
         $tanggalMulaiCarbon = Carbon::parse($tanggalMulai)->startOfDay();
+        $today = Carbon::today();
+
+        // Validasi minimal H+14 dari hari pendaftaran
+        if ($tanggalMulaiCarbon->lt($today->copy()->addDays(14))) {
+            return false;
+        }
+
         $tanggalSelesai = $tanggalMulaiCarbon->copy()->addMonths($durasiBulan)->subDay()->endOfDay();
 
-        $terisi = Pengajuan::where('bidang_id', $bidangId)
+        $query = Pengajuan::where('bidang_id', $bidangId)
             ->whereIn('status', $this->statusAktif)
-            ->where(function ($query) use ($tanggalMulaiCarbon, $tanggalSelesai) {
-                $query->where('tanggal_mulai', '<=', $tanggalSelesai)
-                      ->where('tanggal_selesai_rencana', '>=', $tanggalMulaiCarbon);
-            })
-            ->lockForUpdate()
-            ->count();
+            ->where(function ($q) use ($tanggalMulaiCarbon, $tanggalSelesai) {
+                $q->where('tanggal_mulai', '<=', $tanggalSelesai)
+                  ->where('tanggal_selesai_rencana', '>=', $tanggalMulaiCarbon);
+            });
 
-        return $terisi < $bidang->kapasitas;
+        if ($pembimbingId) {
+            $query->where('pembimbing_id', $pembimbingId);
+        }
+
+        $terisi = $query->lockForUpdate()->count();
+
+        return $terisi < $kapasitas;
     }
 }

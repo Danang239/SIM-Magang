@@ -30,17 +30,19 @@ class CareerStepTanggalRequest extends FormRequest
 
                     $durasi = (int) $this->durasi_bulan;
 
-                    // Validasi ulang server-side via KuotaService (tidak percaya kalender front-end)
+                    $pembimbingId = session('pembimbing_id');
                     $kuotaService = app(KuotaService::class);
                     $terisi = $kuotaService->hitungSlotTerisi(
                         $bidangId,
                         $value,
-                        $durasi
+                        $durasi,
+                        $pembimbingId ? (int) $pembimbingId : null
                     );
 
                     $bidang = \App\Models\Bidang::find($bidangId);
-                    if ($bidang && $terisi >= $bidang->kapasitas) {
-                        $fail('Tanggal yang dipilih sudah penuh. Silakan pilih tanggal lain.');
+                    $kapasitas = $bidang ? $kuotaService->getKapasitas($bidang, $pembimbingId ? (int) $pembimbingId : null) : 0;
+                    if ($terisi >= $kapasitas) {
+                        $fail('Tanggal yang dipilih sudah penuh untuk pembimbing ini. Silakan pilih tanggal lain.');
                     }
                 },
             ],

@@ -78,21 +78,17 @@
                     <img src="{{ asset('logo-brmp.png') }}" alt="Logo BRMP Biogen" class="w-11 h-11 object-contain drop-shadow-md shrink-0">
                     <div>
                         <span class="font-black text-2xl tracking-tight text-white block leading-none font-sans">SIP Biogen</span>
-                        <span class="text-xs text-emerald-200 uppercase tracking-widest font-semibold mt-1 block">Balai Besar R&amp;D</span>
+                        <span class="text-xs text-emerald-200 uppercase tracking-widest font-semibold mt-1 block">Balai Besar Perakitan dan Modernisasi Bioteknologi dan Sumber Daya Genetik Pertanian</span>
                     </div>
                 </div>
 
                 <!-- Middle Content -->
                 <div class="relative z-10 space-y-5 my-auto py-12 max-w-lg">
-                    <div class="inline-flex items-center space-x-2 bg-emerald-900/70 border border-emerald-400/40 px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-200">
-                        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                        <span class="uppercase tracking-wider">SIM-MAGANG &amp; PKL</span>
-                    </div>
                     <h1 class="text-3xl lg:text-4xl font-extrabold leading-tight font-sans text-white">
-                        Modernisasi Bioteknologi Pertanian Indonesia
+                        Sistem Informasi PKL
                     </h1>
-                    <p class="text-sm text-emerald-100/90 leading-relaxed font-medium">
-                        Bergabunglah bersama peneliti &amp; praktisi ahli di Balai Besar Research &amp; Development Biogen. Akses portal pendaftaran dan kelola berkas Anda secara terintegrasi.
+                    <p class="text-sm text-emerald-100/90 leading-relaxed font-medium text-justify">
+                        Sistem Informasi PKL (SIP) merupakan platform untuk mendukung layanan jasa guna memfasilitasi mahasiswa/siswa melaksanakan praktik kerja lapangan di bidang Bioteknologi, Sumber Daya Genetik Pertanian, Bank Gen Pertanian, Unit Pengelola Benih Sumber, Hubungan Masyarakat, Teknologi Informasi, dan Perkantoran.
                     </p>
                 </div>
 

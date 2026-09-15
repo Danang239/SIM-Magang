@@ -63,8 +63,6 @@ class DetailPengajuanController extends Controller
         $path = match ($type) {
             'foto_diri' => $pengajuan->foto_diri,
             'surat_pengantar' => $pengajuan->file_surat_pengantar,
-            'laporan_akhir' => $pengajuan->file_laporan_akhir,
-            'surat_keterangan' => $pengajuan->file_surat_keterangan,
             'surat_balasan' => $pengajuan->file_surat_balasan,
             default => null,
         };

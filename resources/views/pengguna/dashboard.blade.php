@@ -4,7 +4,7 @@
         <div class="mb-10 text-center sm:text-left">
             <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight font-sans">Laboratorium & Bidang Penelitian</h1>
             <p class="text-sm text-gray-500 mt-2 max-w-2xl leading-relaxed">
-                Temukan laboratorium dan bidang riset yang tersedia di Balai Besar Pengujian Standar Instrumen Bioteknologi (BB-Biogen) untuk menunjang program magang, PKL, atau penelitian Anda.
+                Temukan laboratorium dan bidang riset yang tersedia di Balai Besar Pengujian Standar Instrumen Bioteknologi (BB-Biogen) untuk menunjang program Praktik Kerja Lapangan (PKL) Anda.
             </p>
         </div>
 
@@ -30,9 +30,9 @@
                             {{ $b->nama_bidang }}
                         </h2>
 
-                        <!-- Deskripsi -->
+                        <!-- Ruang Lingkup Bidang -->
                         <p class="text-xs text-gray-500 leading-relaxed mb-4">
-                            {{ $b->deskripsi ?: 'Tidak ada deskripsi untuk bidang penelitian ini.' }}
+                            {{ $b->deskripsi ?: 'Tidak ada informasi ruang lingkup untuk bidang penelitian ini.' }}
                         </p>
                     </div>
 
@@ -50,7 +50,7 @@
 
                         <a href="{{ route('pengguna.career.step1') }}" 
                            class="block w-full text-center bg-biogen-medium hover:bg-biogen-light text-white text-xs py-2.5 rounded-xl font-bold shadow-sm transition-all duration-200 mt-2">
-                            Ajukan Magang di Bidang Ini
+                            Ajukan PKL di Bidang Ini
                         </a>
                     </div>
 
@@ -58,15 +58,15 @@
             @endforeach
         </div>
 
-        <!-- Section Alur Pendaftaran Magang / PKL (Alur Sekarang) -->
+        <!-- Section Alur Pendaftaran PKL -->
         <div class="mt-20 pt-12 border-t border-gray-200">
             <div class="text-center mb-12">
                 <span class="inline-block bg-emerald-100 text-emerald-800 px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-3">
                     Prosedur &amp; Tahapan
                 </span>
-                <h2 class="text-2xl font-extrabold text-gray-900 font-sans tracking-tight">Alur Pendaftaran Magang &amp; PKL</h2>
+                <h2 class="text-2xl font-extrabold text-gray-900 font-sans tracking-tight">Alur Pendaftaran PKL</h2>
                 <p class="text-sm text-gray-500 mt-2 max-w-xl mx-auto">
-                    Tahapan pendaftaran hingga pelaksanaan magang di BRMP Biogen secara sistematis dan terintegrasi secara digital.
+                    Tahapan pendaftaran hingga pelaksanaan PKL di BRMP Biogen secara sistematis dan terintegrasi secara digital.
                 </p>
             </div>
 
@@ -81,7 +81,7 @@
                         </div>
                         <h3 class="font-bold text-gray-800 text-base font-sans mb-2 leading-snug">Pilih Bidang &amp; Tanggal</h3>
                         <p class="text-xs text-gray-500 leading-relaxed">
-                            Pilih bidang penelitian yang sesuai di atas, tentukan durasi magang (1-3 bulan), dan tentukan tanggal rencana mulai.
+                            Pilih bidang penelitian yang sesuai di atas, tentukan durasi PKL, dan tentukan tanggal rencana mulai.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-gray-100 text-[11px] text-emerald-700 font-medium flex items-center">
@@ -147,14 +147,14 @@
                         <div class="w-12 h-12 rounded-xl bg-emerald-700 text-white flex items-center justify-center font-bold text-lg mb-4 shadow-sm">
                             5
                         </div>
-                        <h3 class="font-bold text-gray-800 text-base font-sans mb-2 leading-snug">Pelaksanaan &amp; Laporan Akhir</h3>
+                        <h3 class="font-bold text-gray-800 text-base font-sans mb-2 leading-snug">Pelaksanaan &amp; Selesai PKL</h3>
                         <p class="text-xs text-gray-500 leading-relaxed">
-                            Peserta melaksanakan magang hingga selesai, mengunggah Laporan Akhir pada sistem, dan mengunduh Surat Keterangan / Sertifikat Selesai Magang.
+                            Peserta melaksanakan PKL di BRMP Biogen hingga batas waktu yang ditentukan. Status otomatis menjadi <strong>Selesai</strong> setelah tanggal PKL berakhir.
                         </p>
                     </div>
                     <div class="mt-4 pt-3 border-t border-gray-100 text-[11px] text-emerald-700 font-medium flex items-center">
-                        <svg class="w-4 h-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0112 20.055a11.952 11.952 0 01-6.824-2.998 12.078 12.078 0 01-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"/></svg>
-                        Selesai Magang
+                        <svg class="w-4 h-4 mr-1 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                        Selesai PKL
                     </div>
                 </div>
 

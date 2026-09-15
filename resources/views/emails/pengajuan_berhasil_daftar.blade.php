@@ -105,7 +105,7 @@
         </div>
         <div class="content">
             <h2>Halo, {{ $pengajuan->user->name }}</h2>
-            <p>Terima kasih telah mendaftar program Praktik Kerja Lapangan (PKL) / Magang di <strong>Balai Besar Perakitan Materi dan Pemuliaan Tanaman Biogen (BRMP Biogen)</strong>.</p>
+            <p>Terima kasih telah mendaftar program Praktik Kerja Lapangan (PKL) / Magang di <strong>Balai Besar Perakitan dan Modernisasi Bioteknologi dan Sumber Daya Genetik Pertanian (BRMP BIOGEN)</strong>.</p>
             
             <div class="alert-box">
                 ℹ️ <strong>Informasi Verifikasi:</strong><br>
@@ -148,7 +148,7 @@
             <a href="{{ route('pengguna.riwayat') }}" class="btn">Cek Status Pengajuan</a>
         </div>
         <div class="footer">
-            SIM-PKL &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
+            SIP Biogen &copy; {{ date('Y') }} BRMP Biogen - Kementerian Pertanian RI<br>
             Jl. Tentara Pelajar No. 3A, Bogor, Jawa Barat
         </div>
     </div>

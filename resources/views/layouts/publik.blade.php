@@ -297,7 +297,7 @@
                             <div class="min-w-0">
                                 <p class="text-xs font-bold text-white truncate">{{ auth()->user()->name }}</p>
                                 <span class="inline-block text-[9px] font-extrabold text-emerald-200 uppercase tracking-wider bg-emerald-800/80 px-2 py-0.5 rounded-full mt-0.5">
-                                    {{ auth()->user()->hasRole('Pengguna') ? 'Peserta Magang / PKL' : auth()->user()->roles->pluck('name')->first() }}
+                                    {{ auth()->user()->hasRole('Pengguna') ? 'Peserta PKL' : auth()->user()->roles->pluck('name')->first() }}
                                 </span>
                             </div>
                         </div>
@@ -480,7 +480,7 @@
                         <span class="font-bold text-white text-lg font-sans">SIP <span class="text-emerald-400">Biogen</span></span>
                     </div>
                     <span class="hidden sm:inline text-gray-700">|</span>
-                    <span class="text-xs text-gray-400">SIM-MAGANG &copy; {{ date('Y') }} Kementerian Pertanian RI</span>
+                    <span class="text-xs text-gray-400">SIP Biogen &copy; {{ date('Y') }} Kementerian Pertanian RI</span>
                 </div>
 
                 <!-- Right: Social Media Icons with Links -->

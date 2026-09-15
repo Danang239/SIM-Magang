@@ -4,7 +4,7 @@
         <div class="max-w-4xl mx-auto mt-10">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">Formulir Data Peserta Magang/PKL (Form-1 PT)</h1>
+                <h1 class="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">Formulir Data Peserta PKL (Form-1)</h1>
                 <p class="text-gray-500 text-sm mt-1">BRMP Biogen — Kementerian Pertanian RI</p>
             </div>
 
@@ -24,7 +24,7 @@
                         <p class="font-bold text-gray-800 mt-0.5">Jalur {{ $bidang->jenjang }}</p>
                     </div>
                     <div>
-                        <p class="text-xs text-gray-400">Mulai Magang</p>
+                        <p class="text-xs text-gray-400">Mulai PKL</p>
                         <p class="font-bold text-gray-800 mt-0.5">{{ \Carbon\Carbon::parse($step1['tanggal_mulai'])->translatedFormat('d M Y') }}</p>
                     </div>
                     <div>
@@ -75,7 +75,7 @@
                         </div>
                         <div class="space-y-2 flex-1">
                             <label for="foto_diri" class="block text-xs font-bold text-gray-700">Unggah Pas Foto Berwarna (4x6) <span class="text-red-500">* (Maks. 5MB)</span></label>
-                            <p class="text-[11px] text-gray-500 leading-relaxed">Wajib mengunggah foto pas diri berwarna latar belakang merah/biru/polos untuk keperluan identitas berkas magang. Foto akan otomatis terpotong simetris 4x6.</p>
+                            <p class="text-[11px] text-gray-500 leading-relaxed">Wajib mengunggah foto pas diri berwarna latar belakang merah/biru/polos untuk keperluan identitas berkas PKL. Foto akan otomatis terpotong simetris 4x6.</p>
                             <input type="file" name="foto_diri" id="foto_diri" accept=".jpg,.jpeg,.png"
                                 class="text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer"
                                 @change="
@@ -98,33 +98,7 @@
                                         reader.onload = (e) => {
                                             const img = new Image();
                                             img.onload = () => {
-                                                const canvas = document.createElement('canvas');
-                                                const targetW = 400;
-                                                const targetH = 600;
-                                                canvas.width = targetW;
-                                                canvas.height = targetH;
-                                                const ctx = canvas.getContext('2d');
-                                                
-                                                const targetAspect = 4 / 6;
-                                                const origW = img.width;
-                                                const origH = img.height;
-                                                const origAspect = origW / origH;
-                                                
-                                                let cropW, cropH, cropX, cropY;
-                                                if (origAspect > targetAspect) {
-                                                    cropH = origH;
-                                                    cropW = origH * targetAspect;
-                                                    cropX = (origW - cropW) / 2;
-                                                    cropY = 0;
-                                                } else {
-                                                    cropW = origW;
-                                                    cropH = origW / targetAspect;
-                                                    cropX = 0;
-                                                    cropY = (origH - cropH) / 2;
-                                                }
-                                                
-                                                ctx.drawImage(img, cropX, cropY, cropW, cropH, 0, 0, targetW, targetH);
-                                                photoPreview = canvas.toDataURL('image/jpeg', 0.9);
+                                                photoPreview = e.target.result;
                                             };
                                             img.src = e.target.result;
                                         };
@@ -134,53 +108,55 @@
                         </div>
                     </div>
                     
+                    <!-- Input Kolom Data Pribadi -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="nama_lengkap_display" class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap Pemohon</label>
-                            <input type="text" id="nama_lengkap_display" value="{{ auth()->user()->name }}" readonly disabled
-                                class="w-full rounded-lg border-gray-200 bg-gray-100 text-gray-600 text-xs font-bold">
+                            <label for="name" class="block text-xs font-bold text-gray-700 mb-1">Nama Lengkap</label>
+                            <input type="text" id="name" value="{{ auth()->user()->name }}" readonly disabled
+                                class="w-full rounded-lg border-gray-200 bg-gray-100 text-gray-600 text-xs font-semibold">
+                        </div>
+
+                        <div>
+                            <label for="email" class="block text-xs font-bold text-gray-700 mb-1">Alamat E-mail</label>
+                            <input type="email" id="email" value="{{ auth()->user()->email }}" readonly disabled
+                                class="w-full rounded-lg border-gray-200 bg-gray-100 text-gray-600 text-xs font-semibold">
                         </div>
 
                         <div>
                             <label for="nik_ktp" class="block text-xs font-bold text-gray-700 mb-1">No. KTP / NIK <span class="text-red-500">*</span></label>
-                            <input type="text" name="nik_ktp" id="nik_ktp" value="{{ old('nik_ktp') }}"
+                            <input type="text" name="nik_ktp" id="nik_ktp" value="{{ old('nik_ktp') }}" maxlength="30"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="16 digit Nomor Induk Kependudukan">
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
-                            <label for="nim_nisn" class="block text-xs font-bold text-gray-700 mb-1">No. Induk Mahasiswa / Siswa (NIM/NISN) <span class="text-red-500">*</span></label>
-                            <input type="text" name="nim_nisn" id="nim_nisn" value="{{ old('nim_nisn') }}"
+                            <label for="nim_nisn" class="block text-xs font-bold text-gray-700 mb-1">No. Induk Siswa / Mahasiswa (NIM/NISN) <span class="text-red-500">*</span></label>
+                            <input type="text" name="nim_nisn" id="nim_nisn" value="{{ old('nim_nisn') }}" maxlength="50"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Nomor Induk dari Kampus/Sekolah">
+                                placeholder="Nomor Induk Mahasiswa / Siswa">
                         </div>
 
                         <div>
-                            <label for="no_hp" class="block text-xs font-bold text-gray-700 mb-1">No. Telepon / HP / WhatsApp <span class="text-red-500">*</span></label>
-                            <input type="text" name="no_hp" id="no_hp" value="{{ old('no_hp', auth()->user()->no_hp) }}"
+                            <label for="no_hp" class="block text-xs font-bold text-gray-700 mb-1">Nomor HP / WhatsApp Aktif <span class="text-red-500">*</span></label>
+                            <input type="tel" name="no_hp" id="no_hp" value="{{ old('no_hp', auth()->user()->no_hp) }}" maxlength="15"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
                                 placeholder="Contoh: 081234567890">
                         </div>
 
                         <div>
                             <label for="jenis_kelamin" class="block text-xs font-bold text-gray-700 mb-1">Jenis Kelamin <span class="text-red-500">*</span></label>
-                            <select name="jenis_kelamin" id="jenis_kelamin"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs">
+                            <select name="jenis_kelamin" id="jenis_kelamin" class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs">
                                 <option value="">-- Pilih Jenis Kelamin --</option>
                                 <option value="Laki-laki" {{ old('jenis_kelamin') === 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
                                 <option value="Perempuan" {{ old('jenis_kelamin') === 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
                             </select>
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
                             <label for="tempat_lahir" class="block text-xs font-bold text-gray-700 mb-1">Tempat Lahir <span class="text-red-500">*</span></label>
                             <input type="text" name="tempat_lahir" id="tempat_lahir" value="{{ old('tempat_lahir') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Kota tempat lahir">
+                                placeholder="Kota / Kabupaten tempat lahir">
                         </div>
 
                         <div>
@@ -194,7 +170,7 @@
                         <label for="alamat" class="block text-xs font-bold text-gray-700 mb-1">Alamat Lengkap KTP / Domisili <span class="text-red-500">*</span></label>
                         <textarea name="alamat" id="alamat" rows="2"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                            placeholder="Alamat domisili lengkap dengan RT/RW, Kelurahan, Kecamatan, Kota & Kode Pos">{{ old('alamat') }}</textarea>
+                            placeholder="Alamat lengkap tempat tinggal saat ini...">{{ old('alamat') }}</textarea>
                     </div>
                 </div>
 
@@ -202,70 +178,65 @@
                 <div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 space-y-4">
                     <h2 class="text-base font-bold text-gray-800 font-sans border-b border-gray-100 pb-3 flex items-center">
                         <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold mr-2">B</span>
-                        Asal Perguruan Tinggi / Sekolah
+                        Asal {{ strtolower($bidang->jenjang) === 'siswa' ? 'Sekolah (SMK)' : 'Perguruan Tinggi' }}
                     </h2>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama Perguruan Tinggi / Sekolah <span class="text-red-500">*</span></label>
+                        <div class="md:col-span-2">
+                            <label for="instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama {{ strtolower($bidang->jenjang) === 'siswa' ? 'Sekolah' : 'Perguruan Tinggi' }} <span class="text-red-500">*</span></label>
                             <input type="text" name="instansi" id="instansi" value="{{ old('instansi', auth()->user()->instansi) }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Contoh: Universitas Pakuan / SMK Negeri 1 Bogor">
+                                placeholder="Contoh: Universitas Indonesia / SMK Negeri 1 Bogor">
                         </div>
 
                         <div>
-                            <label for="nama_pimpinan_instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama Rektor / Kepala Sekolah / Pimpinan <span class="text-red-500">*</span></label>
+                            <label for="nama_pimpinan_instansi" class="block text-xs font-bold text-gray-700 mb-1">Nama {{ strtolower($bidang->jenjang) === 'siswa' ? 'Kepala Sekolah' : 'Rektor / Pimpinan' }} <span class="text-red-500">*</span></label>
                             <input type="text" name="nama_pimpinan_instansi" id="nama_pimpinan_instansi" value="{{ old('nama_pimpinan_instansi') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Nama Rektor / Dekan / Kepala Sekolah beserta gelar">
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label for="alamat_instansi" class="block text-xs font-bold text-gray-700 mb-1">Alamat Perguruan Tinggi / Sekolah <span class="text-red-500">*</span></label>
-                            <input type="text" name="alamat_instansi" id="alamat_instansi" value="{{ old('alamat_instansi') }}"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Alamat jalan instansi/kampus">
+                                placeholder="Nama pimpinan instansi beserta gelar">
                         </div>
 
                         <div>
-                            <label for="kontak_instansi" class="block text-xs font-bold text-gray-700 mb-1">No. Telepon / Faks / Email Instansi <span class="text-red-500">*</span></label>
+                            <label for="kontak_instansi" class="block text-xs font-bold text-gray-700 mb-1">No. Telepon / Faks / E-mail Instansi <span class="text-red-500">*</span></label>
                             <input type="text" name="kontak_instansi" id="kontak_instansi" value="{{ old('kontak_instansi') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Nomor telepon atau email resmi fakultas/sekolah">
+                                placeholder="Kontak resmi kampus / sekolah">
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
+                            <label for="alamat_instansi" class="block text-xs font-bold text-gray-700 mb-1">Alamat Kampus / Sekolah <span class="text-red-500">*</span></label>
+                            <textarea name="alamat_instansi" id="alamat_instansi" rows="2"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
+                                placeholder="Alamat lengkap instansi pendidikan...">{{ old('alamat_instansi') }}</textarea>
+                        </div>
+
+                        @if(strtolower($bidang->jenjang) !== 'siswa')
                         <div>
-                            <label for="fakultas" class="block text-xs font-bold text-gray-700 mb-1">Fakultas (Opsional untuk PT)</label>
+                            <label for="fakultas" class="block text-xs font-bold text-gray-700 mb-1">Fakultas</label>
                             <input type="text" name="fakultas" id="fakultas" value="{{ old('fakultas') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Misal: Fakultas Matematika & IPA">
+                                placeholder="Contoh: Fakultas Pertanian">
                         </div>
+                        @endif
 
                         <div>
                             <label for="program_studi" class="block text-xs font-bold text-gray-700 mb-1">Jurusan / Program Studi <span class="text-red-500">*</span></label>
                             <input type="text" name="program_studi" id="program_studi" value="{{ old('program_studi', auth()->user()->program_studi) }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Misal: Ilmu Komputer / Bioteknologi / Agribisnis">
+                                placeholder="Contoh: Bioteknologi / Agroteknologi / Rekayasa Perangkat Lunak">
                         </div>
-                    </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div>
                             <label for="tahun_masuk" class="block text-xs font-bold text-gray-700 mb-1">Tahun Masuk <span class="text-red-500">*</span></label>
-                            <input type="text" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk') }}"
-                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Contoh: 2023">
+                            <input type="number" name="tahun_masuk" id="tahun_masuk" value="{{ old('tahun_masuk', date('Y') - 2) }}" min="2000" max="{{ date('Y') + 1 }}"
+                                class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs">
                         </div>
 
                         <div>
                             <label for="pendidikan_terakhir" class="block text-xs font-bold text-gray-700 mb-1">Pendidikan Terakhir <span class="text-red-500">*</span></label>
-                            <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir') }}"
+                            <input type="text" name="pendidikan_terakhir" id="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', strtolower($bidang->jenjang) === 'siswa' ? 'SMP / Sederajat' : 'SMA / SMK / Sederajat') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Contoh: SMA / SMK / D3 / S1">
+                                placeholder="Contoh: SMA/SMK/Diploma">
                         </div>
 
                         <div>
@@ -277,33 +248,36 @@
                     </div>
                 </div>
 
-                <!-- Panel 3: C. Materi Magang/PKL -->
+                <!-- Panel 3: C. Materi PKL (Opsional) -->
                 <div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 space-y-4">
-                    <h2 class="text-base font-bold text-gray-800 font-sans border-b border-gray-100 pb-3 flex items-center">
-                        <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold mr-2">C</span>
-                        Materi Magang / PKL
-                    </h2>
-
-                    <div>
-                        <label for="judul_magang" class="block text-xs font-bold text-gray-700 mb-1">Judul Magang / PKL <span class="text-red-500">*</span></label>
-                        <input type="text" name="judul_magang" id="judul_magang" value="{{ old('judul_magang') }}"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                            placeholder="Judul topik penelitian/praktikum magang yang diajukan">
+                    <div class="flex items-center justify-between border-b border-gray-100 pb-3">
+                        <h2 class="text-base font-bold text-gray-800 font-sans flex items-center">
+                            <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 text-xs flex items-center justify-center font-bold mr-2">C</span>
+                            Materi PKL
+                        </h2>
+                        <span class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-500 border border-gray-200">Opsional</span>
                     </div>
 
                     <div>
-                        <label for="tujuan_magang" class="block text-xs font-bold text-gray-700 mb-1">Tujuan Magang / PKL <span class="text-red-500">*</span></label>
+                        <label for="judul_magang" class="block text-xs font-bold text-gray-700 mb-1">Judul PKL <span class="text-gray-400 font-normal">(Opsional)</span></label>
+                        <input type="text" name="judul_magang" id="judul_magang" value="{{ old('judul_magang') }}"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
+                            placeholder="Judul topik penelitian/praktikum PKL yang diajukan (jika ada)">
+                    </div>
+
+                    <div>
+                        <label for="tujuan_magang" class="block text-xs font-bold text-gray-700 mb-1">Tujuan PKL <span class="text-gray-400 font-normal">(Opsional)</span></label>
                         <textarea name="tujuan_magang" id="tujuan_magang" rows="3"
                             class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                            placeholder="Jelaskan tujuan dan capaian yang ingin diperoleh selama magang di BRMP Biogen...">{{ old('tujuan_magang') }}</textarea>
+                            placeholder="Jelaskan tujuan dan capaian yang ingin diperoleh selama PKL di BRMP Biogen (jika ada)...">{{ old('tujuan_magang') }}</textarea>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label for="nama_dosen_pembimbing" class="block text-xs font-bold text-gray-700 mb-1">Nama Dosen / Guru Pembimbing dari Kampus/Sekolah <span class="text-red-500">*</span></label>
+                            <label for="nama_dosen_pembimbing" class="block text-xs font-bold text-gray-700 mb-1">Nama Dosen / Guru Pembimbing dari Kampus/Sekolah <span class="text-gray-400 font-normal">(Opsional)</span></label>
                             <input type="text" name="nama_dosen_pembimbing" id="nama_dosen_pembimbing" value="{{ old('nama_dosen_pembimbing') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-xs"
-                                placeholder="Nama Dosen Pembimbing Lapangan beserta gelar">
+                                placeholder="Nama Dosen/Guru Pembimbing Lapangan beserta gelar">
                         </div>
 
                         <div>
@@ -461,7 +435,7 @@
                     <label for="syarat_ketentuan" class="text-xs text-gray-600 leading-relaxed cursor-pointer select-none">
                         Saya telah membaca, memahami, dan menyetujui seluruh isi
                         <button type="button" @click.prevent="$dispatch('open-modal', 'modal-syarat-ketentuan')" class="text-emerald-600 hover:underline font-bold focus:outline-none">
-                            Surat Pernyataan &amp; Ketentuan Magang BRMP Biogen
+                            Surat Pernyataan &amp; Ketentuan PKL BRMP Biogen
                         </button>
                         serta menyatakan data di atas adalah benar. <span class="text-red-500 font-bold">*</span>
                     </label>
@@ -487,7 +461,7 @@
         <div class="p-6">
             <h2 class="text-xl font-bold text-gray-800 border-b border-gray-100 pb-3 mb-4 font-sans flex items-center">
                 <svg class="w-6 h-6 me-2 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                Surat Pernyataan Peserta Magang/PKL
+                Surat Pernyataan Peserta PKL
             </h2>
             <div class="text-xs text-gray-700 space-y-3 max-h-[28rem] overflow-y-auto leading-relaxed pr-2">
                 <p class="font-bold text-gray-900 text-sm mb-3">Dengan ini menyatakan bahwa saya:</p>
@@ -509,7 +483,7 @@
                             2
                         </div>
                         <p class="text-xs text-gray-800 leading-relaxed font-medium">
-                            Tidak akan mempublikasikan data/informasi hasil Magang/PKL dalam bentuk apapun kecuali seizin BRMP Biogen.
+                            Tidak akan mempublikasikan data/informasi hasil PKL dalam bentuk apapun kecuali seizin BRMP Biogen.
                         </p>
                     </div>
 
@@ -519,7 +493,7 @@
                             3
                         </div>
                         <p class="text-xs text-gray-800 leading-relaxed font-medium">
-                            Akan menyelesaikan semua kewajiban dan mengembalikan semua pinjaman yang dilakukan sebelum meminta surat keterangan selesai Magang/PKL.
+                            Akan menyelesaikan semua kewajiban dan mengembalikan semua pinjaman yang dilakukan sebelum meminta surat keterangan selesai PKL.
                         </p>
                     </div>
 
@@ -529,7 +503,7 @@
                             4
                         </div>
                         <p class="text-xs text-gray-800 leading-relaxed font-medium">
-                            Akan menyerahkan laporan Magang/PKL kepada pembimbing dan bagian administrasi Kelompok Layanan Standar Instrumen BRMP Biogen sebanyak 1 (satu) rangkap sebagai persyaratan memperoleh surat keterangan selesai Magang/PKL.
+                            Akan menyerahkan laporan PKL kepada pembimbing dan bagian administrasi Kelompok Layanan Standar Instrumen BRMP Biogen sebanyak 1 (satu) rangkap sebagai persyaratan memperoleh surat keterangan selesai PKL.
                         </p>
                     </div>
 
@@ -539,7 +513,7 @@
                             5
                         </div>
                         <p class="text-xs text-gray-800 leading-relaxed font-medium">
-                            Tidak akan menuntut BRMP Biogen apabila terjadi sesuatu kecelakaan selama pelaksanaan Magang/PKL di BRMP Biogen yang mengakibatkan berbagai hal akibat dari kecelakaan tersebut.
+                            Tidak akan menuntut BRMP Biogen apabila terjadi sesuatu kecelakaan selama pelaksanaan PKL di BRMP Biogen yang mengakibatkan berbagai hal akibat dari kecelakaan tersebut.
                         </p>
                     </div>
 
@@ -549,7 +523,7 @@
                             6
                         </div>
                         <p class="text-xs text-gray-800 leading-relaxed font-medium">
-                            Akan menyerahkan sepenuhnya mengenai kepemilikan dan Hak Kekayaan Intelektual (HKI) kepada BRMP Biogen bilamana selama Magang/PKL dihasilkan sesuatu yang berkaitan dengan HKI.
+                            Akan menyerahkan sepenuhnya mengenai kepemilikan dan Hak Kekayaan Intelektual (HKI) kepada BRMP Biogen bilamana selama PKL dihasilkan sesuatu yang berkaitan dengan HKI.
                         </p>
                     </div>
 
@@ -609,9 +583,6 @@
                 { id: 'tahun_masuk', label: 'Tahun Masuk (Panel B)' },
                 { id: 'pendidikan_terakhir', label: 'Pendidikan Terakhir (Panel B)' },
                 { id: 'semester_saat_ini', label: 'Semester Saat Ini / Tahun (Panel B)' },
-                { id: 'judul_magang', label: 'Judul Magang / PKL (Panel C)' },
-                { id: 'tujuan_magang', label: 'Tujuan Magang / PKL (Panel C)' },
-                { id: 'nama_dosen_pembimbing', label: 'Nama Dosen / Guru Pembimbing (Panel C)' },
                 { id: 'kontak_darurat_nama', label: 'Nama Kontak Darurat (Panel D)' },
                 { id: 'kontak_darurat_no', label: 'Nomor Kontak Darurat (Panel D)' },
                 { id: 'hubungan_kontak_darurat', label: 'Hubungan Kontak Darurat (Panel D)' },
@@ -656,7 +627,7 @@
             const syarat = document.getElementById('syarat_ketentuan');
             const containerSyarat = document.getElementById('container-syarat-ketentuan');
             if (!syarat || !syarat.checked) {
-                showFloatingError('Anda wajib mencentang persetujuan Surat Pernyataan & Ketentuan Magang (Panel 7).', containerSyarat);
+                showFloatingError('Anda wajib mencentang persetujuan Surat Pernyataan & Ketentuan PKL (Panel 7).', containerSyarat);
                 return false;
             }
 

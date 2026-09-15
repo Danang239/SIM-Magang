@@ -61,24 +61,14 @@
                 </div>
             </div>
 
-            <!-- Deskripsi Singkat -->
+            <!-- Ruang Lingkup Bidang -->
             <div>
                 <label for="deskripsi" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Deskripsi Singkat Bidang <span class="text-red-500">*</span>
+                    Ruang Lingkup Bidang <span class="text-red-500">*</span>
                 </label>
-                <textarea name="deskripsi" id="deskripsi" rows="3" required
+                <textarea name="deskripsi" id="deskripsi" rows="4" required
                     class="w-full text-xs rounded-xl border border-gray-200 p-4 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none transition"
-                    placeholder="Jelaskan fokus utama kegiatan di laboratorium/divisi ini...">{{ old('deskripsi', $bidang->deskripsi) }}</textarea>
-            </div>
-
-            <!-- Jobdesc / Ruang Lingkup Kerja -->
-            <div>
-                <label for="jobdesc" class="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
-                    Jobdesc & Rincian Aktivitas Peserta
-                </label>
-                <textarea name="jobdesc" id="jobdesc" rows="5"
-                    class="w-full text-xs rounded-xl border border-gray-200 p-4 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none transition font-mono text-[11px]"
-                    placeholder="1. Ekstraksi DNA tanaman&#10;2. Pengoperasian alat PCR&#10;3. Analisis data gel elektroforesis">{{ old('jobdesc', $bidang->jobdesc) }}</textarea>
+                    placeholder="Jelaskan ruang lingkup kegiatan dan fokus utama di laboratorium/divisi ini...">{{ old('deskripsi', $bidang->deskripsi) }}</textarea>
             </div>
 
             <!-- Penugasan Pembimbing & Kuota Khusus -->

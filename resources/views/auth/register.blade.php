@@ -2,7 +2,7 @@
     <!-- Title -->
     <div class="mb-8">
         <h1 class="text-2xl font-extrabold text-gray-900 font-sans">Buat Akun Baru</h1>
-        <p class="text-gray-500 text-sm mt-1">Daftarkan diri Anda untuk mengakses program magang.</p>
+        <p class="text-gray-500 text-sm mt-1">Daftarkan diri Anda untuk mengakses program PKL.</p>
     </div>
 
     <!-- Register Form -->

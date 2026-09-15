@@ -19,7 +19,7 @@ class LaporanStatistikController extends Controller
 
         return Excel::download(
             new LaporanMagangExport($year),
-            "Laporan_Rekapitulasi_Tahunan_Magang_{$year}.xlsx"
+            "Laporan_Rekapitulasi_Tahunan_PKL_{$year}.xlsx"
         );
     }
 
@@ -32,7 +32,7 @@ class LaporanStatistikController extends Controller
 
         return Excel::download(
             new LaporanMagangExport($year),
-            "Laporan_Rekapitulasi_Tahunan_Magang_{$year}.csv",
+            "Laporan_Rekapitulasi_Tahunan_PKL_{$year}.csv",
             \Maatwebsite\Excel\Excel::CSV
         );
     }

@@ -164,7 +164,7 @@
                                             <p class="text-xs font-bold text-gray-800">Surat Balasan Resmi BRMP Biogen</p>
                                             <p class="text-[10px] text-gray-400">
                                                 @if($skmCompleted)
-                                                    Dokumen Penerimaan Magang Resmi
+                                                    Dokumen Penerimaan PKL Resmi
                                                 @else
                                                     Terkunci - Lengkapi Kuesioner SKM Terlebih Dahulu
                                                 @endif
@@ -194,7 +194,7 @@
                             <div class="bg-white rounded-2xl border border-gray-150 shadow-sm p-6 mt-6">
                                 <h3 class="font-bold text-gray-800 text-base mb-2 font-sans">Survei Kepuasan Masyarakat (IKM / SKM)</h3>
                                 <p class="text-xs text-gray-400 leading-relaxed mb-6">
-                                    Mohon berikan penilaian objektif Anda terhadap kualitas pelayanan magang/PKL BRMP Biogen untuk perbaikan sarana kami.
+                                    Mohon berikan penilaian objektif Anda terhadap kualitas pelayanan PKL BRMP Biogen untuk perbaikan sarana kami.
                                 </p>
 
                                 <form method="POST" action="{{ route('pengguna.pengajuan.skm.store', $pengajuan->public_id) }}" class="space-y-6">
@@ -241,7 +241,7 @@
                                     Terima Kasih Atas Partisipasi Anda!
                                 </h3>
                                 <p class="text-xs text-emerald-700 mt-1.5 leading-relaxed">
-                                    Anda telah mengisi survei kepuasan masyarakat (SKM) untuk pengajuan magang ini. Masukan Anda sangat berharga bagi peningkatan pelayanan kami.
+                                    Anda telah mengisi survei kepuasan masyarakat (SKM) untuk pengajuan PKL ini. Masukan Anda sangat berharga bagi peningkatan pelayanan kami.
                                 </p>
                                 @if($pengajuan->skm_saran)
                                     <div class="mt-4 p-4 rounded-xl bg-white/70 border border-emerald-200/50 text-xs text-emerald-900">
@@ -309,16 +309,17 @@
                         </div>
                     </div>
 
-                    <!-- Cancel Application Button (Conditional) --                    @php
+                    <!-- Cancel Application Button (Conditional) -->
+                    @php
                         $cancellable = in_array($pengajuan->status, ['Menunggu Verifikasi', 'Disetujui', 'Terjadwal']);
                     @endphp
                     @if($cancellable)
                         <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 text-center">
                             <h4 class="font-bold text-sm text-gray-700 mb-2">Batalkan Pengajuan?</h4>
-                            <p class="text-xs text-gray-400 leading-relaxed mb-4">Anda masih bisa membatalkan pengajuan ini sebelum status beralih ke "Sedang Magang".</p>
+                            <p class="text-xs text-gray-400 leading-relaxed mb-4">Anda masih bisa membatalkan pengajuan ini sebelum status beralih ke pelaksanaan aktif.</p>
                             
                             <form method="POST" action="{{ route('pengguna.pengajuan.cancel', $pengajuan->public_id) }}" 
-                                onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan magang ini? Tindakan ini tidak dapat dibatalkan.');">
+                                onsubmit="return confirm('Apakah Anda yakin ingin membatalkan pengajuan PKL ini? Tindakan ini tidak dapat dibatalkan.');">
                                 @csrf
                                 <button type="submit" class="w-full bg-red-50 hover:bg-red-100 text-red-650 text-xs font-bold py-2.5 rounded-xl border border-red-200 transition-colors">
                                     Batalkan Pengajuan
@@ -334,8 +335,8 @@
                                 <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-3 text-amber-500">
                                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                                 </div>
-                                <h4 class="font-bold text-sm text-gray-805 mb-2">Lengkapi Persyaratan Magang</h4>
-                                <p class="text-xs text-gray-400 leading-relaxed mb-4">Pengajuan Anda telah disetujui. Lengkapi kuesioner di bawah ini agar jadwal magang Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>.</p>
+                                <h4 class="font-bold text-sm text-gray-805 mb-2">Lengkapi Persyaratan PKL</h4>
+                                <p class="text-xs text-gray-400 leading-relaxed mb-4">Pengajuan Anda telah disetujui. Lengkapi kuesioner di bawah ini agar jadwal PKL Anda resmi diaktifkan dan status berubah menjadi <strong>Terjadwal</strong>.</p>
                                 
                                 <div class="space-y-3">
                                     <a href="{{ route('pengguna.gate.skm', $pengajuan->id) }}" class="block w-full bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold py-2.5 rounded-xl transition shadow-sm">

@@ -60,7 +60,7 @@
                         </div>
                         <div class="bg-gray-50/80 p-3 rounded-xl border border-gray-150 sm:col-span-2">
                             <p class="text-gray-400 font-medium">Pekerjaan</p>
-                            <p class="font-bold text-gray-800 mt-0.5 text-sm">Siswa / Mahasiswa (Peserta Magang)</p>
+                            <p class="font-bold text-gray-800 mt-0.5 text-sm">Siswa / Mahasiswa (Peserta PKL)</p>
                         </div>
                     </div>
 
@@ -145,7 +145,7 @@
                             </label>
                             <textarea id="skm_saran" name="skm_saran" rows="3"
                                 class="w-full rounded-xl border border-gray-200 text-sm text-gray-800 px-4 py-3 focus:ring-2 focus:ring-biogen-medium focus:border-biogen-medium outline-none resize-none transition"
-                                placeholder="Tuliskan saran atau masukan Anda untuk perbaikan layanan magang BRMP Biogen..."
+                                placeholder="Tuliskan saran atau masukan Anda untuk perbaikan layanan PKL BRMP Biogen..."
                                 maxlength="2000">{{ old('skm_saran') }}</textarea>
                             <x-input-error :messages="$errors->get('skm_saran')" class="mt-1" />
                         </div>

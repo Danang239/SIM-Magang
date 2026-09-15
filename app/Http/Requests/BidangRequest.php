@@ -22,7 +22,6 @@ class BidangRequest extends FormRequest
         return [
             'nama_bidang' => ['required', 'string', 'max:255'],
             'deskripsi' => ['required', 'string', 'max:2000'],
-            'jobdesc' => ['nullable', 'string', 'max:4000'],
             'jenjang' => ['required', 'string', 'in:Siswa,Mahasiswa'],
             'kategori' => ['required', 'string', 'in:Mahasiswa,Siswa'],
             'pembimbing_ids' => ['nullable', 'array'],
@@ -43,8 +42,8 @@ class BidangRequest extends FormRequest
         return [
             'nama_bidang.required' => 'Nama bidang penempatan wajib diisi.',
             'nama_bidang.max' => 'Nama bidang maksimal 255 karakter.',
-            'deskripsi.required' => 'Deskripsi bidang penempatan wajib diisi.',
-            'deskripsi.max' => 'Deskripsi bidang maksimal 2000 karakter.',
+            'deskripsi.required' => 'Ruang lingkup bidang penempatan wajib diisi.',
+            'deskripsi.max' => 'Ruang lingkup bidang maksimal 2000 karakter.',
             'jenjang.required' => 'Jenjang pendidikan wajib dipilih.',
             'jenjang.in' => 'Jenjang pendidikan hanya boleh Siswa atau Mahasiswa.',
             'kapasitas.integer' => 'Kapasitas kuota harus berupa angka.',

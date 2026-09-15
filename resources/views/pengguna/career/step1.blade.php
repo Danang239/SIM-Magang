@@ -3,7 +3,7 @@
         <div class="max-w-4xl mx-auto mt-10">
             <!-- Header -->
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">Daftar Program Magang & PKL</h1>
+                <h1 class="text-3xl font-extrabold text-gray-900 font-sans tracking-tight">Daftar Program PKL</h1>
                 <p class="text-gray-500 text-sm mt-1">BRMP Biogen — Kementerian Pertanian RI</p>
             </div>
 
@@ -40,7 +40,7 @@
 
             <!-- Form -->
             <form method="POST" action="{{ route('pengguna.career.step1.store') }}" id="formStep1"
-                x-data='kalenderMagang({
+                x-data='kalenderPKL({
                     kalender: @json($kalender),
                     durasiBulan: {{ old('durasi_bulan', $step1Data['durasi_bulan'] ?? 2) }},
                     apiUrl: "{{ route('pengguna.career.api.kuota', $bidang->id) }}"
@@ -54,7 +54,7 @@
                     <!-- Left: Inputs -->
                     <div class="md:col-span-1 bg-white rounded-2xl border border-gray-150 shadow-sm p-6 space-y-6">
                         <div>
-                            <label for="durasi_bulan" class="block text-sm font-bold text-gray-700 mb-2">Durasi Magang</label>
+                            <label for="durasi_bulan" class="block text-sm font-bold text-gray-700 mb-2">Durasi PKL</label>
                             <select name="durasi_bulan" id="durasi_bulan" 
                                 x-model="durasiBulan"
                                 @change="watchDurasi()"
@@ -69,23 +69,95 @@
 
                         <div>
                             <label for="keahlian" class="block text-sm font-bold text-gray-700 mb-2">Keahlian / Kompetensi</label>
-                            <textarea name="keahlian" id="keahlian" rows="5"
+                            <textarea name="keahlian" id="keahlian" rows="4"
                                 class="w-full rounded-xl border-gray-300 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 text-sm"
                                 placeholder="Sebutkan keahlian, kompetensi, atau bidang riset yang Anda minati terkait bidang ini...">{{ old('keahlian', $step1Data['keahlian'] ?? '') }}</textarea>
+                        </div>
+
+                        <!-- Panduan Indikator Warna Kalender -->
+                        <div class="pt-4 border-t border-gray-150 space-y-3">
+                            <h3 class="text-xs font-bold text-gray-700 uppercase tracking-wider flex items-center">
+                                <svg class="w-4 h-4 mr-1.5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                <span>Panduan Warna Kalender</span>
+                            </h3>
+                            
+                            <div class="space-y-2 text-xs">
+                                <!-- Hijau (Tersedia) -->
+                                <div class="p-2.5 rounded-xl bg-emerald-50/90 border border-emerald-200 flex items-start space-x-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-emerald-500 shrink-0 mt-0.5 shadow-xs"></span>
+                                    <div>
+                                        <p class="font-bold text-emerald-950">Hijau (Tersedia)</p>
+                                        <p class="text-[11px] text-emerald-800 leading-snug mt-0.5">
+                                            Slot kuota terbuka dan sudah memenuhi jeda minimal 14 hari verifikasi. Anda bebas memilih tanggal ini sebagai awal PKL.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Merah (Penuh) -->
+                                <div class="p-2.5 rounded-xl bg-red-50/90 border border-red-200 flex items-start space-x-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-red-500 shrink-0 mt-0.5 shadow-xs"></span>
+                                    <div>
+                                        <p class="font-bold text-red-950">Merah (Slot Penuh)</p>
+                                        <p class="text-[11px] text-red-800 leading-snug mt-0.5">
+                                            Kapasitas pembimbing pada rentang waktu ini sedang terisi penuh oleh peserta lain.
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Abu-Abu (Jeda Verifikasi) -->
+                                <div class="p-2.5 rounded-xl bg-gray-50 border border-gray-200 flex items-start space-x-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-gray-400 shrink-0 mt-0.5 shadow-xs"></span>
+                                    <div>
+                                        <p class="font-bold text-gray-800">Abu-Abu (Jeda 14 Hari)</p>
+                                        <p class="text-[11px] text-gray-600 leading-snug mt-0.5">
+                                            Masa persiapan administrasi dan verifikasi berkas oleh admin sejak tanggal pendaftaran (terkunci otomatis).
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <!-- Hijau Tua (Dipilih) -->
+                                <div class="p-2.5 rounded-xl bg-emerald-100/70 border border-emerald-300 flex items-start space-x-2.5">
+                                    <span class="w-3.5 h-3.5 rounded-md bg-emerald-700 shrink-0 mt-0.5 ring-2 ring-emerald-600 ring-offset-1"></span>
+                                    <div>
+                                        <p class="font-bold text-emerald-950">Dipilih</p>
+                                        <p class="text-[11px] text-emerald-800 leading-snug mt-0.5">
+                                            Tanggal mulai PKL yang saat ini sedang Anda tentukan.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                     <!-- Right: Calendar -->
                     <div id="container-kalender" class="md:col-span-2 bg-white rounded-2xl border border-gray-150 shadow-sm p-6 flex flex-col justify-between transition-all duration-300">
-                        <div>
-                            <div class="flex items-center justify-between mb-6">
-                                <h2 class="text-base font-bold text-gray-800 font-sans">Pilih Tanggal Mulai Magang <span class="text-red-500">*</span></h2>
-                                <div class="flex items-center space-x-3 text-[10px] font-semibold">
-                                    <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-sm bg-green-100 border border-green-200"></span><span class="text-gray-500">Tersedia</span></span>
-                                    <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-sm bg-red-50 border border-red-100"></span><span class="text-gray-500">Penuh</span></span>
-                                    <span class="flex items-center space-x-1"><span class="w-3 h-3 rounded-sm bg-emerald-600 border border-emerald-700"></span><span class="text-gray-500">Dipilih</span></span>
+                            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6">
+                                <h2 class="text-base font-bold text-gray-800 font-sans">Pilih Tanggal Mulai PKL <span class="text-red-500">*</span></h2>
+                                <div class="flex flex-wrap items-center gap-2.5 text-[10px] font-semibold">
+                                    <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-100 border border-emerald-300"></span><span class="text-gray-600">Tersedia</span></span>
+                                    <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-sm bg-red-100 border border-red-300"></span><span class="text-gray-600">Penuh</span></span>
+                                    <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-sm bg-gray-100 border border-gray-300"></span><span class="text-gray-600">Jeda Verifikasi (14 Hari)</span></span>
+                                    <span class="flex items-center space-x-1.5"><span class="w-3 h-3 rounded-sm bg-emerald-600 border border-emerald-700"></span><span class="text-gray-600">Dipilih</span></span>
                                 </div>
                             </div>
+
+                            @php
+                                $adaTanggalTersedia = collect($kalender)->where('tipe', 'tersedia')->count() > 0;
+                            @endphp
+
+                            @if(!$adaTanggalTersedia)
+                                <div class="mb-4 p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-start space-x-3 text-xs text-red-900">
+                                    <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                                    </svg>
+                                    <div>
+                                        <p class="font-bold">Seluruh Kuota Periode Ini Penuh</p>
+                                        <p class="mt-0.5 text-red-800 leading-relaxed">
+                                            Seluruh slot kuota pada pembimbing ini telah terisi penuh hingga 4 bulan ke depan. Belum ada slot pendaftaran yang dapat dipilih pada rentang kalender ini.
+                                        </p>
+                                    </div>
+                                </div>
+                            @endif
 
                             <!-- Calendar Navigation -->
                             <div class="flex items-center justify-between mb-4">
@@ -117,13 +189,14 @@
                                         @click="pilihTanggal(formatTanggal(currentYear, currentMonth, day))"
                                         :disabled="!isAvailable(formatTanggal(currentYear, currentMonth, day))"
                                         :class="{
-                                            'bg-emerald-600 text-white shadow-md': selectedDate === formatTanggal(currentYear, currentMonth, day),
-                                            'bg-green-100 hover:bg-green-200 text-green-800': selectedDate !== formatTanggal(currentYear, currentMonth, day) && isAvailable(formatTanggal(currentYear, currentMonth, day)) && !isFull(formatTanggal(currentYear, currentMonth, day)),
-                                            'bg-red-50 text-red-300 cursor-not-allowed': isFull(formatTanggal(currentYear, currentMonth, day)) && selectedDate !== formatTanggal(currentYear, currentMonth, day),
-                                            'text-gray-300 cursor-not-allowed': !isAvailable(formatTanggal(currentYear, currentMonth, day)) && !isFull(formatTanggal(currentYear, currentMonth, day)),
+                                            'bg-emerald-600 text-white font-bold shadow-md ring-2 ring-emerald-500 ring-offset-1': selectedDate === formatTanggal(currentYear, currentMonth, day),
+                                            'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 font-bold hover:scale-105 cursor-pointer': selectedDate !== formatTanggal(currentYear, currentMonth, day) && isAvailable(formatTanggal(currentYear, currentMonth, day)),
+                                            'bg-red-50 text-red-400 border border-red-200 cursor-not-allowed': selectedDate !== formatTanggal(currentYear, currentMonth, day) && isFull(formatTanggal(currentYear, currentMonth, day)),
+                                            'bg-gray-100 text-gray-400 border border-gray-200 cursor-not-allowed': selectedDate !== formatTanggal(currentYear, currentMonth, day) && isJedaVerifikasi(formatTanggal(currentYear, currentMonth, day)),
+                                            'text-gray-300 cursor-not-allowed bg-transparent': selectedDate !== formatTanggal(currentYear, currentMonth, day) && isLampau(formatTanggal(currentYear, currentMonth, day)),
                                         }"
-                                        class="w-full aspect-square rounded-lg text-xs font-semibold transition-all duration-150 flex flex-col items-center justify-center"
-                                        :title="isFull(formatTanggal(currentYear, currentMonth, day)) ? 'Slot penuh' : (!isAvailable(formatTanggal(currentYear, currentMonth, day)) ? 'Tanggal tidak tersedia' : 'Klik untuk pilih')"
+                                        class="w-full aspect-square rounded-lg text-xs transition-all duration-150 flex flex-col items-center justify-center"
+                                        :title="getTooltip(formatTanggal(currentYear, currentMonth, day))"
                                         x-text="day">
                                     </button>
                                 </template>
@@ -163,7 +236,7 @@
     </div>
 
     <script>
-    function kalenderMagang({ kalender, durasiBulan, apiUrl }) {
+    function kalenderPKL({ kalender, durasiBulan, apiUrl }) {
         return {
             kalender,
             durasiBulan,
@@ -217,16 +290,35 @@
             },
 
             isAvailable(tanggalStr) {
-                return this.kalender[tanggalStr] !== undefined;
+                const info = this.kalender[tanggalStr];
+                return info && info.tersedia === true;
             },
 
             isFull(tanggalStr) {
                 const info = this.kalender[tanggalStr];
-                return info && !info.tersedia;
+                return info && info.tipe === 'penuh';
+            },
+
+            isJedaVerifikasi(tanggalStr) {
+                const info = this.kalender[tanggalStr];
+                return info && info.tipe === 'jeda_verifikasi';
+            },
+
+            isLampau(tanggalStr) {
+                const info = this.kalender[tanggalStr];
+                return !info || info.tipe === 'lampau';
+            },
+
+            getTooltip(tanggalStr) {
+                const info = this.kalender[tanggalStr];
+                if (!info || info.tipe === 'lampau') return 'Tanggal sudah lewat';
+                if (info.tipe === 'jeda_verifikasi') return 'Masa jeda verifikasi berkas (14 hari)';
+                if (info.tipe === 'penuh') return `Slot Penuh (${info.terisi}/${info.kapasitas} terisi)`;
+                return `Tersedia (${info.slot_sisa} slot sisa) — Klik untuk memilih`;
             },
 
             pilihTanggal(tanggalStr) {
-                if (!this.isAvailable(tanggalStr) || this.isFull(tanggalStr)) return;
+                if (!this.isAvailable(tanggalStr)) return;
                 this.selectedDate = tanggalStr;
                 document.getElementById('inputTanggalMulai').value = tanggalStr;
             },
@@ -249,7 +341,7 @@
                     .then(res => res.json())
                     .then(data => {
                         this.kalender = data;
-                        if (this.selectedDate && (!this.isAvailable(this.selectedDate) || this.isFull(this.selectedDate))) {
+                        if (this.selectedDate && !this.isAvailable(this.selectedDate)) {
                             this.selectedDate = null;
                             document.getElementById('inputTanggalMulai').value = '';
                         }
@@ -268,7 +360,7 @@
         const tgl = document.getElementById('inputTanggalMulai').value;
         const containerKalender = document.getElementById('container-kalender');
         if (!tgl) {
-            showFloatingError('Silakan pilih salah satu Tanggal Mulai Magang yang masih tersedia pada kalender.', containerKalender);
+            showFloatingError('Silakan pilih salah satu Tanggal Mulai PKL yang masih tersedia pada kalender.', containerKalender);
             return;
         }
 

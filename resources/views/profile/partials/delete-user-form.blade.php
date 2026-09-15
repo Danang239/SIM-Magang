@@ -6,7 +6,7 @@
         </h2>
 
         <p class="mt-1 text-xs text-gray-500 leading-relaxed">
-            {{ __('Setelah akun Anda dihapus, semua data profil, histori pendaftaran magang, dan berkas terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.') }}
+            {{ __('Setelah akun Anda dihapus, semua data profil, histori pendaftaran PKL, dan berkas terkait akan dihapus secara permanen. Tindakan ini tidak dapat dibatalkan.') }}
         </p>
     </header>
 

@@ -76,6 +76,8 @@ Route::middleware(['auth', 'role:Administrator'])->prefix('admin')->name('admin.
     Route::get('/riwayat-pengajuan', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'index'])->name('riwayat-pengajuan.index');
     Route::get('/riwayat-pengajuan/{public_id}', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'show'])->name('riwayat-pengajuan.show');
     Route::post('/riwayat-pengajuan/{public_id}/verifikasi', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'verifikasi'])->name('riwayat-pengajuan.verifikasi');
+    Route::get('/riwayat-pengajuan/{public_id}/export-pdf', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'exportPdf'])->name('riwayat-pengajuan.export-pdf');
+    Route::get('/riwayat-pengajuan/{public_id}/export-word', [\App\Http\Controllers\Admin\RiwayatPengajuanController::class, 'exportWord'])->name('riwayat-pengajuan.export-word');
 
     // Master Data Pembimbing
     Route::resource('/pembimbing', \App\Http\Controllers\Admin\PembimbingController::class)->except(['show']);
